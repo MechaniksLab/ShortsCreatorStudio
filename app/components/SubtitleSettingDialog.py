@@ -14,13 +14,13 @@ class SubtitleSettingDialog(MessageBoxBase):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.titleLabel = BodyLabel(self.tr("字幕设置"), self)
+        self.titleLabel = BodyLabel("Параметры субтитров", self)
 
         # 创建设置卡片
         self.split_card = SwitchSettingCard(
             FIF.ALIGNMENT,
-            self.tr("字幕分割"),
-            self.tr("字幕是否使用大语言模型进行智能断句"),
+            "Разделение субтитров",
+            "Использовать LLM для умного разбиения субтитров",
             cfg.need_split,
             self,
         )
@@ -28,17 +28,17 @@ class SubtitleSettingDialog(MessageBoxBase):
         self.split_type_card = ComboBoxSettingCard(
             cfg.split_type,
             FIF.TILES,
-            self.tr("字幕分割类型"),
-            self.tr("根据句子或者根据语义对字幕进行断句"),
-            texts=[model.value for model in cfg.split_type.validator.options],
+            "Тип разбиения",
+            "Разбивать по смыслу или по предложениям",
+            texts=["По смыслу", "По предложениям"],
             parent=self,
         )
 
         self.word_count_cjk_card = SpinBoxSettingCard(
             cfg.max_word_count_cjk,
             FIF.TILES,
-            self.tr("中文最大字数"),
-            self.tr("单条字幕的最大字数 (对于中日韩等字符)"),
+            "Макс. символов CJK",
+            "Максимум символов в одной строке (китайский/японский/корейский)",
             minimum=8,
             maximum=50,
             parent=self,
@@ -47,8 +47,8 @@ class SubtitleSettingDialog(MessageBoxBase):
         self.word_count_english_card = SpinBoxSettingCard(
             cfg.max_word_count_english,
             FIF.TILES,
-            self.tr("英文最大单词数"),
-            self.tr("单条字幕的最大单词数 (英文)"),
+            "Макс. слов (английский)",
+            "Максимум слов в одной строке для английского",
             minimum=8,
             maximum=50,
             parent=self,
@@ -56,8 +56,8 @@ class SubtitleSettingDialog(MessageBoxBase):
 
         self.remove_punctuation_card = SwitchSettingCard(
             FIF.ALIGNMENT,
-            self.tr("去除末尾标点符号"),
-            self.tr("是否去除中文字幕中的末尾标点符号"),
+            "Убирать конечную пунктуацию",
+            "Удалять знаки препинания в конце строк",
             cfg.needs_remove_punctuation,
             self,
         )
@@ -74,8 +74,8 @@ class SubtitleSettingDialog(MessageBoxBase):
         self.viewLayout.setSpacing(10)
 
         # 设置窗口标题
-        self.setWindowTitle(self.tr("字幕设置"))
+        self.setWindowTitle("Параметры субтитров")
 
         # 只显示取消按钮
         self.yesButton.hide()
-        self.cancelButton.setText(self.tr("关闭"))
+        self.cancelButton.setText("Закрыть")

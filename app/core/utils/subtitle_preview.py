@@ -59,6 +59,22 @@ def generate_ass_file(
     """生成临时 ASS 文件"""
     original_text, translate_text = preview_text
 
+    def _extract_style_blur(styles_text: str, style_name: str) -> float:
+        if not styles_text:
+            return 0.0
+        import re
+
+        m = re.search(rf";VC_BLUR:{re.escape(style_name)}=([0-9.]+)", styles_text)
+        if not m:
+            return 0.0
+        try:
+            return float(m.group(1))
+        except ValueError:
+            return 0.0
+
+    default_blur = _extract_style_blur(style_str, "Default")
+    secondary_blur = _extract_style_blur(style_str, "Secondary")
+
     preview_start_ms = 0
     preview_end_ms = 1000
     original_text = EffectManager.apply_ass_effect(
@@ -81,6 +97,11 @@ def generate_ass_file(
         rainbow_end_color,
         1,
     )
+
+    if original_text and default_blur > 0:
+        original_text = f"{{\\blur{default_blur}}}{original_text}"
+    if translated_text and secondary_blur > 0:
+        translated_text = f"{{\\blur{secondary_blur}}}{translated_text}"
 
     dialogue = (
         [

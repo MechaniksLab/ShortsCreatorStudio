@@ -320,6 +320,13 @@ class SubtitleStyleInterface(QWidget):
             decimals=1,
         )
 
+        self.mainShadowColorCard = ColorSettingCard(
+            QColor(0, 0, 0, 160),
+            FIF.PALETTE,
+            "Цвет тени (основной)",
+            "Цвет тени основного текста",
+        )
+
         self.mainBlurCard = DoubleSpinBoxSettingCard(
             FIF.HIGHTLIGHT,
             "Свечение/размытие (основной)",
@@ -386,6 +393,13 @@ class SubtitleStyleInterface(QWidget):
             decimals=1,
         )
 
+        self.subShadowColorCard = ColorSettingCard(
+            QColor(0, 0, 0, 160),
+            FIF.PALETTE,
+            "Цвет тени (доп.)",
+            "Цвет тени дополнительного текста",
+        )
+
         self.subBlurCard = DoubleSpinBoxSettingCard(
             FIF.HIGHTLIGHT,
             "Свечение/размытие (доп.)",
@@ -436,6 +450,7 @@ class SubtitleStyleInterface(QWidget):
         self.mainGroup.addSettingCard(self.mainOutlineColorCard)
         self.mainGroup.addSettingCard(self.mainOutlineSizeCard)
         self.mainGroup.addSettingCard(self.mainShadowCard)
+        self.mainGroup.addSettingCard(self.mainShadowColorCard)
         self.mainGroup.addSettingCard(self.mainBlurCard)
 
         self.subGroup.addSettingCard(self.subFontCard)
@@ -445,6 +460,7 @@ class SubtitleStyleInterface(QWidget):
         self.subGroup.addSettingCard(self.subOutlineColorCard)
         self.subGroup.addSettingCard(self.subOutlineSizeCard)
         self.subGroup.addSettingCard(self.subShadowCard)
+        self.subGroup.addSettingCard(self.subShadowColorCard)
         self.subGroup.addSettingCard(self.subBlurCard)
 
         self.previewGroup.addSettingCard(self.previewTextCard)
@@ -569,6 +585,7 @@ class SubtitleStyleInterface(QWidget):
         self.mainOutlineColorCard.colorChanged.connect(self.onSettingChanged)
         self.mainOutlineSizeCard.spinBox.valueChanged.connect(self.onSettingChanged)
         self.mainShadowCard.spinBox.valueChanged.connect(self.onSettingChanged)
+        self.mainShadowColorCard.colorChanged.connect(self.onSettingChanged)
         self.mainBlurCard.spinBox.valueChanged.connect(self.onSettingChanged)
 
         # 副字幕样式
@@ -579,6 +596,7 @@ class SubtitleStyleInterface(QWidget):
         self.subOutlineColorCard.colorChanged.connect(self.onSettingChanged)
         self.subOutlineSizeCard.spinBox.valueChanged.connect(self.onSettingChanged)
         self.subShadowCard.spinBox.valueChanged.connect(self.onSettingChanged)
+        self.subShadowColorCard.colorChanged.connect(self.onSettingChanged)
         self.subBlurCard.spinBox.valueChanged.connect(self.onSettingChanged)
 
         # 预览设置
@@ -653,6 +671,14 @@ class SubtitleStyleInterface(QWidget):
         """生成 ASS 样式字符串"""
         style_format = "Format: Name,Fontname,Fontsize,PrimaryColour,SecondaryColour,OutlineColour,BackColour,Bold,Italic,Underline,StrikeOut,ScaleX,ScaleY,Spacing,Angle,BorderStyle,Outline,Shadow,Alignment,MarginL,MarginR,MarginV,Encoding"
 
+        def _qcolor_to_ass(color: QColor, with_alpha: bool = True) -> str:
+            r, g, b, a = color.getRgb()
+            # Qt хранит alpha как непрозрачность (0=прозрачный, 255=непрозрачный),
+            # а ASS хранит alpha как прозрачность (00=непрозрачный, FF=прозрачный)
+            ass_alpha = 255 - a if with_alpha else 0
+            aa = f"{ass_alpha:02X}"
+            return f"&H{aa}{b:02X}{g:02X}{r:02X}"
+
         # 从控件获取当前设置
         # 获取垂直间距
         vertical_spacing = int(
@@ -675,6 +701,7 @@ class SubtitleStyleInterface(QWidget):
         main_spacing = self.mainSpacingCard.spinBox.value()
         main_outline_size = self.mainOutlineSizeCard.spinBox.value()
         main_shadow = self.mainShadowCard.spinBox.value()
+        main_shadow_color = _qcolor_to_ass(self.mainShadowColorCard.colorPicker.color)
         main_blur = self.mainBlurCard.spinBox.value()
 
         # 提取副字幕样式元素
@@ -691,13 +718,24 @@ class SubtitleStyleInterface(QWidget):
         sub_spacing = self.subSpacingCard.spinBox.value()
         sub_outline_size = self.subOutlineSizeCard.spinBox.value()
         sub_shadow = self.subShadowCard.spinBox.value()
+        sub_shadow_color = _qcolor_to_ass(self.subShadowColorCard.colorPicker.color)
         sub_blur = self.subBlurCard.spinBox.value()
 
         # 生成样式字符串
-        main_style = f"Style: Default,{main_font},{main_size},{main_color},&H000000FF,{main_outline_color},&H00000000,-1,0,0,0,100,100,{main_spacing},0,1,{main_outline_size},{main_shadow},2,10,10,{vertical_spacing},1,\\q1\\blur{main_blur}"
-        sub_style = f"Style: Secondary,{sub_font},{sub_size},{sub_color},&H000000FF,{sub_outline_color},&H00000000,-1,0,0,0,100,100,{sub_spacing},0,1,{sub_outline_size},{sub_shadow},2,10,10,{vertical_spacing},1,\\q1\\blur{sub_blur}"
+        # В ASS нет отдельного поля blur в строке Style, поэтому храним его
+        # как комментарии вида ;VC_BLUR:StyleName=value и применяем в Dialogue.
+        main_style = f"Style: Default,{main_font},{main_size},{main_color},&H000000FF,{main_outline_color},{main_shadow_color},-1,0,0,0,100,100,{main_spacing},0,1,{main_outline_size},{main_shadow},2,10,10,{vertical_spacing},1"
+        sub_style = f"Style: Secondary,{sub_font},{sub_size},{sub_color},&H000000FF,{sub_outline_color},{sub_shadow_color},-1,0,0,0,100,100,{sub_spacing},0,1,{sub_outline_size},{sub_shadow},2,10,10,{vertical_spacing},1"
 
-        return f"[V4+ Styles]\n{style_format}\n{main_style}\n{sub_style}"
+        extras = [
+            f";VC_BLUR:Default={main_blur}",
+            f";VC_BLUR:Secondary={sub_blur}",
+        ]
+
+        return (
+            f"[V4+ Styles]\n{style_format}\n{main_style}\n{sub_style}\n"
+            + "\n".join(extras)
+        )
 
     def updatePreview(self):
         """更新预览图片"""
@@ -846,7 +884,7 @@ class SubtitleStyleInterface(QWidget):
                 if primary_color.startswith("&H"):
                     # 移除 &H 前缀,转换为 RGB
                     color_hex = primary_color[2:]
-                    alpha = int(color_hex[0:2], 16)
+                    alpha = 255 - int(color_hex[0:2], 16)
                     blue = int(color_hex[2:4], 16)
                     green = int(color_hex[4:6], 16)
                     red = int(color_hex[6:8], 16)
@@ -855,16 +893,27 @@ class SubtitleStyleInterface(QWidget):
                 outline_color = parts[5].strip()
                 if outline_color.startswith("&H"):
                     color_hex = outline_color[2:]
-                    alpha = int(color_hex[0:2], 16)
+                    alpha = 255 - int(color_hex[0:2], 16)
                     blue = int(color_hex[2:4], 16)
                     green = int(color_hex[4:6], 16)
                     red = int(color_hex[6:8], 16)
                     self.mainOutlineColorCard.setColor(QColor(red, green, blue, alpha))
 
+                shadow_color = parts[6].strip()
+                if shadow_color.startswith("&H") and len(shadow_color) >= 10:
+                    color_hex = shadow_color[2:]
+                    alpha = 255 - int(color_hex[0:2], 16)
+                    blue = int(color_hex[2:4], 16)
+                    green = int(color_hex[4:6], 16)
+                    red = int(color_hex[6:8], 16)
+                    self.mainShadowColorCard.setColor(QColor(red, green, blue, alpha))
+
                 self.mainSpacingCard.spinBox.setValue(float(parts[13]))
                 self.mainOutlineSizeCard.spinBox.setValue(float(parts[16]))
                 self.mainShadowCard.spinBox.setValue(float(parts[17]))
-                blur_match = re.search(r"\\blur([0-9.]+)", parts[23])
+                blur_match = re.search(r";VC_BLUR:Default=([0-9.]+)", style_content)
+                if not blur_match:
+                    blur_match = re.search(r"#EXTRAS:blur=([0-9.]+)", style_content)
                 self.mainBlurCard.spinBox.setValue(
                     float(blur_match.group(1)) if blur_match else 0.0
                 )
@@ -877,7 +926,7 @@ class SubtitleStyleInterface(QWidget):
                 primary_color = parts[3].strip()
                 if primary_color.startswith("&H"):
                     color_hex = primary_color[2:]
-                    alpha = int(color_hex[0:2], 16)
+                    alpha = 255 - int(color_hex[0:2], 16)
                     blue = int(color_hex[2:4], 16)
                     green = int(color_hex[4:6], 16)
                     red = int(color_hex[6:8], 16)
@@ -886,16 +935,27 @@ class SubtitleStyleInterface(QWidget):
                 outline_color = parts[5].strip()
                 if outline_color.startswith("&H"):
                     color_hex = outline_color[2:]
-                    alpha = int(color_hex[0:2], 16)
+                    alpha = 255 - int(color_hex[0:2], 16)
                     blue = int(color_hex[2:4], 16)
                     green = int(color_hex[4:6], 16)
                     red = int(color_hex[6:8], 16)
                     self.subOutlineColorCard.setColor(QColor(red, green, blue, alpha))
 
+                shadow_color = parts[6].strip()
+                if shadow_color.startswith("&H") and len(shadow_color) >= 10:
+                    color_hex = shadow_color[2:]
+                    alpha = 255 - int(color_hex[0:2], 16)
+                    blue = int(color_hex[2:4], 16)
+                    green = int(color_hex[4:6], 16)
+                    red = int(color_hex[6:8], 16)
+                    self.subShadowColorCard.setColor(QColor(red, green, blue, alpha))
+
                 self.subSpacingCard.spinBox.setValue(float(parts[13]))
                 self.subOutlineSizeCard.spinBox.setValue(float(parts[16]))
                 self.subShadowCard.spinBox.setValue(float(parts[17]))
-                blur_match = re.search(r"\\blur([0-9.]+)", parts[23])
+                blur_match = re.search(r";VC_BLUR:Secondary=([0-9.]+)", style_content)
+                if not blur_match:
+                    blur_match = re.search(r"#EXTRAS:blur=([0-9.]+)", style_content)
                 self.subBlurCard.spinBox.setValue(
                     float(blur_match.group(1)) if blur_match else 0.0
                 )

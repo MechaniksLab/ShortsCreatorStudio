@@ -364,6 +364,29 @@ class ASRData:
 
         from app.core.subtitle_processor.effect_manager import EffectManager
 
+        def _extract_style_blur(styles_text: str, style_name: str) -> float:
+            if not styles_text:
+                return 0.0
+            pattern = rf";VC_BLUR:{re.escape(style_name)}=([0-9.]+)"
+            m = re.search(pattern, styles_text)
+            if m:
+                try:
+                    return float(m.group(1))
+                except ValueError:
+                    return 0.0
+            return 0.0
+
+        default_blur = _extract_style_blur(style_str, "Default")
+        secondary_blur = _extract_style_blur(style_str, "Secondary")
+
+        def _apply_style_overrides(text: str, style_name: str) -> str:
+            if not text:
+                return text
+            blur_value = default_blur if style_name == "Default" else secondary_blur
+            if blur_value > 0:
+                return f"{{\\blur{blur_value}}}{text}"
+            return text
+
         dialogue_template = "Dialogue: 0,{},{},{},,0,0,0,,{}\n"
         for idx, seg in enumerate(self.segments):
             start_time, end_time = seg.to_ass_ts()
@@ -396,35 +419,56 @@ class ASRData:
             if layout == "译文在上":
                 if has_translation:
                     ass_content += dialogue_template.format(
-                        start_time, end_time, "Secondary", original_effect_text
+                        start_time,
+                        end_time,
+                        "Secondary",
+                        _apply_style_overrides(original_effect_text, "Secondary"),
                     )
                     ass_content += dialogue_template.format(
-                        start_time, end_time, "Default", translated_effect_text
+                        start_time,
+                        end_time,
+                        "Default",
+                        _apply_style_overrides(translated_effect_text, "Default"),
                     )
                 else:
                     ass_content += dialogue_template.format(
-                        start_time, end_time, "Default", original_effect_text
+                        start_time,
+                        end_time,
+                        "Default",
+                        _apply_style_overrides(original_effect_text, "Default"),
                     )
             elif layout == "原文在上":
                 if has_translation:
                     ass_content += dialogue_template.format(
-                        start_time, end_time, "Secondary", translated_effect_text
+                        start_time,
+                        end_time,
+                        "Secondary",
+                        _apply_style_overrides(translated_effect_text, "Secondary"),
                     )
                     ass_content += dialogue_template.format(
-                        start_time, end_time, "Default", original_effect_text
+                        start_time,
+                        end_time,
+                        "Default",
+                        _apply_style_overrides(original_effect_text, "Default"),
                     )
                 else:
                     ass_content += dialogue_template.format(
-                        start_time, end_time, "Default", original_effect_text
+                        start_time,
+                        end_time,
+                        "Default",
+                        _apply_style_overrides(original_effect_text, "Default"),
                     )
             elif layout == "仅原文":
                 ass_content += dialogue_template.format(
-                    start_time, end_time, "Default", original_effect_text
+                    start_time,
+                    end_time,
+                    "Default",
+                    _apply_style_overrides(original_effect_text, "Default"),
                 )
             elif layout == "仅译文":
                 text = translated_effect_text if has_translation else original_effect_text
                 ass_content += dialogue_template.format(
-                    start_time, end_time, "Default", text
+                    start_time, end_time, "Default", _apply_style_overrides(text, "Default")
                 )
 
         if save_path:

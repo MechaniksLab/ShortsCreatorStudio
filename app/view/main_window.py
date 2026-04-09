@@ -60,9 +60,9 @@ class MainWindow(FluentWindow):
     def initNavigation(self):
         """初始化导航栏"""
         # 添加导航项
-        self.addSubInterface(self.homeInterface, FIF.HOME, self.tr("主页"))
-        self.addSubInterface(self.batchProcessInterface, FIF.VIDEO, self.tr("批量处理"))
-        self.addSubInterface(self.subtitleStyleInterface, FIF.FONT, self.tr("字幕样式"))
+        self.addSubInterface(self.homeInterface, FIF.HOME, "Главная")
+        self.addSubInterface(self.batchProcessInterface, FIF.VIDEO, "Пакетная обработка")
+        self.addSubInterface(self.subtitleStyleInterface, FIF.FONT, "Стиль субтитров")
 
         self.navigationInterface.addSeparator()
 
@@ -88,7 +88,7 @@ class MainWindow(FluentWindow):
         if interface.windowTitle():
             self.setWindowTitle(interface.windowTitle())
         else:
-            self.setWindowTitle(self.tr("卡卡字幕助手 -- VideoCaptioner"))
+            self.setWindowTitle("VideoCaptioner")
         self.stackedWidget.setCurrentWidget(interface, popOut=False)
 
     def initWindow(self):
@@ -96,7 +96,7 @@ class MainWindow(FluentWindow):
         self.resize(1050, 800)
         self.setMinimumWidth(700)
         self.setWindowIcon(QIcon(str(LOGO_PATH)))
-        self.setWindowTitle(self.tr("卡卡字幕助手 -- VideoCaptioner"))
+        self.setWindowTitle("VideoCaptioner")
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 
@@ -116,14 +116,14 @@ class MainWindow(FluentWindow):
     def onGithubDialog(self):
         """打开GitHub"""
         w = MessageBox(
-            self.tr("GitHub信息"),
-            self.tr(
-                "VideoCaptioner 由本人在课余时间独立开发完成，目前托管在GitHub上，欢迎Star和Fork。项目诚然还有很多地方需要完善，遇到软件的问题或者BUG欢迎提交Issue。\n\n https://github.com/WEIFENG2333/VideoCaptioner"
-            ),
+            "Информация о GitHub",
+            "VideoCaptioner разработан автором как независимый проект и размещён на GitHub."
+            " Буду рад вашим Star и Fork. Если столкнётесь с проблемами или багами —"
+            " пожалуйста, создайте Issue.\n\n https://github.com/WEIFENG2333/VideoCaptioner",
             self,
         )
-        w.yesButton.setText(self.tr("打开 GitHub"))
-        w.cancelButton.setText(self.tr("支持作者"))
+        w.yesButton.setText("Открыть GitHub")
+        w.cancelButton.setText("Поддержать автора")
         if w.exec():
             QDesktopServices.openUrl(QUrl(GITHUB_REPO_URL))
         else:
@@ -133,11 +133,11 @@ class MainWindow(FluentWindow):
 
     def onNewVersion(self, version, force_update, update_info, download_url):
         """新版本提示"""
-        title = "发现新版本" if not force_update else "当前版本已停用"
-        content = f"发现新版本 {version}\n\n{update_info}"
+        title = "Доступна новая версия" if not force_update else "Текущая версия отключена"
+        content = f"Найдена новая версия {version}\n\n{update_info}"
         w = MessageBox(title, content, self)
-        w.yesButton.setText("立即更新")
-        w.cancelButton.setText("稍后再说" if not force_update else "退出程序")
+        w.yesButton.setText("Обновить сейчас")
+        w.cancelButton.setText("Позже" if not force_update else "Выйти из программы")
         if w.exec():
             QDesktopServices.openUrl(QUrl(download_url))
         if force_update:
@@ -145,8 +145,8 @@ class MainWindow(FluentWindow):
 
     def onAnnouncement(self, content):
         """显示公告"""
-        w = MessageBox("公告", content, self)
-        w.yesButton.setText("我知道了")
+        w = MessageBox("Объявление", content, self)
+        w.yesButton.setText("Понятно")
         w.cancelButton.hide()
         w.exec()
 
