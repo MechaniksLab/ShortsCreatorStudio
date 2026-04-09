@@ -7928,3 +7928,28 @@ CUDA可用
 视频总时长: 14.28秒
 视频合成完成
 视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 01.mp4
+
+===========转录任务开始===========
+时间：2026-04-10 01:29:39.652995
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 0221.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpn9x4r2g1.wav
+视频时长: 14.28秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【原始字幕】Последовательность 0221-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-10 01:29:39.755061
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【样式字幕】Последовательность 0221-FasterWhisper ✨-俄语.ass
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-10 01:29:39.776105
+开始合成视频: E:/Render/Последовательность 0221.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 0221.mp4" -acodec copy -vcodec libx264 -preset medium -vf subtitles='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Render\【卡卡】Последовательность 0221.mp4"
+视频总时长: 14.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
