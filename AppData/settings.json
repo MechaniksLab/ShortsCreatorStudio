@@ -1,0 +1,101 @@
+{
+    "Translate": {
+        "BatchSize": 10,
+        "DeeplxEndpoint": "",
+        "NeedReflectTranslate": false,
+        "ThreadNum": 10,
+        "TranslatorServiceEnum": "LLM 大模型翻译"
+    },
+    "LLM": {
+        "ChatGLM_API_Base": "https://open.bigmodel.cn/api/paas/v4",
+        "ChatGLM_API_Key": "",
+        "ChatGLM_Model": "glm-4",
+        "DeepSeek_API_Base": "https://api.deepseek.com/v1",
+        "DeepSeek_API_Key": "",
+        "DeepSeek_Model": "deepseek-chat",
+        "Gemini_API_Base": "https://generativelanguage.googleapis.com/v1beta/openai/",
+        "Gemini_API_Key": "",
+        "Gemini_Model": "gemini-pro",
+        "LLMService": "LM Studio",
+        "LmStudio_API_Base": "http://192.168.0.11:1234/v1",
+        "LmStudio_API_Key": "lmstudio",
+        "LmStudio_Model": "meta-llama-3.1-8b-instruct",
+        "Ollama_API_Base": "http://localhost:11434/v1",
+        "Ollama_API_Key": "ollama",
+        "Ollama_Model": "llama2",
+        "OpenAI_API_Base": "https://api.openai.com/v1",
+        "OpenAI_API_Key": "",
+        "OpenAI_Model": "gpt-4o-mini",
+        "Public_API_Base": "https://ddg.bkfeng.top/v1",
+        "Public_API_Key": "please-do-not-use-for-personal-purposes",
+        "Public_Model": "gpt-4o-mini",
+        "SiliconCloud_API_Base": "https://api.siliconflow.cn/v1",
+        "SiliconCloud_API_Key": "",
+        "SiliconCloud_Model": "gpt-4o-mini"
+    },
+    "Update": {
+        "CheckUpdateAtStartUp": true
+    },
+    "Subtitle": {
+        "CustomPromptText": "",
+        "MaxWordCountCJK": 25,
+        "MaxWordCountEnglish": 20,
+        "NeedOptimize": false,
+        "NeedSplit": true,
+        "NeedTranslate": false,
+        "NeedsRemovePunctuation": true,
+        "SplitType": "语义分段",
+        "TargetLanguage": "俄语"
+    },
+    "MainWindow": {
+        "DpiScale": "Auto",
+        "Language": "Auto",
+        "MicaEnabled": false
+    },
+    "FasterWhisper": {
+        "Device": "cuda",
+        "FfMdxKim2": false,
+        "Model": "large-v2",
+        "ModelDir": "",
+        "OneWord": true,
+        "Program": "faster-whisper-xxl.exe",
+        "Prompt": "",
+        "VadFilter": false,
+        "VadMethod": "silero_v5",
+        "VadThreshold": 0.09999999999999999
+    },
+    "Video": {
+        "NeedVideo": true,
+        "SoftSubtitle": false
+    },
+    "SubtitleStyle": {
+        "Effect": "zoom_in",
+        "EffectDuration": 300,
+        "EffectIntensity": 100,
+        "Layout": "仅原文",
+        "PreviewImage": "E:\\Neyro\\VideoCaptioner\\resource\\assets\\default_bg_portrait.png",
+        "RainbowEndColor": "#24ffde",
+        "StyleName": "default"
+    },
+    "QFluentWidgets": {
+        "ThemeColor": "#ff28f08b",
+        "ThemeMode": "Dark"
+    },
+    "Transcribe": {
+        "TranscribeLanguage": "俄语",
+        "TranscribeModel": "FasterWhisper ✨",
+        "UseASRCache": true
+    },
+    "WhisperAPI": {
+        "WhisperApiBase": "",
+        "WhisperApiKey": "",
+        "WhisperApiModel": "",
+        "WhisperApiPrompt": ""
+    },
+    "Whisper": {
+        "WhisperModel": "tiny"
+    },
+    "Save": {
+        "Work_Dir": "E:/Neyro/VideoCaptioner/work-dir"
+    }
+}
