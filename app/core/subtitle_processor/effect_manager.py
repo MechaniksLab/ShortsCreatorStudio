@@ -24,6 +24,11 @@ class SubtitleEffect(str, Enum):
     TWINKLE = "twinkle"  # мерцание
     RAINBOW = "rainbow"  # радуга цветов
     SHINE = "shine"  # подсветка
+    SLIDE_UP = "slide_up"
+    SLIDE_LEFT = "slide_left"
+    POP_ROTATE = "pop_rotate"
+    SHAKE = "shake"
+    NEON_FLICKER = "neon_flicker"
 
 
 @dataclass
@@ -275,6 +280,12 @@ class EffectManager:
             "Вращение": SubtitleEffect.SPIN.value,
             "Увеличение": SubtitleEffect.ZOOM_IN.value,
             "Качание": SubtitleEffect.SWING.value,
+            "Скольжение снизу": SubtitleEffect.SLIDE_UP.value,
+            "Скольжение слева": SubtitleEffect.SLIDE_LEFT.value,
+            "Поп + поворот": SubtitleEffect.POP_ROTATE.value,
+            "Дрожание": SubtitleEffect.SHAKE.value,
+            "Неоновое мерцание": SubtitleEffect.NEON_FLICKER.value,
+            "Глитч": SubtitleEffect.GLITCH.value,
             "Печатная машинка": SubtitleEffect.TYPEWRITER.value,
             "Мерцание": SubtitleEffect.TWINKLE.value,
             "Радуга": SubtitleEffect.RAINBOW.value,
@@ -351,6 +362,43 @@ class EffectManager:
             return (
                 f"{{\\frz0\\t(0,{min(effect_duration_ms//2, duration)},\\frz{int(8*intensity)})"
                 f"\\t({min(effect_duration_ms//2, duration)},{min(effect_duration_ms, duration)},\\frz{-int(8*intensity)})}}{text}"
+            )
+
+        if effect_type == SubtitleEffect.SLIDE_UP.value:
+            start_y = 760 + int(70 * intensity)
+            end_y = 660
+            return f"{{\\move(640,{start_y},640,{end_y},0,{min(effect_duration_ms, duration)})}}{text}"
+
+        if effect_type == SubtitleEffect.SLIDE_LEFT.value:
+            start_x = -200
+            end_x = 640
+            return f"{{\\move({start_x},660,{end_x},660,0,{min(effect_duration_ms, duration)})}}{text}"
+
+        if effect_type == SubtitleEffect.POP_ROTATE.value:
+            start_scale = max(35, int(100 - 45 * intensity))
+            rot = int(18 * intensity)
+            return (
+                f"{{\\fscx{start_scale}\\fscy{start_scale}\\frz{rot}"
+                f"\\t(0,{min(effect_duration_ms, duration)},\\fscx100\\fscy100\\frz0)}}{text}"
+            )
+
+        if effect_type == SubtitleEffect.SHAKE.value:
+            amp = max(2, int(6 * intensity))
+            t1 = min(effect_duration_ms // 3, duration)
+            t2 = min((effect_duration_ms * 2) // 3, duration)
+            t3 = min(effect_duration_ms, duration)
+            return (
+                f"{{\\pos(640,660)"
+                f"\\t(0,{t1},\\pos({640-amp},{660+amp}))"
+                f"\\t({t1},{t2},\\pos({640+amp},{660-amp}))"
+                f"\\t({t2},{t3},\\pos(640,660))}}{text}"
+            )
+
+        if effect_type == SubtitleEffect.NEON_FLICKER.value:
+            glow_alpha = max(0, min(255, int(110 - 35 * intensity)))
+            return (
+                f"{{\\bord3\\blur{max(1, int(2*intensity))}\\3a&H{glow_alpha:02X}&"
+                f"\\t(0,{min(effect_duration_ms, duration)},\\3a&H00&)}}{text}"
             )
 
         if effect_type == SubtitleEffect.TWINKLE.value:

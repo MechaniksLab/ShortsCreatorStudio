@@ -29,6 +29,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
 ASS_TEMP_FILENAME = CACHE_PATH / "preview.ass"  # 预览的临时 ASS 文件路径
 PREVIEW_IMAGE_FILENAME = CACHE_PATH / "preview.png"  # 预览的图片路径
+PREVIEW_VIDEO_FILENAME = CACHE_PATH / "preview_effect.mp4"
 DEFAULT_BG_PATH = RESOURCE_PATH / "assets" / "default_bg.png"
 
 
@@ -161,6 +162,58 @@ def generate_preview(
         f"ass={ass_file_processed}",
         "-frames:v",
         "1",
+        str(output_path),
+    ]
+    run_subprocess(cmd)
+    return str(output_path)
+
+
+def generate_preview_video(
+    style_str: str,
+    preview_text: Tuple[str, Optional[str]],
+    bg_path: str,
+    width: int,
+    height: int,
+    effect_type: str = "none",
+    effect_duration_ms: int = 300,
+    effect_intensity: float = 1.0,
+    rainbow_end_color: str = "#0000FF",
+    duration_sec: float = 2.0,
+) -> str:
+    """Генерирует короткое видео предпросмотра с анимацией эффекта."""
+
+    ass_file = generate_ass_file(
+        style_str,
+        preview_text,
+        width,
+        height,
+        effect_type,
+        effect_duration_ms,
+        effect_intensity,
+        rainbow_end_color,
+    )
+    ass_file = auto_wrap_ass_file(ass_file)
+    bg_path = ensure_background(Path(bg_path))
+
+    output_path = PREVIEW_VIDEO_FILENAME
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    ass_file_processed = ass_file.replace("\\", "/").replace(":", r"\\:")
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-loop",
+        "1",
+        "-i",
+        str(bg_path),
+        "-vf",
+        f"ass={ass_file_processed}",
+        "-t",
+        str(duration_sec),
+        "-r",
+        "30",
+        "-pix_fmt",
+        "yuv420p",
         str(output_path),
     ]
     run_subprocess(cmd)
