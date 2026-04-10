@@ -71,11 +71,16 @@
     "SubtitleStyle": {
         "Effect": "zoom_in",
         "EffectDuration": 300,
-        "EffectIntensity": 100,
+        "EffectIntensity": 140,
         "Layout": "仅原文",
+        "MotionAmplitude": 20,
+        "MotionDirection": "up",
+        "MotionEasing": "ease_out",
+        "MotionJitter": 12,
         "PreviewImage": "E:\\Neyro\\VideoCaptioner\\resource\\assets\\default_bg_portrait.png",
         "RainbowEndColor": "#24ffde",
-        "StyleName": "default"
+        "StyleName": "default",
+        "StylePreset": "custom"
     },
     "QFluentWidgets": {
         "ThemeColor": "#ff28f08b",

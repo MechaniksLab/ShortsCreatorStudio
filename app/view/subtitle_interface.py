@@ -557,6 +557,10 @@ class SubtitleInterface(QWidget):
                     effect_duration_ms=cfg.subtitle_effect_duration.value,
                     effect_intensity=cfg.subtitle_effect_intensity.value / 100,
                     rainbow_end_color=cfg.subtitle_rainbow_end_color.value,
+                    motion_direction=cfg.subtitle_motion_direction.value,
+                    motion_amplitude=cfg.subtitle_motion_amplitude.value / 100,
+                    motion_easing=cfg.subtitle_motion_easing.value,
+                    motion_jitter=cfg.subtitle_motion_jitter.value / 100,
                 )
             else:
                 asr_data.save(file_path, layout=layout)
@@ -672,6 +676,10 @@ class SubtitleInterface(QWidget):
                 effect_duration_ms=cfg.subtitle_effect_duration.value,
                 effect_intensity=cfg.subtitle_effect_intensity.value / 100,
                 rainbow_end_color=cfg.subtitle_rainbow_end_color.value,
+                motion_direction=cfg.subtitle_motion_direction.value,
+                motion_amplitude=cfg.subtitle_motion_amplitude.value / 100,
+                motion_easing=cfg.subtitle_motion_easing.value,
+                motion_jitter=cfg.subtitle_motion_jitter.value / 100,
             )
             signalBus.add_subtitle(temp_srt_path)
 

@@ -29,6 +29,7 @@ class SubtitleEffect(str, Enum):
     POP_ROTATE = "pop_rotate"
     SHAKE = "shake"
     NEON_FLICKER = "neon_flicker"
+    WORD_HIGHLIGHT = "word_highlight"
 
 
 @dataclass
@@ -287,10 +288,27 @@ class EffectManager:
             "Неоновое мерцание": SubtitleEffect.NEON_FLICKER.value,
             "Глитч": SubtitleEffect.GLITCH.value,
             "Печатная машинка": SubtitleEffect.TYPEWRITER.value,
+            "Подсветка по словам": SubtitleEffect.WORD_HIGHLIGHT.value,
             "Мерцание": SubtitleEffect.TWINKLE.value,
             "Радуга": SubtitleEffect.RAINBOW.value,
             "Блик": SubtitleEffect.SHINE.value,
         }
+
+    @staticmethod
+    def get_motion_effect_types() -> set[str]:
+        """Эффекты, где используются direction/amplitude/easing/jitter."""
+        return {
+            SubtitleEffect.BOUNCE.value,
+            SubtitleEffect.WAVE.value,
+            SubtitleEffect.SLIDE_UP.value,
+            SubtitleEffect.SLIDE_LEFT.value,
+            SubtitleEffect.SHAKE.value,
+            SubtitleEffect.ZOOM_IN.value,
+        }
+
+    @staticmethod
+    def is_motion_customizable(effect_type: str) -> bool:
+        return effect_type in EffectManager.get_motion_effect_types()
 
     @staticmethod
     def _hex_to_ass_bgr(hex_color: str) -> str:
@@ -304,6 +322,47 @@ class EffectManager:
         return f"&H00{bb}{gg}{rr}".upper()
 
     @staticmethod
+    def _easing_accel(easing: str) -> float:
+        easing = (easing or "ease_out").lower()
+        if easing == "ease_in":
+            return 1.7
+        if easing == "ease_in_out":
+            return 1.2
+        if easing == "linear":
+            return 1.0
+        return 0.7  # ease_out
+
+    @staticmethod
+    def _dir_to_offset(direction: str, distance: int) -> tuple[int, int]:
+        direction = (direction or "up").lower()
+        if direction == "down":
+            return 0, -distance
+        if direction == "left":
+            return distance, 0
+        if direction == "right":
+            return -distance, 0
+        return 0, distance  # up: появление снизу
+
+    @staticmethod
+    def _word_highlight_ass(text: str, effect_duration_ms: int) -> str:
+        if not text:
+            return text
+
+        # Для языков с пробелами: подсветка по словам; иначе — по символам
+        tokens = text.split()
+        joiner = " "
+        if len(tokens) <= 1:
+            compact = text.strip()
+            if not compact:
+                return text
+            tokens = list(compact)
+            joiner = ""
+
+        total_cs = max(1, int(effect_duration_ms / 10))
+        per_cs = max(1, total_cs // max(1, len(tokens)))
+        return joiner.join([f"{{\\k{per_cs}}}{token}" for token in tokens])
+
+    @staticmethod
     def apply_ass_effect(
         text: str,
         effect_type: str,
@@ -313,6 +372,10 @@ class EffectManager:
         effect_intensity: float = 1.0,
         rainbow_end_color: str = "#0000FF",
         index: int = 0,
+        motion_direction: str = "up",
+        motion_amplitude: float = 1.0,
+        motion_easing: str = "ease_out",
+        motion_jitter: float = 0.0,
     ) -> str:
         """Преобразует текст в ASS override-теги для базовых анимаций."""
         if not text:
@@ -325,6 +388,10 @@ class EffectManager:
 
         effect_duration_ms = max(50, min(effect_duration_ms, duration))
         intensity = max(0.1, min(effect_intensity, 3.0))
+        amp = max(0.2, min(motion_amplitude, 3.0))
+        jitter = max(0.0, min(motion_jitter, 1.0))
+        accel = EffectManager._easing_accel(motion_easing)
+        j = int((6 * jitter) * (-1 if index % 2 else 1))
 
         if effect_type == SubtitleEffect.FADE_IN.value:
             return f"{{\\fad({min(effect_duration_ms, duration // 2)},0)}}{text}"
@@ -337,18 +404,20 @@ class EffectManager:
             return f"{{\\fad({fad},{fad})}}{text}"
 
         if effect_type == SubtitleEffect.BOUNCE.value:
-            jump = int(30 * intensity)
-            return f"{{\\move(640,660,640,{660-jump},0,{min(effect_duration_ms, duration)})}}{text}"
+            jump = int(30 * intensity * amp)
+            dx, dy = EffectManager._dir_to_offset(motion_direction, jump)
+            sx, sy = 640 + dx + j, 660 + dy
+            return f"{{\\move({sx},{sy},640,660,0,{min(effect_duration_ms, duration)})}}{text}"
 
         if effect_type == SubtitleEffect.PULSE.value:
             scale = int(100 + 12 * intensity)
             return f"{{\\t(0,{min(effect_duration_ms, duration)},\\fscx{scale}\\fscy{scale})}}{text}"
 
         if effect_type == SubtitleEffect.WAVE.value:
-            amp = int(8 * intensity)
-            y1 = 650 + (index % 2) * amp
-            y2 = 640 - (index % 2) * amp
-            return f"{{\\move(640,{y1},640,{y2},0,{min(effect_duration_ms, duration)})}}{text}"
+            wave_amp = int(8 * intensity * amp)
+            y1 = 650 + (index % 2) * wave_amp
+            y2 = 640 - (index % 2) * wave_amp
+            return f"{{\\move({640+j},{y1},640,{y2},0,{min(effect_duration_ms, duration)})}}{text}"
 
         if effect_type == SubtitleEffect.SPIN.value:
             rot = int(360 * intensity)
@@ -356,7 +425,14 @@ class EffectManager:
 
         if effect_type == SubtitleEffect.ZOOM_IN.value:
             start_scale = max(30, int(100 - 30 * intensity))
-            return f"{{\\fscx{start_scale}\\fscy{start_scale}\\t(0,{min(effect_duration_ms, duration)},\\fscx100\\fscy100)}}{text}"
+            distance = int(80 * amp)
+            dx, dy = EffectManager._dir_to_offset(motion_direction, distance)
+            sx, sy = 640 + dx + j, 660 + dy
+            return (
+                f"{{\\move({sx},{sy},640,660,0,{min(effect_duration_ms, duration)})"
+                f"\\fscx{start_scale}\\fscy{start_scale}"
+                f"\\t(0,{min(effect_duration_ms, duration)},{accel:.2f},\\fscx100\\fscy100)}}{text}"
+            )
 
         if effect_type == SubtitleEffect.SWING.value:
             return (
@@ -365,14 +441,16 @@ class EffectManager:
             )
 
         if effect_type == SubtitleEffect.SLIDE_UP.value:
-            start_y = 760 + int(70 * intensity)
-            end_y = 660
-            return f"{{\\move(640,{start_y},640,{end_y},0,{min(effect_duration_ms, duration)})}}{text}"
+            distance = int(70 * intensity * amp)
+            dx, dy = EffectManager._dir_to_offset(motion_direction, distance)
+            sx, sy = 640 + dx + j, 660 + dy
+            return f"{{\\move({sx},{sy},640,660,0,{min(effect_duration_ms, duration)})}}{text}"
 
         if effect_type == SubtitleEffect.SLIDE_LEFT.value:
-            start_x = -200
-            end_x = 640
-            return f"{{\\move({start_x},660,{end_x},660,0,{min(effect_duration_ms, duration)})}}{text}"
+            distance = int(240 * amp)
+            dx, dy = EffectManager._dir_to_offset(motion_direction, distance)
+            sx, sy = 640 + dx + j, 660 + dy
+            return f"{{\\move({sx},{sy},640,660,0,{min(effect_duration_ms, duration)})}}{text}"
 
         if effect_type == SubtitleEffect.POP_ROTATE.value:
             start_scale = max(35, int(100 - 45 * intensity))
@@ -383,14 +461,14 @@ class EffectManager:
             )
 
         if effect_type == SubtitleEffect.SHAKE.value:
-            amp = max(2, int(6 * intensity))
+            shake_amp = max(2, int(6 * intensity * amp))
             t1 = min(effect_duration_ms // 3, duration)
             t2 = min((effect_duration_ms * 2) // 3, duration)
             t3 = min(effect_duration_ms, duration)
             return (
                 f"{{\\pos(640,660)"
-                f"\\t(0,{t1},\\pos({640-amp},{660+amp}))"
-                f"\\t({t1},{t2},\\pos({640+amp},{660-amp}))"
+                f"\\t(0,{t1},\\pos({640-shake_amp+j},{660+shake_amp}))"
+                f"\\t({t1},{t2},\\pos({640+shake_amp+j},{660-shake_amp}))"
                 f"\\t({t2},{t3},\\pos(640,660))}}{text}"
             )
 
@@ -412,6 +490,9 @@ class EffectManager:
         if effect_type == SubtitleEffect.TYPEWRITER.value:
             # Простая имитация: плавный fade-in + более быстрое появление
             return f"{{\\fad({min(effect_duration_ms, duration // 3)},0)}}{text}"
+
+        if effect_type == SubtitleEffect.WORD_HIGHLIGHT.value:
+            return EffectManager._word_highlight_ass(text, effect_duration_ms)
 
         if effect_type == SubtitleEffect.RAINBOW.value:
             # ASS не поддерживает покадровую радугу без сложной генерации,

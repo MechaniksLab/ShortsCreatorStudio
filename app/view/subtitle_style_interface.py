@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from typing import Optional, Tuple
 
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
 from PyQt5.QtGui import QColor, QFontDatabase
 from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import BodyLabel, CardWidget
@@ -19,6 +19,8 @@ from qfluentwidgets import (
     PushSettingCard,
     ScrollArea,
     SettingCardGroup,
+    Slider,
+    PushButton,
 )
 
 from app.common.config import cfg
@@ -47,6 +49,32 @@ ORIENTATION_LABEL_TO_VALUE = {
 }
 ORIENTATION_VALUE_TO_LABEL = {v: k for k, v in ORIENTATION_LABEL_TO_VALUE.items()}
 
+STYLE_PRESET_LABEL_TO_VALUE = {
+    "Свой (Custom)": "custom",
+    "TikTok Dynamic": "tiktok_dynamic",
+    "YouTube Shorts Clean": "shorts_clean",
+    "Minimal Classic": "minimal_classic",
+}
+STYLE_PRESET_VALUE_TO_LABEL = {v: k for k, v in STYLE_PRESET_LABEL_TO_VALUE.items()}
+
+MOTION_DIRECTION_LABEL_TO_VALUE = {
+    "Снизу вверх": "up",
+    "Сверху вниз": "down",
+    "Слева направо": "left",
+    "Справа налево": "right",
+}
+MOTION_DIRECTION_VALUE_TO_LABEL = {
+    v: k for k, v in MOTION_DIRECTION_LABEL_TO_VALUE.items()
+}
+
+MOTION_EASING_LABEL_TO_VALUE = {
+    "Ease Out (мягкий финиш)": "ease_out",
+    "Ease In (мягкий старт)": "ease_in",
+    "Ease In-Out": "ease_in_out",
+    "Linear": "linear",
+}
+MOTION_EASING_VALUE_TO_LABEL = {v: k for k, v in MOTION_EASING_LABEL_TO_VALUE.items()}
+
 PERVIEW_TEXTS = {
     "Длинный текст": (
         "This is a long text used for testing subtitle preview and style settings.",
@@ -72,7 +100,7 @@ DEFAULT_BG_PORTRAIT = {
 
 
 class PreviewThread(QThread):
-    previewReady = pyqtSignal(str)
+    previewReady = pyqtSignal(str, int)
 
     def __init__(
         self,
@@ -85,6 +113,12 @@ class PreviewThread(QThread):
         effect_duration_ms: int,
         effect_intensity: float,
         rainbow_end_color: str,
+        motion_direction: str,
+        motion_amplitude: float,
+        motion_easing: str,
+        motion_jitter: float,
+        preview_time_sec: float,
+        request_id: int,
     ):
         """
         Args:
@@ -101,8 +135,15 @@ class PreviewThread(QThread):
         self.effect_duration_ms = effect_duration_ms
         self.effect_intensity = effect_intensity
         self.rainbow_end_color = rainbow_end_color
+        self.motion_direction = motion_direction
+        self.motion_amplitude = motion_amplitude
+        self.motion_easing = motion_easing
+        self.motion_jitter = motion_jitter
+        self.preview_time_sec = preview_time_sec
+        self.request_id = request_id
 
     def run(self):
+        frame_token = f"{self.request_id}_{int(self.preview_time_sec * 1000)}"
         preview_path = generate_preview(
             style_str=self.style_str,
             preview_text=self.preview_text,
@@ -113,8 +154,14 @@ class PreviewThread(QThread):
             effect_duration_ms=self.effect_duration_ms,
             effect_intensity=self.effect_intensity,
             rainbow_end_color=self.rainbow_end_color,
+            motion_direction=self.motion_direction,
+            motion_amplitude=self.motion_amplitude,
+            motion_easing=self.motion_easing,
+            motion_jitter=self.motion_jitter,
+            preview_time_sec=self.preview_time_sec,
+            frame_token=frame_token,
         )
-        self.previewReady.emit(preview_path)
+        self.previewReady.emit(preview_path, self.request_id)
 
 
 class SubtitleStyleInterface(QWidget):
@@ -136,11 +183,30 @@ class SubtitleStyleInterface(QWidget):
         # 添加一个标志位来控制是否触发onSettingChanged
         self._loading_style = False
 
+        # Live preview state (должен быть инициализирован до __setValues,
+        # т.к. loadStyle() внутри __setValues вызывает updatePreview())
+        self._live_timer = QTimer(self)
+        self._live_timer.setInterval(40)  # ~25 FPS
+        self._live_timer.timeout.connect(self._onLiveTimerTick)
+        self._live_playing = False
+
+        self._preview_debounce_timer = QTimer(self)
+        self._preview_debounce_timer.setSingleShot(True)
+        self._preview_debounce_timer.setInterval(80)
+        self._preview_debounce_timer.timeout.connect(self._renderPreviewNow)
+
+        self._preview_thread = None
+        self._preview_pending = False
+        self._preview_request_id = 0
+        self._latest_applied_request_id = -1
+
         # 设置初始值,加载样式
         self.__setValues()
 
         # 连接信号
         self.connectSignals()
+
+        self._update_motion_controls_state()
 
     def _initSettingsArea(self):
         """初始化左侧设置区域"""
@@ -178,6 +244,24 @@ class SubtitleStyleInterface(QWidget):
         self.previewBottomWidget = QWidget()
         self.previewBottomLayout = QVBoxLayout(self.previewBottomWidget)
 
+        self.timelineWidget = QWidget()
+        self.timelineLayout = QHBoxLayout(self.timelineWidget)
+        self.timelineLayout.setContentsMargins(0, 0, 0, 0)
+        self.timelineLayout.setSpacing(8)
+
+        self.playPreviewButton = PushButton("▶ Live", self.timelineWidget)
+        self.playPreviewButton.setFixedWidth(78)
+        self.timelineSlider = Slider(Qt.Horizontal, self.timelineWidget)
+        self.timelineSlider.setRange(0, 1000)
+        self.timelineSlider.setValue(0)
+        self.timelineSlider.setSingleStep(40)
+        self.timelineLabel = BodyLabel("0.00 c", self.timelineWidget)
+        self.timelineLabel.setMinimumWidth(55)
+
+        self.timelineLayout.addWidget(self.playPreviewButton)
+        self.timelineLayout.addWidget(self.timelineSlider, 1)
+        self.timelineLayout.addWidget(self.timelineLabel)
+
         self.styleNameComboBox = ComboBoxSettingCard(
             FIF.VIEW, "Выбор стиля", "Выберите сохранённый пресет стиля", texts=[]
         )
@@ -207,6 +291,7 @@ class SubtitleStyleInterface(QWidget):
         self.previewBottomLayout.addWidget(self.newStyleButton)
         self.previewBottomLayout.addWidget(self.openStyleFolderButton)
         self.previewBottomLayout.addWidget(self.previewEffectButton)
+        self.previewBottomLayout.addWidget(self.timelineWidget)
 
         self.previewLayout.addWidget(self.previewTopWidget)
         self.previewLayout.addWidget(self.previewBottomWidget)
@@ -252,6 +337,43 @@ class SubtitleStyleInterface(QWidget):
             FIF.PALETTE,
             "Конечный цвет радуги",
             "Цвет, в который переходит текст при эффекте Радуга",
+        )
+
+        self.presetCard = ComboBoxSettingCard(
+            FIF.BOOK_SHELF,
+            "Пресет стиля",
+            "Готовые наборы для шортсов",
+            texts=list(STYLE_PRESET_LABEL_TO_VALUE.keys()),
+        )
+
+        self.motionDirectionCard = ComboBoxSettingCard(
+            FIF.MOVE,
+            "Направление анимации",
+            "Работает для: Прыжок, Волна, Скольжение, Дрожание, Увеличение",
+            texts=list(MOTION_DIRECTION_LABEL_TO_VALUE.keys()),
+        )
+
+        self.motionAmplitudeCard = SpinBoxSettingCard(
+            FIF.ZOOM,
+            "Амплитуда движения (%)",
+            "Работает для motion-эффектов (см. выше)",
+            minimum=20,
+            maximum=300,
+        )
+
+        self.motionEasingCard = ComboBoxSettingCard(
+            FIF.SPEED_HIGH,
+            "Плавность (easing)",
+            "Профиль скорости для motion-эффектов",
+            texts=list(MOTION_EASING_LABEL_TO_VALUE.keys()),
+        )
+
+        self.motionJitterCard = SpinBoxSettingCard(
+            FIF.SYNC,
+            "Дрожание (jitter, %) ",
+            "Микро-смещение позиции (только motion-эффекты)",
+            minimum=0,
+            maximum=100,
         )
 
         # 垂直间距
@@ -442,6 +564,11 @@ class SubtitleStyleInterface(QWidget):
         self.layoutGroup.addSettingCard(self.effectDurationCard)
         self.layoutGroup.addSettingCard(self.effectIntensityCard)
         self.layoutGroup.addSettingCard(self.rainbowEndColorCard)
+        self.layoutGroup.addSettingCard(self.presetCard)
+        self.layoutGroup.addSettingCard(self.motionDirectionCard)
+        self.layoutGroup.addSettingCard(self.motionAmplitudeCard)
+        self.layoutGroup.addSettingCard(self.motionEasingCard)
+        self.layoutGroup.addSettingCard(self.motionJitterCard)
         self.layoutGroup.addSettingCard(self.verticalSpacingCard)
         self.mainGroup.addSettingCard(self.mainFontCard)
         self.mainGroup.addSettingCard(self.mainSizeCard)
@@ -514,6 +641,25 @@ class SubtitleStyleInterface(QWidget):
         self.effectIntensityCard.spinBox.setValue(cfg.get(cfg.subtitle_effect_intensity))
         rainbow_hex = cfg.get(cfg.subtitle_rainbow_end_color) or "#0000FF"
         self.rainbowEndColorCard.setColor(QColor(rainbow_hex))
+        self.presetCard.comboBox.setCurrentText(
+            STYLE_PRESET_VALUE_TO_LABEL.get(
+                cfg.get(cfg.subtitle_style_preset), "Свой (Custom)"
+            )
+        )
+        self.motionDirectionCard.comboBox.setCurrentText(
+            MOTION_DIRECTION_VALUE_TO_LABEL.get(
+                cfg.get(cfg.subtitle_motion_direction), "Снизу вверх"
+            )
+        )
+        self.motionAmplitudeCard.spinBox.setValue(
+            int(cfg.get(cfg.subtitle_motion_amplitude))
+        )
+        self.motionEasingCard.comboBox.setCurrentText(
+            MOTION_EASING_VALUE_TO_LABEL.get(
+                cfg.get(cfg.subtitle_motion_easing), "Ease Out (мягкий финиш)"
+            )
+        )
+        self.motionJitterCard.spinBox.setValue(int(cfg.get(cfg.subtitle_motion_jitter)))
         # 设置字幕样式
         self.styleNameComboBox.comboBox.setCurrentText(cfg.get(cfg.subtitle_style_name))
 
@@ -562,6 +708,9 @@ class SubtitleStyleInterface(QWidget):
                 self.effect_options.get(text, "none"),
             )
         )
+        self.effectCard.currentTextChanged.connect(
+            lambda _: self._update_motion_controls_state()
+        )
         self.effectDurationCard.spinBox.valueChanged.connect(self.onSettingChanged)
         self.effectDurationCard.spinBox.valueChanged.connect(
             lambda value: cfg.set(cfg.subtitle_effect_duration, int(value))
@@ -573,6 +722,35 @@ class SubtitleStyleInterface(QWidget):
         self.rainbowEndColorCard.colorChanged.connect(self.onSettingChanged)
         self.rainbowEndColorCard.colorChanged.connect(
             lambda color: cfg.set(cfg.subtitle_rainbow_end_color, color.name())
+        )
+        self.presetCard.currentTextChanged.connect(self.onPresetChanged)
+        self.presetCard.currentTextChanged.connect(
+            lambda text: cfg.set(
+                cfg.subtitle_style_preset,
+                STYLE_PRESET_LABEL_TO_VALUE.get(text, "custom"),
+            )
+        )
+        self.motionDirectionCard.currentTextChanged.connect(self.onSettingChanged)
+        self.motionDirectionCard.currentTextChanged.connect(
+            lambda text: cfg.set(
+                cfg.subtitle_motion_direction,
+                MOTION_DIRECTION_LABEL_TO_VALUE.get(text, "up"),
+            )
+        )
+        self.motionAmplitudeCard.spinBox.valueChanged.connect(self.onSettingChanged)
+        self.motionAmplitudeCard.spinBox.valueChanged.connect(
+            lambda value: cfg.set(cfg.subtitle_motion_amplitude, int(value))
+        )
+        self.motionEasingCard.currentTextChanged.connect(self.onSettingChanged)
+        self.motionEasingCard.currentTextChanged.connect(
+            lambda text: cfg.set(
+                cfg.subtitle_motion_easing,
+                MOTION_EASING_LABEL_TO_VALUE.get(text, "ease_out"),
+            )
+        )
+        self.motionJitterCard.spinBox.valueChanged.connect(self.onSettingChanged)
+        self.motionJitterCard.spinBox.valueChanged.connect(
+            lambda value: cfg.set(cfg.subtitle_motion_jitter, int(value))
         )
         # 垂直间距
         self.verticalSpacingCard.spinBox.valueChanged.connect(self.onSettingChanged)
@@ -604,6 +782,8 @@ class SubtitleStyleInterface(QWidget):
         self.orientationCard.currentTextChanged.connect(self.onOrientationChanged)
         self.previewImageCard.clicked.connect(self.selectPreviewImage)
         self.previewEffectButton.clicked.connect(self.showEffectPreview)
+        self.playPreviewButton.clicked.connect(self.toggleLivePreview)
+        self.timelineSlider.valueChanged.connect(self.onTimelineChanged)
 
         # 连接样式切换信号
         self.styleNameComboBox.currentTextChanged.connect(self.loadStyle)
@@ -639,7 +819,7 @@ class SubtitleStyleInterface(QWidget):
             DEFAULT_BG_LANDSCAPE if orientation == "横屏" else DEFAULT_BG_PORTRAIT
         )
         cfg.set(cfg.subtitle_preview_image, str(Path(preview_image["path"])))
-        self.updatePreview()
+        self._schedulePreviewUpdate()
 
     def onSettingChanged(self):
         """当任何设置改变时调用"""
@@ -647,13 +827,90 @@ class SubtitleStyleInterface(QWidget):
         if self._loading_style:
             return
 
-        self.updatePreview()
+        self._schedulePreviewUpdate()
         # 获取当前选择的样式名称
         current_style = self.styleNameComboBox.comboBox.currentText()
         if current_style:
             self.saveStyle(current_style)  # 自动保存为当前选择的样式
         else:
             self.saveStyle("default")  # 如果没有选择样式,保存为默认样式
+
+    def _update_motion_controls_state(self):
+        effect_label = self.effectCard.comboBox.currentText()
+        effect_value = self.effect_options.get(effect_label, "none")
+        enabled = EffectManager.is_motion_customizable(effect_value)
+
+        self.motionDirectionCard.setEnabled(enabled)
+        self.motionAmplitudeCard.setEnabled(enabled)
+        self.motionEasingCard.setEnabled(enabled)
+        self.motionJitterCard.setEnabled(enabled)
+
+    def toggleLivePreview(self):
+        self._live_playing = not self._live_playing
+        if self._live_playing:
+            self.playPreviewButton.setText("⏸ Live")
+            self._live_timer.start()
+        else:
+            self.playPreviewButton.setText("▶ Live")
+            self._live_timer.stop()
+
+    def _onLiveTimerTick(self):
+        next_value = self.timelineSlider.value() + self.timelineSlider.singleStep()
+        if next_value > self.timelineSlider.maximum():
+            next_value = self.timelineSlider.minimum()
+        self.timelineSlider.setValue(next_value)
+
+    def onTimelineChanged(self, value: int):
+        self.timelineLabel.setText(f"{value / 1000:.2f} c")
+        self._schedulePreviewUpdate(immediate=self._live_playing)
+
+    def onPresetChanged(self, preset_label: str):
+        if self._loading_style:
+            return
+
+        preset = STYLE_PRESET_LABEL_TO_VALUE.get(preset_label, "custom")
+        if preset == "custom":
+            self.onSettingChanged()
+            return
+
+        self._loading_style = True
+        try:
+            if preset == "tiktok_dynamic":
+                self.effectCard.comboBox.setCurrentText("Подсветка по словам")
+                self.effectDurationCard.spinBox.setValue(450)
+                self.effectIntensityCard.spinBox.setValue(140)
+                self.motionDirectionCard.comboBox.setCurrentText("Снизу вверх")
+                self.motionAmplitudeCard.spinBox.setValue(140)
+                self.motionEasingCard.comboBox.setCurrentText("Ease Out (мягкий финиш)")
+                self.motionJitterCard.spinBox.setValue(12)
+                self.mainOutlineSizeCard.spinBox.setValue(2.8)
+                self.mainShadowCard.spinBox.setValue(2.2)
+            elif preset == "shorts_clean":
+                self.effectCard.comboBox.setCurrentText("Плавное появление")
+                self.effectDurationCard.spinBox.setValue(260)
+                self.effectIntensityCard.spinBox.setValue(90)
+                self.motionDirectionCard.comboBox.setCurrentText("Снизу вверх")
+                self.motionAmplitudeCard.spinBox.setValue(80)
+                self.motionEasingCard.comboBox.setCurrentText("Linear")
+                self.motionJitterCard.spinBox.setValue(0)
+                self.mainOutlineSizeCard.spinBox.setValue(2.0)
+                self.mainShadowCard.spinBox.setValue(1.2)
+            elif preset == "minimal_classic":
+                self.effectCard.comboBox.setCurrentText("Без эффекта")
+                self.effectDurationCard.spinBox.setValue(200)
+                self.effectIntensityCard.spinBox.setValue(100)
+                self.motionDirectionCard.comboBox.setCurrentText("Снизу вверх")
+                self.motionAmplitudeCard.spinBox.setValue(60)
+                self.motionEasingCard.comboBox.setCurrentText("Ease In-Out")
+                self.motionJitterCard.spinBox.setValue(0)
+                self.mainOutlineSizeCard.spinBox.setValue(1.6)
+                self.mainShadowCard.spinBox.setValue(0.8)
+        finally:
+            self._loading_style = False
+
+        self._schedulePreviewUpdate()
+        current_style = self.styleNameComboBox.comboBox.currentText() or "default"
+        self.saveStyle(current_style)
 
     def selectPreviewImage(self):
         """选择预览背景图片"""
@@ -665,7 +922,103 @@ class SubtitleStyleInterface(QWidget):
         )
         if file_path:
             cfg.set(cfg.subtitle_preview_image, file_path)
-            self.updatePreview()
+            self._schedulePreviewUpdate()
+
+    def _schedulePreviewUpdate(self, immediate: bool = False):
+        self._preview_pending = True
+        if immediate or self._live_playing:
+            if self._preview_thread and self._preview_thread.isRunning():
+                return
+            self._renderPreviewNow()
+            return
+        self._preview_debounce_timer.start()
+
+    def _renderPreviewNow(self):
+        if not self._preview_pending:
+            return
+
+        if self._preview_thread and self._preview_thread.isRunning():
+            return
+
+        self._preview_pending = False
+        self._preview_request_id += 1
+        request_id = self._preview_request_id
+
+        # 生成 ASS 样式字符串
+        style_str = self.generateAssStyles()
+
+        # 获取预览文本
+        main_text, sub_text = PERVIEW_TEXTS[self.previewTextCard.comboBox.currentText()]
+
+        # 字幕布局
+        layout = self.layoutCard.comboBox.currentText()
+        layout_value = LAYOUT_LABEL_TO_VALUE.get(layout, "译文在上")
+        if layout_value == "译文在上":
+            main_text, sub_text = sub_text, main_text
+        elif layout_value == "原文在上":
+            main_text, sub_text = main_text, sub_text
+        elif layout_value == "仅译文":
+            main_text, sub_text = sub_text, None
+        elif layout_value == "仅原文":
+            main_text, sub_text = main_text, None
+
+        # 获取预览方向
+        orientation_label = self.orientationCard.comboBox.currentText()
+        orientation = ORIENTATION_LABEL_TO_VALUE.get(orientation_label, "横屏")
+        default_preview = (
+            DEFAULT_BG_LANDSCAPE if orientation == "横屏" else DEFAULT_BG_PORTRAIT
+        )
+
+        # 检查是否存在用户自定义背景图片
+        user_bg_path = cfg.get(cfg.subtitle_preview_image)
+        if user_bg_path and Path(user_bg_path).exists():
+            path = user_bg_path
+            width = default_preview["width"]
+            height = default_preview["height"]
+        else:
+            path = default_preview["path"]
+            width = default_preview["width"]
+            height = default_preview["height"]
+
+        timeline_ms = self.timelineSlider.value()
+        effect_type = cfg.get(cfg.subtitle_effect)
+        if effect_type != "none":
+            preview_window_ms = self.timelineSlider.maximum()
+            effect_ms = min(
+                max(50, int(cfg.get(cfg.subtitle_effect_duration))),
+                preview_window_ms,
+            )
+            preview_time_sec = (
+                (timeline_ms / max(1, self.timelineSlider.maximum()))
+                * (effect_ms / 1000.0)
+            )
+        else:
+            preview_time_sec = timeline_ms / 1000.0
+
+        self._preview_thread = PreviewThread(
+            style_str=style_str,
+            preview_text=(main_text, sub_text),
+            bg_path=path,
+            width=width,
+            height=height,
+            effect_type=effect_type,
+            effect_duration_ms=cfg.get(cfg.subtitle_effect_duration),
+            effect_intensity=cfg.get(cfg.subtitle_effect_intensity) / 100,
+            rainbow_end_color=cfg.get(cfg.subtitle_rainbow_end_color),
+            motion_direction=cfg.get(cfg.subtitle_motion_direction),
+            motion_amplitude=cfg.get(cfg.subtitle_motion_amplitude) / 100,
+            motion_easing=cfg.get(cfg.subtitle_motion_easing),
+            motion_jitter=cfg.get(cfg.subtitle_motion_jitter) / 100,
+            preview_time_sec=preview_time_sec,
+            request_id=request_id,
+        )
+        self._preview_thread.previewReady.connect(self.onPreviewReady)
+        self._preview_thread.finished.connect(self._onPreviewThreadFinished)
+        self._preview_thread.start()
+
+    def _onPreviewThreadFinished(self):
+        if self._preview_pending:
+            self._renderPreviewNow()
 
     def generateAssStyles(self) -> str:
         """生成 ASS 样式字符串"""
@@ -738,56 +1091,8 @@ class SubtitleStyleInterface(QWidget):
         )
 
     def updatePreview(self):
-        """更新预览图片"""
-        # 生成 ASS 样式字符串
-        style_str = self.generateAssStyles()
-
-        # 获取预览文本
-        main_text, sub_text = PERVIEW_TEXTS[self.previewTextCard.comboBox.currentText()]
-
-        # 字幕布局
-        layout = self.layoutCard.comboBox.currentText()
-        layout_value = LAYOUT_LABEL_TO_VALUE.get(layout, "译文在上")
-        if layout_value == "译文在上":
-            main_text, sub_text = sub_text, main_text
-        elif layout_value == "原文在上":
-            main_text, sub_text = main_text, sub_text
-        elif layout_value == "仅译文":
-            main_text, sub_text = sub_text, None
-        elif layout_value == "仅原文":
-            main_text, sub_text = main_text, None
-
-        # 获取预览方向
-        orientation_label = self.orientationCard.comboBox.currentText()
-        orientation = ORIENTATION_LABEL_TO_VALUE.get(orientation_label, "横屏")
-        default_preview = DEFAULT_BG_LANDSCAPE if orientation == "横屏" else DEFAULT_BG_PORTRAIT
-        
-        # 检查是否存在用户自定义背景图片
-        user_bg_path = cfg.get(cfg.subtitle_preview_image)
-        if user_bg_path and Path(user_bg_path).exists():
-            path = user_bg_path
-            # 可以保持默认宽高或获取实际图片宽高
-            width = default_preview["width"]
-            height = default_preview["height"]
-        else:
-            path = default_preview["path"]
-            width = default_preview["width"]
-            height = default_preview["height"]
-
-        # 创建预览线程
-        self.preview_thread = PreviewThread(
-            style_str=style_str,
-            preview_text=(main_text, sub_text),
-            bg_path=path,
-            width=width,
-            height=height,
-            effect_type=cfg.get(cfg.subtitle_effect),
-            effect_duration_ms=cfg.get(cfg.subtitle_effect_duration),
-            effect_intensity=cfg.get(cfg.subtitle_effect_intensity) / 100,
-            rainbow_end_color=cfg.get(cfg.subtitle_rainbow_end_color),
-        )
-        self.preview_thread.previewReady.connect(self.onPreviewReady)
-        self.preview_thread.start()
+        """请求更新预览（带防抖和串行渲染）"""
+        self._schedulePreviewUpdate()
 
     def showEffectPreview(self):
         """Сгенерировать короткое видео предпросмотра эффекта и открыть его."""
@@ -823,6 +1128,10 @@ class SubtitleStyleInterface(QWidget):
             effect_duration_ms=cfg.get(cfg.subtitle_effect_duration),
             effect_intensity=cfg.get(cfg.subtitle_effect_intensity) / 100,
             rainbow_end_color=cfg.get(cfg.subtitle_rainbow_end_color),
+            motion_direction=cfg.get(cfg.subtitle_motion_direction),
+            motion_amplitude=cfg.get(cfg.subtitle_motion_amplitude) / 100,
+            motion_easing=cfg.get(cfg.subtitle_motion_easing),
+            motion_jitter=cfg.get(cfg.subtitle_motion_jitter) / 100,
         )
 
         if sys.platform == "win32":
@@ -832,8 +1141,11 @@ class SubtitleStyleInterface(QWidget):
         else:
             subprocess.run(["xdg-open", video_path])
 
-    def onPreviewReady(self, preview_path):
+    def onPreviewReady(self, preview_path, request_id: int):
         """预览图片生成完成的回调"""
+        if request_id < self._latest_applied_request_id:
+            return
+        self._latest_applied_request_id = request_id
         self.previewImage.setImage(preview_path)
         self.updatePreviewImage()
 
@@ -854,6 +1166,16 @@ class SubtitleStyleInterface(QWidget):
         """窗口显示事件"""
         super().showEvent(event)
         self.updatePreviewImage()
+
+    def closeEvent(self, event):
+        self._live_timer.stop()
+        self._preview_debounce_timer.stop()
+        if self._preview_thread and self._preview_thread.isRunning():
+            self._preview_thread.quit()
+            if not self._preview_thread.wait(500):
+                self._preview_thread.terminate()
+                self._preview_thread.wait(200)
+        super().closeEvent(event)
 
     def loadStyle(self, style_name):
         """加载指定样式"""

@@ -205,6 +205,10 @@ class ASRData:
         effect_duration_ms: int = 300,
         effect_intensity: float = 1.0,
         rainbow_end_color: str = "#0000FF",
+        motion_direction: str = "up",
+        motion_amplitude: float = 1.0,
+        motion_easing: str = "ease_out",
+        motion_jitter: float = 0.0,
     ) -> None:
         """
         Save the ASRData to a file
@@ -236,6 +240,10 @@ class ASRData:
                 effect_duration_ms=effect_duration_ms,
                 effect_intensity=effect_intensity,
                 rainbow_end_color=rainbow_end_color,
+                motion_direction=motion_direction,
+                motion_amplitude=motion_amplitude,
+                motion_easing=motion_easing,
+                motion_jitter=motion_jitter,
             )
         else:
             raise ValueError(f"Unsupported file extension: {save_path}")
@@ -328,6 +336,10 @@ class ASRData:
         effect_duration_ms: int = 300,
         effect_intensity: float = 1.0,
         rainbow_end_color: str = "#0000FF",
+        motion_direction: str = "up",
+        motion_amplitude: float = 1.0,
+        motion_easing: str = "ease_out",
+        motion_jitter: float = 0.0,
     ) -> str:
         """转换为ASS字幕格式
 
@@ -401,6 +413,10 @@ class ASRData:
                 effect_intensity,
                 rainbow_end_color,
                 idx,
+                motion_direction,
+                motion_amplitude,
+                motion_easing,
+                motion_jitter,
             )
             translated_effect_text = EffectManager.apply_ass_effect(
                 translated,
@@ -411,6 +427,10 @@ class ASRData:
                 effect_intensity,
                 rainbow_end_color,
                 idx,
+                motion_direction,
+                motion_amplitude,
+                motion_easing,
+                motion_jitter,
             )
 
             # 检查是否有译文

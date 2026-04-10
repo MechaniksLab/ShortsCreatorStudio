@@ -256,6 +256,30 @@ class Config(QConfig):
     subtitle_rainbow_end_color = ConfigItem(
         "SubtitleStyle", "RainbowEndColor", "#0000FF"
     )
+    subtitle_style_preset = OptionsConfigItem(
+        "SubtitleStyle",
+        "StylePreset",
+        "custom",
+        OptionsValidator(["custom", "tiktok_dynamic", "shorts_clean", "minimal_classic"]),
+    )
+    subtitle_motion_direction = OptionsConfigItem(
+        "SubtitleStyle",
+        "MotionDirection",
+        "up",
+        OptionsValidator(["up", "down", "left", "right"]),
+    )
+    subtitle_motion_amplitude = RangeConfigItem(
+        "SubtitleStyle", "MotionAmplitude", 100, RangeValidator(20, 300)
+    )
+    subtitle_motion_easing = OptionsConfigItem(
+        "SubtitleStyle",
+        "MotionEasing",
+        "ease_out",
+        OptionsValidator(["ease_out", "ease_in", "ease_in_out", "linear"]),
+    )
+    subtitle_motion_jitter = RangeConfigItem(
+        "SubtitleStyle", "MotionJitter", 0, RangeValidator(0, 100)
+    )
 
     # ------------------- 保存配置 -------------------
     work_dir = ConfigItem("Save", "Work_Dir", WORK_PATH, FolderValidator())

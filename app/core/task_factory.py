@@ -196,6 +196,11 @@ class TaskFactory:
             subtitle_effect_duration=cfg.subtitle_effect_duration.value,
             subtitle_effect_intensity=cfg.subtitle_effect_intensity.value / 100,
             subtitle_rainbow_end_color=cfg.subtitle_rainbow_end_color.value,
+            subtitle_style_preset=cfg.subtitle_style_preset.value,
+            subtitle_motion_direction=cfg.subtitle_motion_direction.value,
+            subtitle_motion_amplitude=cfg.subtitle_motion_amplitude.value / 100,
+            subtitle_motion_easing=cfg.subtitle_motion_easing.value,
+            subtitle_motion_jitter=cfg.subtitle_motion_jitter.value / 100,
         )
 
         return SubtitleTask(

@@ -555,6 +555,11 @@ class SubtitleConfig:
     subtitle_effect_duration: int = 300
     subtitle_effect_intensity: float = 1.0
     subtitle_rainbow_end_color: str = "#0000FF"
+    subtitle_style_preset: str = "custom"
+    subtitle_motion_direction: str = "up"
+    subtitle_motion_amplitude: float = 1.0
+    subtitle_motion_easing: str = "ease_out"
+    subtitle_motion_jitter: float = 0.0
 
 
 @dataclass

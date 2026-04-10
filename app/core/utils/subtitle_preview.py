@@ -55,6 +55,10 @@ def generate_ass_file(
     effect_duration_ms: int = 300,
     effect_intensity: float = 1.0,
     rainbow_end_color: str = "#0000FF",
+    motion_direction: str = "up",
+    motion_amplitude: float = 1.0,
+    motion_easing: str = "ease_out",
+    motion_jitter: float = 0.0,
 ) -> str:
     """生成临时 ASS 文件"""
     original_text, translate_text = preview_text
@@ -76,7 +80,7 @@ def generate_ass_file(
     secondary_blur = _extract_style_blur(style_str, "Secondary")
 
     preview_start_ms = 0
-    preview_end_ms = 1000
+    preview_end_ms = 2000
     original_text = EffectManager.apply_ass_effect(
         original_text,
         effect_type,
@@ -86,6 +90,10 @@ def generate_ass_file(
         effect_intensity,
         rainbow_end_color,
         0,
+        motion_direction,
+        motion_amplitude,
+        motion_easing,
+        motion_jitter,
     )
     translated_text = EffectManager.apply_ass_effect(
         translate_text,
@@ -96,6 +104,10 @@ def generate_ass_file(
         effect_intensity,
         rainbow_end_color,
         1,
+        motion_direction,
+        motion_amplitude,
+        motion_easing,
+        motion_jitter,
     )
 
     if original_text and default_blur > 0:
@@ -105,11 +117,11 @@ def generate_ass_file(
 
     dialogue = (
         [
-            f"Dialogue: 0,0:00:00.00,0:00:01.00,Secondary,,0,0,0,,{translated_text}",
-            f"Dialogue: 0,0:00:00.00,0:00:01.00,Default,,0,0,0,,{original_text}",
+            f"Dialogue: 0,0:00:00.00,0:00:02.00,Secondary,,0,0,0,,{translated_text}",
+            f"Dialogue: 0,0:00:00.00,0:00:02.00,Default,,0,0,0,,{original_text}",
         ]
         if translate_text
-        else [f"Dialogue: 0,0:00:00.00,0:00:01.00,Default,,0,0,0,,{original_text}"]
+        else [f"Dialogue: 0,0:00:00.00,0:00:02.00,Default,,0,0,0,,{original_text}"]
     )
 
     ass_content = SCRIPT_INFO_TEMPLATE.format(
@@ -154,6 +166,12 @@ def generate_preview(
     effect_duration_ms: int = 300,
     effect_intensity: float = 1.0,
     rainbow_end_color: str = "#0000FF",
+    motion_direction: str = "up",
+    motion_amplitude: float = 1.0,
+    motion_easing: str = "ease_out",
+    motion_jitter: float = 0.0,
+    preview_time_sec: float = 0.0,
+    frame_token: Optional[str] = None,
 ) -> str:
     """生成预览图片"""
 
@@ -166,19 +184,36 @@ def generate_preview(
         effect_duration_ms,
         effect_intensity,
         rainbow_end_color,
+        motion_direction,
+        motion_amplitude,
+        motion_easing,
+        motion_jitter,
     )
     ass_file = auto_wrap_ass_file(ass_file)
     bg_path = ensure_background(Path(bg_path))
 
-    output_path = PREVIEW_IMAGE_FILENAME
+    output_path = (
+        CACHE_PATH / f"preview_{frame_token}.png"
+        if frame_token
+        else PREVIEW_IMAGE_FILENAME
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     ass_file_processed = ass_file.replace("\\", "/").replace(":", r"\\:")
+    preview_time_sec = max(0.0, float(preview_time_sec))
+    loop_duration = max(1.5, preview_time_sec + 0.2)
+
     cmd = [
         "ffmpeg",
         "-y",
+        "-loop",
+        "1",
+        "-t",
+        str(loop_duration),
         "-i",
         str(bg_path),
+        "-ss",
+        str(preview_time_sec),
         "-vf",
         f"ass={ass_file_processed}",
         "-frames:v",
@@ -199,6 +234,10 @@ def generate_preview_video(
     effect_duration_ms: int = 300,
     effect_intensity: float = 1.0,
     rainbow_end_color: str = "#0000FF",
+    motion_direction: str = "up",
+    motion_amplitude: float = 1.0,
+    motion_easing: str = "ease_out",
+    motion_jitter: float = 0.0,
     duration_sec: float = 2.0,
 ) -> str:
     """Генерирует короткое видео предпросмотра с анимацией эффекта."""
@@ -212,6 +251,10 @@ def generate_preview_video(
         effect_duration_ms,
         effect_intensity,
         rainbow_end_color,
+        motion_direction,
+        motion_amplitude,
+        motion_easing,
+        motion_jitter,
     )
     ass_file = auto_wrap_ass_file(ass_file)
     bg_path = ensure_background(Path(bg_path))

@@ -207,6 +207,10 @@ class SubtitleThread(QThread):
                             effect_duration_ms=subtitle_config.subtitle_effect_duration,
                             effect_intensity=subtitle_config.subtitle_effect_intensity,
                             rainbow_end_color=subtitle_config.subtitle_rainbow_end_color,
+                            motion_direction=subtitle_config.subtitle_motion_direction,
+                            motion_amplitude=subtitle_config.subtitle_motion_amplitude,
+                            motion_easing=subtitle_config.subtitle_motion_easing,
+                            motion_jitter=subtitle_config.subtitle_motion_jitter,
                         )
                         logger.info(f"字幕保存到 {save_path}")
 
@@ -219,6 +223,10 @@ class SubtitleThread(QThread):
                 effect_duration_ms=subtitle_config.subtitle_effect_duration,
                 effect_intensity=subtitle_config.subtitle_effect_intensity,
                 rainbow_end_color=subtitle_config.subtitle_rainbow_end_color,
+                motion_direction=subtitle_config.subtitle_motion_direction,
+                motion_amplitude=subtitle_config.subtitle_motion_amplitude,
+                motion_easing=subtitle_config.subtitle_motion_easing,
+                motion_jitter=subtitle_config.subtitle_motion_jitter,
             )
             logger.info(f"字幕保存到 {self.task.output_path}")
 

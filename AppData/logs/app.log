@@ -7953,3 +7953,215 @@ CUDA可用
 视频总时长: 14.28秒
 视频合成完成
 视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+2026-04-10 12:07:28 - subtitle_preview - ERROR - Subprocess error: b"ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-version3 --enable-static --pkg-config=pkgconf --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-dxva2 --enable-d3d11va --enable-libvpl --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband\r\n  libavutil      58. 29.100 / 58. 29.100\r\n  libavcodec     60. 31.102 / 60. 31.102\r\n  libavformat    60. 16.100 / 60. 16.100\r\n  libavdevice    60.  3.100 / 60.  3.100\r\n  libavfilter     9. 12.100 /  9. 12.100\r\n  libswscale      7.  5.100 /  7.  5.100\r\n  libswresample   4. 12.100 /  4. 12.100\r\n  libpostproc    57.  3.100 / 57.  3.100\r\nInput #0, png_pipe, from 'E:\\Neyro\\VideoCaptioner\\resource\\assets\\default_bg_portrait.png':\r\n  Duration: N/A, bitrate: N/A\r\n  Stream #0:0: Video: png, rgb24(pc, gbr/unknown/unknown), 480x852 [SAR 2835:2835 DAR 40:71], 25 fps, 25 tbr, 25 tbn\r\n[Parsed_ass_0 @ 000001bfbec0c1c0] libass API version: 0x1701000\r\n[Parsed_ass_0 @ 000001bfbec0c1c0] libass source: commit: 0.17.0-63-gc047dd2ea16f73abb4f448e6db3637158c1226d0\r\n[Parsed_ass_0 @ 000001bfbec0c1c0] Shaper: FriBidi 1.0.13 (SIMPLE) HarfBuzz-ng 8.3.0 (COMPLEX)\r\n[Parsed_ass_0 @ 000001bfbec0c1c0] Using font provider directwrite (with GDI)\r\n[Parsed_ass_0 @ 000001bfbec0c1c0] Read failed, 0: No error\r\n[Parsed_ass_0 @ 000001bfbec0c1c0] Could not create a libass track when reading file 'E:/Neyro/VideoCaptioner/AppData/cache/preview.ass'\r\n[AVFilterGraph @ 000001bfbec0bfc0] Error initializing filters\r\n[vost#0:0/png @ 000001bfbec23540] Error initializing a simple filtergraph\r\nError opening output file E:\\Neyro\\VideoCaptioner\\AppData\\cache\\preview.png.\r\nError opening output files: Invalid argument\r\n"
+2026-04-10 12:07:44 - subtitle_preview - ERROR - Subprocess error: b"ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-version3 --enable-static --pkg-config=pkgconf --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-dxva2 --enable-d3d11va --enable-libvpl --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband\r\n  libavutil      58. 29.100 / 58. 29.100\r\n  libavcodec     60. 31.102 / 60. 31.102\r\n  libavformat    60. 16.100 / 60. 16.100\r\n  libavdevice    60.  3.100 / 60.  3.100\r\n  libavfilter     9. 12.100 /  9. 12.100\r\n  libswscale      7.  5.100 /  7.  5.100\r\n  libswresample   4. 12.100 /  4. 12.100\r\n  libpostproc    57.  3.100 / 57.  3.100\r\nInput #0, png_pipe, from 'E:\\Neyro\\VideoCaptioner\\resource\\assets\\default_bg_portrait.png':\r\n  Duration: N/A, bitrate: N/A\r\n  Stream #0:0: Video: png, rgb24(pc, gbr/unknown/unknown), 480x852 [SAR 2835:2835 DAR 40:71], 25 fps, 25 tbr, 25 tbn\r\n[Parsed_ass_0 @ 000001d2c37ac1c0] libass API version: 0x1701000\r\n[Parsed_ass_0 @ 000001d2c37ac1c0] libass source: commit: 0.17.0-63-gc047dd2ea16f73abb4f448e6db3637158c1226d0\r\n[Parsed_ass_0 @ 000001d2c37ac1c0] Shaper: FriBidi 1.0.13 (SIMPLE) HarfBuzz-ng 8.3.0 (COMPLEX)\r\n[Parsed_ass_0 @ 000001d2c37ac1c0] Using font provider directwrite (with GDI)\r\n[Parsed_ass_0 @ 000001d2c37ac1c0] Read failed, 0: No error\r\n[Parsed_ass_0 @ 000001d2c37ac1c0] Could not create a libass track when reading file 'E:/Neyro/VideoCaptioner/AppData/cache/preview.ass'\r\n[AVFilterGraph @ 000001d2c37abfc0] Error initializing filters\r\n[vost#0:0/png @ 000001d2c37c3540] Error initializing a simple filtergraph\r\nError opening output file E:\\Neyro\\VideoCaptioner\\AppData\\cache\\preview.png.\r\nError opening output files: Invalid argument\r\n"
+2026-04-10 12:07:44 - subtitle_preview - ERROR - Subprocess error: b"ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-version3 --enable-static --pkg-config=pkgconf --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-dxva2 --enable-d3d11va --enable-libvpl --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband\r\n  libavutil      58. 29.100 / 58. 29.100\r\n  libavcodec     60. 31.102 / 60. 31.102\r\n  libavformat    60. 16.100 / 60. 16.100\r\n  libavdevice    60.  3.100 / 60.  3.100\r\n  libavfilter     9. 12.100 /  9. 12.100\r\n  libswscale      7.  5.100 /  7.  5.100\r\n  libswresample   4. 12.100 /  4. 12.100\r\n  libpostproc    57.  3.100 / 57.  3.100\r\nInput #0, png_pipe, from 'E:\\Neyro\\VideoCaptioner\\resource\\assets\\default_bg_portrait.png':\r\n  Duration: N/A, bitrate: N/A\r\n  Stream #0:0: Video: png, rgb24(pc, gbr/unknown/unknown), 480x852 [SAR 2835:2835 DAR 40:71], 25 fps, 25 tbr, 25 tbn\r\n[Parsed_ass_0 @ 000001ed1b0fc1c0] libass API version: 0x1701000\r\n[Parsed_ass_0 @ 000001ed1b0fc1c0] libass source: commit: 0.17.0-63-gc047dd2ea16f73abb4f448e6db3637158c1226d0\r\n[Parsed_ass_0 @ 000001ed1b0fc1c0] Shaper: FriBidi 1.0.13 (SIMPLE) HarfBuzz-ng 8.3.0 (COMPLEX)\r\n[Parsed_ass_0 @ 000001ed1b0fc1c0] Using font provider directwrite (with GDI)\r\n[Parsed_ass_0 @ 000001ed1b0fc1c0] Added subtitle file: 'E:/Neyro/VideoCaptioner/AppData/cache/preview.ass' (3 styles, 1 events)\r\nStream mapping:\r\n  Stream #0:0 -> #0:0 (png (native) -> png (native))\r\nPress [q] to stop, [?] for help\r\n[Parsed_ass_0 @ 000001ed198b8ec0] libass API version: 0x1701000\r\n[Parsed_ass_0 @ 000001ed198b8ec0] libass source: commit: 0.17.0-63-gc047dd2ea16f73abb4f448e6db3637158c1226d0\r\n[Parsed_ass_0 @ 000001ed198b8ec0] Shaper: FriBidi 1.0.13 (SIMPLE) HarfBuzz-ng 8.3.0 (COMPLEX)\r\n[Parsed_ass_0 @ 000001ed198b8ec0] Using font provider directwrite (with GDI)\r\n[Parsed_ass_0 @ 000001ed198b8ec0] Read failed, 0: No error\r\n[Parsed_ass_0 @ 000001ed198b8ec0] Could not create a libass track when reading file 'E:/Neyro/VideoCaptioner/AppData/cache/preview.ass'\r\n[AVFilterGraph @ 000001ed1b16c2c0] Error initializing filters\r\n[vf#0:0 @ 000001ed1b113dc0] Error reinitializing filters!\r\nFailed to inject frame into filter network: Invalid argument\r\nError while filtering: Invalid argument\r\n[out#0/image2 @ 000001ed1b112cc0] Nothing was written into output file, because at least one of its streams received no packets.\r\nframe=    0 fps=0.0 q=0.0 Lsize=       0kB time=N/A bitrate=N/A speed=N/A    \r\nConversion failed!\r\n"
+2026-04-10 12:07:45 - subtitle_preview - ERROR - Subprocess error: b"ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-version3 --enable-static --pkg-config=pkgconf --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-dxva2 --enable-d3d11va --enable-libvpl --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband\r\n  libavutil      58. 29.100 / 58. 29.100\r\n  libavcodec     60. 31.102 / 60. 31.102\r\n  libavformat    60. 16.100 / 60. 16.100\r\n  libavdevice    60.  3.100 / 60.  3.100\r\n  libavfilter     9. 12.100 /  9. 12.100\r\n  libswscale      7.  5.100 /  7.  5.100\r\n  libswresample   4. 12.100 /  4. 12.100\r\n  libpostproc    57.  3.100 / 57.  3.100\r\nInput #0, png_pipe, from 'E:\\Neyro\\VideoCaptioner\\resource\\assets\\default_bg_portrait.png':\r\n  Duration: N/A, bitrate: N/A\r\n  Stream #0:0: Video: png, rgb24(pc, gbr/unknown/unknown), 480x852 [SAR 2835:2835 DAR 40:71], 25 fps, 25 tbr, 25 tbn\r\n[Parsed_ass_0 @ 000002279a70c1c0] libass API version: 0x1701000\r\n[Parsed_ass_0 @ 000002279a70c1c0] libass source: commit: 0.17.0-63-gc047dd2ea16f73abb4f448e6db3637158c1226d0\r\n[Parsed_ass_0 @ 000002279a70c1c0] Shaper: FriBidi 1.0.13 (SIMPLE) HarfBuzz-ng 8.3.0 (COMPLEX)\r\n[Parsed_ass_0 @ 000002279a70c1c0] Using font provider directwrite (with GDI)\r\n[Parsed_ass_0 @ 000002279a70c1c0] Read failed, 0: No error\r\n[Parsed_ass_0 @ 000002279a70c1c0] Could not create a libass track when reading file 'E:/Neyro/VideoCaptioner/AppData/cache/preview.ass'\r\n[AVFilterGraph @ 000002279a70bfc0] Error initializing filters\r\n[vost#0:0/png @ 000002279a723540] Error initializing a simple filtergraph\r\nError opening output file E:\\Neyro\\VideoCaptioner\\AppData\\cache\\preview.png.\r\nError opening output files: Invalid argument\r\n"
+2026-04-10 12:07:45 - subtitle_preview - ERROR - Subprocess error: b"ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-version3 --enable-static --pkg-config=pkgconf --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-dxva2 --enable-d3d11va --enable-libvpl --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband\r\n  libavutil      58. 29.100 / 58. 29.100\r\n  libavcodec     60. 31.102 / 60. 31.102\r\n  libavformat    60. 16.100 / 60. 16.100\r\n  libavdevice    60.  3.100 / 60.  3.100\r\n  libavfilter     9. 12.100 /  9. 12.100\r\n  libswscale      7.  5.100 /  7.  5.100\r\n  libswresample   4. 12.100 /  4. 12.100\r\n  libpostproc    57.  3.100 / 57.  3.100\r\nInput #0, png_pipe, from 'E:\\Neyro\\VideoCaptioner\\resource\\assets\\default_bg_portrait.png':\r\n  Duration: N/A, bitrate: N/A\r\n  Stream #0:0: Video: png, rgb24(pc, gbr/unknown/unknown), 480x852 [SAR 2835:2835 DAR 40:71], 25 fps, 25 tbr, 25 tbn\r\n[Parsed_ass_0 @ 0000024c7a14c1c0] libass API version: 0x1701000\r\n[Parsed_ass_0 @ 0000024c7a14c1c0] libass source: commit: 0.17.0-63-gc047dd2ea16f73abb4f448e6db3637158c1226d0\r\n[Parsed_ass_0 @ 0000024c7a14c1c0] Shaper: FriBidi 1.0.13 (SIMPLE) HarfBuzz-ng 8.3.0 (COMPLEX)\r\n[Parsed_ass_0 @ 0000024c7a14c1c0] Using font provider directwrite (with GDI)\r\n[Parsed_ass_0 @ 0000024c7a14c1c0] Added subtitle file: 'E:/Neyro/VideoCaptioner/AppData/cache/preview.ass' (3 styles, 1 events)\r\nStream mapping:\r\n  Stream #0:0 -> #0:0 (png (native) -> png (native))\r\nPress [q] to stop, [?] for help\r\n[Parsed_ass_0 @ 0000024c78978ec0] libass API version: 0x1701000\r\n[Parsed_ass_0 @ 0000024c78978ec0] libass source: commit: 0.17.0-63-gc047dd2ea16f73abb4f448e6db3637158c1226d0\r\n[Parsed_ass_0 @ 0000024c78978ec0] Shaper: FriBidi 1.0.13 (SIMPLE) HarfBuzz-ng 8.3.0 (COMPLEX)\r\n[Parsed_ass_0 @ 0000024c78978ec0] Using font provider directwrite (with GDI)\r\n[Parsed_ass_0 @ 0000024c78978ec0] Read failed, 0: No error\r\n[Parsed_ass_0 @ 0000024c78978ec0] Could not create a libass track when reading file 'E:/Neyro/VideoCaptioner/AppData/cache/preview.ass'\r\n[AVFilterGraph @ 0000024c7a150c80] Error initializing filters\r\n[vf#0:0 @ 0000024c7a163dc0] Error reinitializing filters!\r\nFailed to inject frame into filter network: Invalid argument\r\nError while filtering: Invalid argument\r\n[out#0/image2 @ 0000024c7a162cc0] Nothing was written into output file, because at least one of its streams received no packets.\r\nframe=    0 fps=0.0 q=0.0 Lsize=       0kB time=N/A bitrate=N/A speed=N/A    \r\nConversion failed!\r\n"
+2026-04-10 12:07:45 - subtitle_preview - ERROR - Subprocess error: b"ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-version3 --enable-static --pkg-config=pkgconf --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-dxva2 --enable-d3d11va --enable-libvpl --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband\r\n  libavutil      58. 29.100 / 58. 29.100\r\n  libavcodec     60. 31.102 / 60. 31.102\r\n  libavformat    60. 16.100 / 60. 16.100\r\n  libavdevice    60.  3.100 / 60.  3.100\r\n  libavfilter     9. 12.100 /  9. 12.100\r\n  libswscale      7.  5.100 /  7.  5.100\r\n  libswresample   4. 12.100 /  4. 12.100\r\n  libpostproc    57.  3.100 / 57.  3.100\r\nInput #0, png_pipe, from 'E:\\Neyro\\VideoCaptioner\\resource\\assets\\default_bg_portrait.png':\r\n  Duration: N/A, bitrate: N/A\r\n  Stream #0:0: Video: png, rgb24(pc, gbr/unknown/unknown), 480x852 [SAR 2835:2835 DAR 40:71], 25 fps, 25 tbr, 25 tbn\r\n[Parsed_ass_0 @ 000002e52e9ec1c0] libass API version: 0x1701000\r\n[Parsed_ass_0 @ 000002e52e9ec1c0] libass source: commit: 0.17.0-63-gc047dd2ea16f73abb4f448e6db3637158c1226d0\r\n[Parsed_ass_0 @ 000002e52e9ec1c0] Shaper: FriBidi 1.0.13 (SIMPLE) HarfBuzz-ng 8.3.0 (COMPLEX)\r\n[Parsed_ass_0 @ 000002e52e9ec1c0] Using font provider directwrite (with GDI)\r\n[Parsed_ass_0 @ 000002e52e9ec1c0] Read failed, 0: No error\r\n[Parsed_ass_0 @ 000002e52e9ec1c0] Could not create a libass track when reading file 'E:/Neyro/VideoCaptioner/AppData/cache/preview.ass'\r\n[AVFilterGraph @ 000002e52e9ebfc0] Error initializing filters\r\n[vost#0:0/png @ 000002e52ea03540] Error initializing a simple filtergraph\r\nError opening output file E:\\Neyro\\VideoCaptioner\\AppData\\cache\\preview.png.\r\nError opening output files: Invalid argument\r\n"
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-10 12:30:44.188889
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 0221.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp4glmgw1z.wav
+视频时长: 14.28秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【原始字幕】Последовательность 0221-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-10 12:30:44.299968
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【样式字幕】Последовательность 0221-FasterWhisper ✨-俄语.ass
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-10 12:30:44.347967
+开始合成视频: E:/Render/Последовательность 0221.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 0221.mp4" -acodec copy -vcodec libx264 -preset medium -vf subtitles='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Render\【卡卡】Последовательность 0221.mp4"
+视频总时长: 14.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
+
+===========转录任务开始===========
+时间：2026-04-10 12:31:38.000202
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 0221.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmply14xh4w.wav
+视频时长: 14.28秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【原始字幕】Последовательность 0221-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-10 12:31:38.101734
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【样式字幕】Последовательность 0221-FasterWhisper ✨-俄语.ass
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-10 12:31:38.121735
+开始合成视频: E:/Render/Последовательность 0221.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 0221.mp4" -acodec copy -vcodec libx264 -preset medium -vf subtitles='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Render\【卡卡】Последовательность 0221.mp4"
+视频总时长: 14.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
+
+===========转录任务开始===========
+时间：2026-04-10 12:31:58.884526
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 0221.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpcmtdy5kv.wav
+视频时长: 14.28秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【原始字幕】Последовательность 0221-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-10 12:31:58.984550
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【样式字幕】Последовательность 0221-FasterWhisper ✨-俄语.ass
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-10 12:31:59.008550
+开始合成视频: E:/Render/Последовательность 0221.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 0221.mp4" -acodec copy -vcodec libx264 -preset medium -vf subtitles='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Render\【卡卡】Последовательность 0221.mp4"
+视频总时长: 14.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
+
+===========转录任务开始===========
+时间：2026-04-10 12:32:26.983057
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 0221.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmppzi9a0ck.wav
+视频时长: 14.28秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【原始字幕】Последовательность 0221-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-10 12:32:27.084057
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【样式字幕】Последовательность 0221-FasterWhisper ✨-俄语.ass
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-10 12:32:27.103059
+开始合成视频: E:/Render/Последовательность 0221.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 0221.mp4" -acodec copy -vcodec libx264 -preset medium -vf subtitles='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Render\【卡卡】Последовательность 0221.mp4"
+视频总时长: 14.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
+
+===========转录任务开始===========
+时间：2026-04-10 12:32:49.083446
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 0221.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp0v0_to60.wav
+视频时长: 14.28秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【原始字幕】Последовательность 0221-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-10 12:32:49.183446
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【样式字幕】Последовательность 0221-FasterWhisper ✨-俄语.ass
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-10 12:32:49.208992
+开始合成视频: E:/Render/Последовательность 0221.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 0221.mp4" -acodec copy -vcodec libx264 -preset medium -vf subtitles='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Render\【卡卡】Последовательность 0221.mp4"
+视频总时长: 14.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
+
+===========转录任务开始===========
+时间：2026-04-10 12:33:17.515377
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 0221.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpurifqg44.wav
+视频时长: 14.28秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【原始字幕】Последовательность 0221-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-10 12:33:17.619376
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【样式字幕】Последовательность 0221-FasterWhisper ✨-俄语.ass
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-10 12:33:17.637375
+开始合成视频: E:/Render/Последовательность 0221.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 0221.mp4" -acodec copy -vcodec libx264 -preset medium -vf subtitles='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Render\【卡卡】Последовательность 0221.mp4"
+视频总时长: 14.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
+
+===========转录任务开始===========
+时间：2026-04-10 12:34:34.536178
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 0221.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpqyw432ai.wav
+视频时长: 14.28秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【原始字幕】Последовательность 0221-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-10 12:34:34.639125
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【样式字幕】Последовательность 0221-FasterWhisper ✨-俄语.ass
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-10 12:34:34.661087
+开始合成视频: E:/Render/Последовательность 0221.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 0221.mp4" -acodec copy -vcodec libx264 -preset medium -vf subtitles='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Render\【卡卡】Последовательность 0221.mp4"
+视频总时长: 14.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
+
+===========转录任务开始===========
+时间：2026-04-10 12:35:07.096378
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 0221.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmprs4mbwm4.wav
+视频时长: 14.28秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【原始字幕】Последовательность 0221-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-10 12:35:07.210012
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 0221\subtitle\【样式字幕】Последовательность 0221-FasterWhisper ✨-俄语.ass
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-10 12:35:07.230011
+开始合成视频: E:/Render/Последовательность 0221.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 0221.mp4" -acodec copy -vcodec libx264 -preset medium -vf subtitles='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Render\【卡卡】Последовательность 0221.mp4"
+视频总时长: 14.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 0221.mp4
