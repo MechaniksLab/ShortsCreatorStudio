@@ -5,7 +5,7 @@ from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import InfoBar, InfoBarPosition, MessageBoxBase, SettingCardGroup
 
 from app.common.config import cfg
-from app.core.entities import TranscribeLanguageEnum
+from app.core.entities import TranscribeLanguageEnum, get_transcribe_language_display_texts
 
 
 class LanguageSettingDialog(MessageBoxBase):
@@ -33,7 +33,7 @@ class LanguageSettingDialog(MessageBoxBase):
             FIF.LANGUAGE,
             self.tr("源语言"),
             self.tr("音频的源语言"),
-            [lang.value for lang in TranscribeLanguageEnum],
+            get_transcribe_language_display_texts(),
         )
         self.language_card.comboBox.setMaxVisibleItems(6)
 

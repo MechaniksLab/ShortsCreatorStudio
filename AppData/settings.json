@@ -90,7 +90,7 @@
         "PreviewImage": "E:\\Neyro\\VideoCaptioner\\resource\\assets\\default_bg_portrait.png",
         "RainbowEndColor": "#4ca6ff",
         "SafeAreaEnabled": true,
-        "SafeMarginX": 6,
+        "SafeMarginX": 20,
         "SafeMarginY": 10,
         "SpeakerColorMode": "off",
         "StyleName": "default",

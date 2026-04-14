@@ -480,6 +480,171 @@ LANGUAGES = {
 }
 
 
+# ---------- UI локализация названий языков/моделей на русский ----------
+LANGUAGE_CODE_TO_RU = {
+    "af": "Африкаанс",
+    "am": "Амхарский",
+    "ar": "Арабский",
+    "as": "Ассамский",
+    "az": "Азербайджанский",
+    "ba": "Башкирский",
+    "be": "Белорусский",
+    "bg": "Болгарский",
+    "bn": "Бенгальский",
+    "bo": "Тибетский",
+    "br": "Бретонский",
+    "bs": "Боснийский",
+    "ca": "Каталанский",
+    "cs": "Чешский",
+    "cy": "Валлийский",
+    "da": "Датский",
+    "de": "Немецкий",
+    "el": "Греческий",
+    "en": "Английский",
+    "es": "Испанский",
+    "et": "Эстонский",
+    "eu": "Баскский",
+    "fa": "Персидский",
+    "fi": "Финский",
+    "fo": "Фарерский",
+    "fr": "Французский",
+    "gl": "Галисийский",
+    "gu": "Гуджарати",
+    "ha": "Хауса",
+    "haw": "Гавайский",
+    "he": "Иврит",
+    "hi": "Хинди",
+    "hr": "Хорватский",
+    "ht": "Гаитянский креольский",
+    "hu": "Венгерский",
+    "hy": "Армянский",
+    "id": "Индонезийский",
+    "is": "Исландский",
+    "it": "Итальянский",
+    "ja": "Японский",
+    "jw": "Яванский",
+    "ka": "Грузинский",
+    "kk": "Казахский",
+    "km": "Кхмерский",
+    "kn": "Каннада",
+    "ko": "Корейский",
+    "la": "Латинский",
+    "lb": "Люксембургский",
+    "ln": "Лингала",
+    "lo": "Лаосский",
+    "lt": "Литовский",
+    "lv": "Латышский",
+    "mi": "Маори",
+    "mk": "Македонский",
+    "ml": "Малаялам",
+    "mn": "Монгольский",
+    "mr": "Маратхи",
+    "ms": "Малайский",
+    "mt": "Мальтийский",
+    "my": "Мьянманский",
+    "ne": "Непальский",
+    "nl": "Нидерландский",
+    "nn": "Нюнорск",
+    "no": "Норвежский",
+    "oc": "Окситанский",
+    "pa": "Панджаби",
+    "pl": "Польский",
+    "ps": "Пушту",
+    "pt": "Португальский",
+    "ro": "Румынский",
+    "ru": "Русский",
+    "sa": "Санскрит",
+    "sd": "Синдхи",
+    "si": "Сингальский",
+    "sk": "Словацкий",
+    "sl": "Словенский",
+    "sn": "Шона",
+    "so": "Сомалийский",
+    "sq": "Албанский",
+    "sr": "Сербский",
+    "su": "Сунданский",
+    "sv": "Шведский",
+    "sw": "Суахили",
+    "ta": "Тамильский",
+    "te": "Телугу",
+    "tg": "Таджикский",
+    "th": "Тайский",
+    "tk": "Туркменский",
+    "tl": "Тагальский",
+    "tr": "Турецкий",
+    "tt": "Татарский",
+    "uk": "Украинский",
+    "ur": "Урду",
+    "uz": "Узбекский",
+    "vi": "Вьетнамский",
+    "yi": "Идиш",
+    "yo": "Йоруба",
+    "yue": "Кантонский",
+    "zh": "Китайский",
+    "zh-CN": "Китайский (упрощённый)",
+    "zh-Hans": "Китайский (упрощённый)",
+    "zh-Hant": "Китайский (традиционный)",
+    "zh-TW": "Китайский (традиционный)",
+}
+
+TRANSCRIBE_MODEL_RU = {
+    TranscribeModelEnum.BIJIAN.value: "B-интерфейс",
+    TranscribeModelEnum.JIANYING.value: "J-интерфейс",
+    TranscribeModelEnum.FASTER_WHISPER.value: "FasterWhisper ✨",
+    TranscribeModelEnum.WHISPER_CPP.value: "WhisperCpp",
+    TranscribeModelEnum.WHISPER_API.value: "Whisper [API]",
+}
+
+TRANSLATOR_SERVICE_RU = {
+    TranslatorServiceEnum.OPENAI.value: "LLM-перевод",
+    TranslatorServiceEnum.DEEPLX.value: "DeepLx",
+    TranslatorServiceEnum.BING.value: "Microsoft Translator",
+    TranslatorServiceEnum.GOOGLE.value: "Google Translator",
+}
+
+
+def language_value_to_ru(value: str) -> str:
+    """Преобразовать внутреннее имя языка в русское отображаемое."""
+    special = {
+        "简体中文": "Китайский (упрощённый)",
+        "繁体中文": "Китайский (традиционный)",
+        "中文": "Китайский",
+        "日本語": "Японский",
+        "韩语": "Корейский",
+        "粤语": "Кантонский",
+        "英语": "Английский",
+        "法语": "Французский",
+        "德语": "Немецкий",
+        "西班牙语": "Испанский",
+        "俄语": "Русский",
+        "葡萄牙语": "Португальский",
+        "土耳其语": "Турецкий",
+    }
+    if value in special:
+        return special[value]
+    code = LANGUAGES.get(value)
+    if code:
+        return LANGUAGE_CODE_TO_RU.get(code, value)
+    return value
+
+
+def transcribe_model_to_ru(value: str) -> str:
+    return TRANSCRIBE_MODEL_RU.get(value, value)
+
+
+def translator_service_to_ru(value: str) -> str:
+    return TRANSLATOR_SERVICE_RU.get(value, value)
+
+
+def get_transcribe_language_display_texts() -> List[str]:
+    return [language_value_to_ru(lang.value) for lang in TranscribeLanguageEnum]
+
+
+def get_target_language_display_texts() -> List[str]:
+    return [language_value_to_ru(lang.value) for lang in TargetLanguageEnum]
+
+
+
 @dataclass
 class VideoInfo:
     """视频信息类"""

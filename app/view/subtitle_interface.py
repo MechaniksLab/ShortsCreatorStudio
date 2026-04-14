@@ -41,6 +41,7 @@ from app.core.entities import (
     SubtitleTask,
     SupportedSubtitleFormats,
     TargetLanguageEnum,
+    language_value_to_ru,
 )
 from app.core.task_factory import TaskFactory
 from app.core.utils.get_subtitle_style import get_subtitle_style
@@ -216,7 +217,9 @@ class SubtitleInterface(QWidget):
         )
         self.translate_button.setChecked(cfg.need_translate.value)
         self.optimize_button.setChecked(cfg.need_optimize.value)
-        self.target_language_button.setText(cfg.target_language.value.value)
+        self.target_language_button.setText(
+            language_value_to_ru(cfg.target_language.value.value)
+        )
         self.target_language_button.setEnabled(cfg.need_translate.value)
 
     def _setup_top_layout(self):
@@ -291,7 +294,7 @@ class SubtitleInterface(QWidget):
         self.target_language_menu = RoundMenu(parent=self)
         self.target_language_menu.setMaxVisibleItems(10)
         for lang in TargetLanguageEnum:
-            action = Action(text=lang.value)
+            action = Action(text=language_value_to_ru(lang.value))
             action.triggered.connect(
                 lambda checked, l=lang.value: signalBus.target_language_changed.emit(l)
             )
@@ -843,7 +846,7 @@ class SubtitleInterface(QWidget):
         """处理翻译语言变更"""
         for lang in TargetLanguageEnum:
             if lang.value == language:
-                self.target_language_button.setText(lang.value)
+                self.target_language_button.setText(language_value_to_ru(lang.value))
                 cfg.set(cfg.target_language, lang)
                 break
 
