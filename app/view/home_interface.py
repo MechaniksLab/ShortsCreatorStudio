@@ -1,8 +1,9 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QSizePolicy, QStackedWidget, QVBoxLayout, QWidget
-from qfluentwidgets import SegmentedWidget
+from qfluentwidgets import SegmentedWidget, isDarkTheme
 
 from app.core.task_factory import TaskFactory
+from app.view.auto_shorts_interface import AutoShortsInterface
 from app.view.subtitle_interface import SubtitleInterface
 from app.view.task_creation_interface import TaskCreationInterface
 from app.view.transcription_interface import TranscriptionInterface
@@ -16,11 +17,10 @@ class HomeInterface(QWidget):
 
         # 设置对象名称和样式
         self.setObjectName("HomeInterface")
-        self.setStyleSheet(
-            """
-            HomeInterface{background: white}
-        """
-        )
+        if isDarkTheme():
+            self.setStyleSheet("HomeInterface{background: #202124;}")
+        else:
+            self.setStyleSheet("HomeInterface{background: #f5f6f8;}")
 
         # 创建分段控件和堆叠控件
         self.pivot = SegmentedWidget(self)
@@ -34,6 +34,7 @@ class HomeInterface(QWidget):
         self.transcription_interface = TranscriptionInterface(self)
         self.subtitle_optimization_interface = SubtitleInterface(self)
         self.video_synthesis_interface = VideoSynthesisInterface(self)
+        self.auto_shorts_interface = AutoShortsInterface(self)
 
         self.addSubInterface(
             self.task_creation_interface, "TaskCreationInterface", "Создание задачи"
@@ -50,6 +51,11 @@ class HomeInterface(QWidget):
             self.video_synthesis_interface,
             "VideoSynthesisInterface",
             "Синтез видео с субтитрами",
+        )
+        self.addSubInterface(
+            self.auto_shorts_interface,
+            "AutoShortsInterface",
+            "Auto Shorts (поиск моментов)",
         )
 
         self.vBoxLayout.addWidget(self.pivot)
@@ -120,4 +126,5 @@ class HomeInterface(QWidget):
         self.transcription_interface.close()
         self.subtitle_optimization_interface.close()
         self.video_synthesis_interface.close()
+        self.auto_shorts_interface.close()
         super().closeEvent(event)

@@ -10239,3 +10239,541 @@ CUDA可用
 视频合成完成
 视频合成完成，保存路径: E:\Render\【卡卡】Последовательность 01_13.mp4
 Latest version info: v1.3.3
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i E:/Render/Detroit Become Human 5.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpdh8y4fex.wav
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmp6ly3uble\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp6ly3uble\audio.wav
+1% |   28/2969 | 00:19<<33:22 |  1.47 audio seconds/s
+2% |   59/2969 | 00:26<<21:50 |  2.22 audio seconds/s
+3% |   83/2969 | 00:30<<17:56 |  2.68 audio seconds/s
+4% |  113/2969 | 00:34<<14:32 |  3.27 audio seconds/s
+5% |  135/2969 | 01:11<<25:06 |  1.88 audio seconds/s
+6% |  165/2969 | 01:16<<21:46 |  2.15 audio seconds/s
+7% |  194/2969 | 01:22<<19:44 |  2.34 audio seconds/s
+8% |  223/2969 | 01:26<<17:50 |  2.56 audio seconds/s
+8% |  251/2969 | 01:30<<16:22 |  2.77 audio seconds/s
+9% |  282/2969 | 01:36<<15:21 |  2.92 audio seconds/s
+10% |  311/2969 | 01:39<<14:12 |  3.12 audio seconds/s
+11% |  338/2969 | 01:45<<13:40 |  3.21 audio seconds/s
+12% |  367/2969 | 01:49<<12:59 |  3.34 audio seconds/s
+13% |  392/2969 | 01:52<<12:19 |  3.48 audio seconds/s
+14% |  416/2969 | 01:55<<11:49 |  3.60 audio seconds/s
+15% |  454/2969 | 02:00<<11:06 |  3.77 audio seconds/s
+16% |  483/2969 | 02:04<<10:43 |  3.86 audio seconds/s
+17% |  510/2969 | 02:08<<10:17 |  3.98 audio seconds/s
+18% |  541/2969 | 02:11<<09:49 |  4.12 audio seconds/s
+19% |  561/2969 | 02:13<<09:34 |  4.19 audio seconds/s
+20% |  591/2969 | 02:18<<09:18 |  4.25 audio seconds/s
+21% |  617/2969 | 02:21<<08:59 |  4.36 audio seconds/s
+22% |  647/2969 | 02:27<<08:49 |  4.38 audio seconds/s
+23% |  677/2969 | 02:31<<08:33 |  4.46 audio seconds/s
+24% |  705/2969 | 02:37<<08:25 |  4.48 audio seconds/s
+25% |  736/2969 | 02:43<<08:15 |  4.51 audio seconds/s
+26% |  764/2969 | 02:47<<08:04 |  4.55 audio seconds/s
+27% |  793/2969 | 02:53<<07:55 |  4.57 audio seconds/s
+28% |  825/2969 | 02:58<<07:42 |  4.63 audio seconds/s
+29% |  855/2969 | 03:00<<07:27 |  4.73 audio seconds/s
+30% |  878/2969 | 03:03<<07:16 |  4.79 audio seconds/s
+31% |  915/2969 | 03:07<<07:00 |  4.89 audio seconds/s
+32% |  940/2969 | 03:09<<06:49 |  4.96 audio seconds/s
+33% |  971/2969 | 03:12<<06:37 |  5.03 audio seconds/s
+34% | 1005/2969 | 03:17<<06:25 |  5.09 audio seconds/s
+35% | 1025/2969 | 03:20<<06:20 |  5.10 audio seconds/s
+36% | 1056/2969 | 03:26<<06:14 |  5.10 audio seconds/s
+37% | 1094/2969 | 03:30<<06:01 |  5.19 audio seconds/s
+38% | 1114/2969 | 03:36<<05:59 |  5.16 audio seconds/s
+39% | 1154/2969 | 03:39<<05:45 |  5.26 audio seconds/s
+40% | 1179/2969 | 03:43<<05:39 |  5.28 audio seconds/s
+41% | 1205/2969 | 03:48<<05:34 |  5.28 audio seconds/s
+42% | 1235/2969 | 03:54<<05:29 |  5.27 audio seconds/s
+42% | 1259/2969 | 03:59<<05:25 |  5.25 audio seconds/s
+43% | 1289/2969 | 04:06<<05:21 |  5.23 audio seconds/s
+44% | 1316/2969 | 04:13<<05:18 |  5.19 audio seconds/s
+45% | 1344/2969 | 04:17<<05:10 |  5.23 audio seconds/s
+46% | 1369/2969 | 04:23<<05:08 |  5.19 audio seconds/s
+47% | 1403/2969 | 04:29<<05:01 |  5.20 audio seconds/s
+48% | 1432/2969 | 04:38<<04:58 |  5.15 audio seconds/s
+49% | 1453/2969 | 04:42<<04:54 |  5.15 audio seconds/s
+50% | 1475/2969 | 04:48<<04:52 |  5.11 audio seconds/s
+51% | 1504/2969 | 04:55<<04:47 |  5.09 audio seconds/s
+52% | 1531/2969 | 04:58<<04:40 |  5.12 audio seconds/s
+52% | 1557/2969 | 05:07<<04:38 |  5.07 audio seconds/s
+53% | 1582/2969 | 05:14<<04:35 |  5.03 audio seconds/s
+54% | 1610/2969 | 05:21<<04:31 |  5.00 audio seconds/s
+55% | 1642/2969 | 05:29<<04:26 |  4.98 audio seconds/s
+56% | 1671/2969 | 05:37<<04:22 |  4.95 audio seconds/s
+57% | 1700/2969 | 05:46<<04:18 |  4.91 audio seconds/s
+58% | 1726/2969 | 05:49<<04:11 |  4.94 audio seconds/s
+59% | 1756/2969 | 05:55<<04:05 |  4.94 audio seconds/s
+60% | 1787/2969 | 06:00<<03:58 |  4.96 audio seconds/s
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpkj5_6vi7.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpu2k4ef5r.wav
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmprgamop3u\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmprgamop3u\audio.wav
+9% |  28/300 | 00:34<<05:34 |  0.81 audio seconds/s
+20% |  60/300 | 00:36<<02:24 |  1.66 audio seconds/s
+22% |  66/300 | 00:38<<02:16 |  1.72 audio seconds/s
+39% | 118/300 | 00:42<<01:05 |  2.77 audio seconds/s
+49% | 147/300 | 00:58<<01:01 |  2.50 audio seconds/s
+58% | 175/300 | 01:04<<00:45 |  2.73 audio seconds/s
+65% | 196/300 | 01:08<<00:36 |  2.88 audio seconds/s
+78% | 233/300 | 01:12<<00:20 |  3.21 audio seconds/s
+88% | 264/300 | 01:17<<00:10 |  3.41 audio seconds/s
+95% | 286/300 | 01:21<<00:03 |  3.51 audio seconds/s
+100% | 300/300 | 01:23<<00:00 |  3.59 audio seconds/s
+Transcription speed: 3.57 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmprgamop3u' directory.
+Operation finished in:  0:01:26.131
+Faster Whisper 返回值: 3221226505
+Faster Whisper 识别完成
+Render short: ffmpeg -ss 0.000 -to 20.730 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_001_0s_20s.mp4
+Render short: ffmpeg -ss 27.040 -to 66.060 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_002_27s_66s.mp4
+Render short: ffmpeg -ss 163.380 -to 182.870 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_003_163s_182s.mp4
+Render short: ffmpeg -ss 11.400 -to 27.960 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_004_11s_27s.mp4
+Render short: ffmpeg -ss 249.710 -to 281.930 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_005_249s_281s.mp4
+Render short: ffmpeg -ss 58.580 -to 94.980 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_006_58s_94s.mp4
+Render short: ffmpeg -ss 232.930 -to 269.370 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_007_232s_269s.mp4
+Render short: ffmpeg -ss 263.610 -to 299.830 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_008_263s_299s.mp4
+Render short: ffmpeg -ss 94.520 -to 113.960 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_009_94s_113s.mp4
+Render short: ffmpeg -ss 102.480 -to 121.400 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_010_102s_121s.mp4
+Render short: ffmpeg -ss 139.160 -to 172.690 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_011_139s_172s.mp4
+Render short: ffmpeg -ss 112.620 -to 134.820 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_012_112s_134s.mp4
+Render short: ffmpeg -ss 171.660 -to 195.670 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_013_171s_195s.mp4
+Render short: ffmpeg -ss 213.230 -to 250.850 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_014_213s_250s.mp4
+Render short: ffmpeg -ss 121.400 -to 147.400 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_015_121s_147s.mp4
+Render short: ffmpeg -ss 180.175 -to 206.575 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_016_180s_206s.mp4
+Render short: ffmpeg -ss 194.670 -to 214.670 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_017_194s_214s.mp4
+Render short: ffmpeg -ss 204.970 -to 223.230 -i E:/Render/Detroit Become Human 5.mp4 -vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920 -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Render\shorts_Detroit Become Human 5\short_018_204s_223s.mp4
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Failed to fetch version info: %s
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpjta45wuv.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpb11354ey.wav
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmp3t5k9ibz\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp3t5k9ibz\audio.wav
+16% |  29/180 | 00:52<<04:30 |  0.56 audio seconds/s
+33% |  59/180 | 00:57<<01:57 |  1.03 audio seconds/s
+48% |  87/180 | 01:01<<01:05 |  1.42 audio seconds/s
+64% | 116/180 | 01:05<<00:36 |  1.78 audio seconds/s
+80% | 144/180 | 01:10<<00:17 |  2.05 audio seconds/s
+92% | 166/180 | 01:14<<00:06 |  2.23 audio seconds/s
+99% | 178/180 | 01:16<<00:00 |  2.32 audio seconds/s
+100% | 180/180 | 01:17<<00:00 |  2.33 audio seconds/s
+Transcription speed: 2.33 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp3t5k9ibz' directory.
+Operation finished in:  0:01:19.333
+Faster Whisper 返回值: 3221226505
+Faster Whisper 识别完成
+Render short: ffmpeg -ss 171.680 -to 188.960 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]crop=815:458:0:0,scale=1080:637[cam];[0:v]crop=1712:1440:497:0,scale=1080:1280[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v libx264 -preset fast -crf 20 -c:a aac -b:a 192k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_171s_188s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmppz1mlfte.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp1vb7rb3r.wav
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 171.680 -to 188.960 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]crop=1002:438:0:0,scale=1080:640[cam];[0:v]crop=1587:1440:562:0,scale=1080:1280[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p -movflags +faststart -threads 0 -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_171s_188s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmp1le8q7rt.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmprimjnhv0.wav
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 171.680 -to 188.960 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]crop=815:458:0:0,scale=1080:637[cam];[0:v]crop=1712:1440:497:0,scale=1080:1280[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p -movflags +faststart -threads 0 -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_171s_188s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpu8qar2zz.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpfyqoqhg6.wav
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 171.680 -to 188.960 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]crop=815:458:0:0,scale=1080:637[cam];[0:v]crop=1712:1440:497:0,scale=1080:1280[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p -movflags +faststart -threads 0 -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_171s_188s.mp4
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmp4z54hw18.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmprrmclbuq.wav
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmp0agjaj3w\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp0agjaj3w\audio.wav
+16% |  29/180 | 00:48<<04:11 |  0.60 audio seconds/s
+28% |  50/180 | 00:51<<02:13 |  0.97 audio seconds/s
+48% |  87/180 | 00:55<<00:59 |  1.55 audio seconds/s
+64% | 116/180 | 01:02<<00:34 |  1.86 audio seconds/s
+80% | 144/180 | 01:06<<00:16 |  2.15 audio seconds/s
+92% | 166/180 | 01:10<<00:05 |  2.34 audio seconds/s
+100% | 180/180 | 01:13<<00:00 |  2.46 audio seconds/s
+Transcription speed: 2.45 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp0agjaj3w' directory.
+Operation finished in:  0:01:15.496
+Faster Whisper 返回值: 3221226505
+Faster Whisper 识别完成
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -to 195.700 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]crop=815:458:0:0,scale=1080:637[cam];[0:v]crop=1712:1440:497:0,scale=1080:1280[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p5 -cq 23 -b:v 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpsau6n4oj.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpmrgubkw0.wav
+转换为音频执行命令: ffmpeg -i C:\Temp\tmppxpcs3ls.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpkwvk8ytt.wav
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -to 195.700 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]crop=815:458:0:0,scale=1080:637:flags=fast_bilinear[cam];[0:v]crop=1712:1440:497:0,scale=1080:1280:flags=fast_bilinear[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640,fps=30[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 27 -b:v 0 -pix_fmt yuv420p -r 30 -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmp7wb2ua5l.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpnifx5bg2.wav
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=720x1280:color=black[base];[0:v]crop=815:458:0:0,scale=720:425:flags=fast_bilinear[cam];[0:v]crop=1712:1440:497:0,scale=720:853:flags=fast_bilinear[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:427,fps=30[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 27 -b:v 0 -pix_fmt yuv420p -r 30 -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpzvzjp_wn.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp5ai70z32.wav
+2026-04-14 23:44:26 - shorts_processor - WARNING - Enterprise packet parse failed: Connection error.
+2026-04-14 23:44:33 - shorts_processor - WARNING - LLM rerank skipped: Connection error.
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 164.060 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+2026-04-14 23:44:55 - shorts_processor - ERROR - Short render failed [short_001_164s_195s.mp4]. stderr: [h264 @ 0000022ee6a8a040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000022ee6a8a040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 0000022cdf20ca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 0000022cdf21be00] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:44:56 - shorts_processor - ERROR - Fallback render failed [short_001_164s_195s.mp4]: [AVFormatContext @ 0000029c6cf3ccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 0000029c6d078340] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 130.320 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_002_130s_169s.mp4
+2026-04-14 23:44:57 - shorts_processor - ERROR - Short render failed [short_002_130s_169s.mp4]. stderr: [h264 @ 000001d9318ca040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000001d9318ca040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000001d729f7ca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000001d729f8cd00] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:44:57 - shorts_processor - ERROR - Fallback render failed [short_002_130s_169s.mp4]: [AVFormatContext @ 000001f5f480ccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 000001f5f4947f00] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 145.445 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_003_145s_182s.mp4
+2026-04-14 23:44:59 - shorts_processor - ERROR - Short render failed [short_003_145s_182s.mp4]. stderr: [h264 @ 000001c1ca02a040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000001c1ca02a040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000001bfc27bca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000001bfc27cb8c0] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:44:59 - shorts_processor - ERROR - Fallback render failed [short_003_145s_182s.mp4]: [AVFormatContext @ 0000027d228dccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 0000027d22a18000] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 229.660 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_004_229s_269s.mp4
+2026-04-14 23:45:01 - shorts_processor - ERROR - Short render failed [short_004_229s_269s.mp4]. stderr: [h264 @ 000002964b45a040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000002964b45a040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 0000029443b9ca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 0000029443bac140] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:45:01 - shorts_processor - ERROR - Fallback render failed [short_004_229s_269s.mp4]: [AVFormatContext @ 00000271e95eccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 00000271e9727dc0] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 249.420 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_005_249s_281s.mp4
+2026-04-14 23:45:03 - shorts_processor - ERROR - Short render failed [short_005_249s_281s.mp4]. stderr: [h264 @ 0000027d3825a040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000027d3825a040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 0000027b307eca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 0000027b307fbac0] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:45:03 - shorts_processor - ERROR - Fallback render failed [short_005_249s_281s.mp4]: [AVFormatContext @ 000001f7519fccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 000001f751b38340] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 178.580 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_006_178s_206s.mp4
+2026-04-14 23:45:05 - shorts_processor - ERROR - Short render failed [short_006_178s_206s.mp4]. stderr: [h264 @ 0000020ea504a040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000020ea504a040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 0000020c9d79ca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 0000020c9d7ab9c0] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:45:05 - shorts_processor - ERROR - Fallback render failed [short_006_178s_206s.mp4]: [AVFormatContext @ 000001d4fa3fccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 000001d4fa537980] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 263.640 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_007_263s_299s.mp4
+2026-04-14 23:45:07 - shorts_processor - ERROR - Short render failed [short_007_263s_299s.mp4]. stderr: [h264 @ 00000214847fa040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 00000214847fa040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000002127cf2ca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000002127cf3b380] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:45:07 - shorts_processor - ERROR - Fallback render failed [short_007_263s_299s.mp4]: [AVFormatContext @ 0000027a8cf7ccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 0000027a8d0b7540] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 213.260 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_008_213s_233s.mp4
+2026-04-14 23:45:09 - shorts_processor - ERROR - Short render failed [short_008_213s_233s.mp4]. stderr: [h264 @ 000001ae5dcba040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000001ae5dcba040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000001ac5644ca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000001ac5645bac0] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:45:09 - shorts_processor - ERROR - Fallback render failed [short_008_213s_233s.mp4]: [AVFormatContext @ 000002a47151ccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 000002a471657cc0] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 222.140 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_009_222s_240s.mp4
+2026-04-14 23:45:11 - shorts_processor - ERROR - Short render failed [short_009_222s_240s.mp4]. stderr: [h264 @ 0000018b44d2a040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000018b44d2a040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000001893d4aca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000001893d4bc480] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:45:11 - shorts_processor - ERROR - Fallback render failed [short_009_222s_240s.mp4]: [AVFormatContext @ 00000239749accc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 0000023974ae7980] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 191.620 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_010_191s_215s.mp4
+2026-04-14 23:45:13 - shorts_processor - ERROR - Short render failed [short_010_191s_215s.mp4]. stderr: [h264 @ 0000026e1a29a040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000026e1a29a040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 0000026c129eca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 0000026c129fbc00] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:45:14 - shorts_processor - ERROR - Fallback render failed [short_010_191s_215s.mp4]: [AVFormatContext @ 000002ed501eccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 000002ed50328340] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 204.260 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_011_204s_225s.mp4
+2026-04-14 23:45:15 - shorts_processor - ERROR - Short render failed [short_011_204s_225s.mp4]. stderr: [h264 @ 0000023550fc00c0] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000023550fc00c0] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000002334800ca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000002354f7b14c0] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:45:15 - shorts_processor - ERROR - Fallback render failed [short_011_204s_225s.mp4]: [AVFormatContext @ 000002bd87d6ccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 000002bd87ea8340] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 120.610 -t 12.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=540x960,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=540:318[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=540:640[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:320[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ull -rc constqp -qp 30 -bf 0 -g 48 -pix_fmt yuv420p -r 24 -c:a copy -movflags +faststart -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_012_120s_145s.mp4
+2026-04-14 23:45:17 - shorts_processor - ERROR - Short render failed [short_012_120s_145s.mp4]. stderr: [h264 @ 00000211fa51a040] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 00000211fa51a040] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 0000020ff2c7ca00] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 0000020ff2c8b580] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:45:17 - shorts_processor - ERROR - Fallback render failed [short_012_120s_145s.mp4]: [AVFormatContext @ 0000028f8a1dccc0] Unable to choose an output format for '30'; use a standard extension for the filename or specify the format manually.
+[out#0 @ 0000028f8a317ac0] Error initializing the muxer for 30: Invalid argument
+Error opening output file 30.
+Error opening output files: Invalid argument
+
+2026-04-14 23:45:17 - auto_shorts_thread - ERROR - Auto shorts render failed: Рендер не создал ни одного шортса. Проверьте FFmpeg, параметры шаблона и путь вывода. Детальный лог: E:\Neyro\VideoCaptionerEnchanted\AppData\logs\auto_shorts_render.log
+Traceback (most recent call last):
+  File "E:\Neyro\VideoCaptionerEnchanted\app\thread\auto_shorts_thread.py", line 351, in run
+    raise RuntimeError(
+RuntimeError: Рендер не создал ни одного шортса. Проверьте FFmpeg, параметры шаблона и путь вывода. Детальный лог: E:\Neyro\VideoCaptionerEnchanted\AppData\logs\auto_shorts_render.log
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]crop=815:458:0:0,scale=1080:637[cam];[0:v]crop=1712:1440:497:0,scale=1080:1280[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p5 -rc vbr -cq 23 -b:v 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpabt1__27.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp9os8su25.wav
+2026-04-14 23:58:22 - shorts_processor - WARNING - Enterprise packet parse failed: Connection error.
+2026-04-14 23:58:29 - shorts_processor - WARNING - LLM rerank skipped: Connection error.
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+2026-04-14 23:59:15 - shorts_processor - ERROR - Short render failed [short_001_164s_195s.mp4]. stderr: [h264 @ 00000203fd360700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 00000203fd360700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 00000201f434c880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 00000203fe7cb540] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:59:24 - shorts_processor - WARNING - Fallback render succeeded for short_001_164s_195s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 130.320 -t 39.260 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_002_130s_169s.mp4
+2026-04-14 23:59:25 - shorts_processor - ERROR - Short render failed [short_002_130s_169s.mp4]. stderr: [h264 @ 000002a3dde10700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000002a3dde10700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000002a1d4dcc880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000002a3df28ab80] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:59:37 - shorts_processor - WARNING - Fallback render succeeded for short_002_130s_169s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 145.445 -t 37.435 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_003_145s_182s.mp4
+2026-04-14 23:59:38 - shorts_processor - ERROR - Short render failed [short_003_145s_182s.mp4]. stderr: [h264 @ 0000025774590700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000025774590700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000002556b58c880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 0000025775a0afc0] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-14 23:59:49 - shorts_processor - WARNING - Fallback render succeeded for short_003_145s_182s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 229.660 -t 39.720 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_004_229s_269s.mp4
+2026-04-14 23:59:50 - shorts_processor - ERROR - Short render failed [short_004_229s_269s.mp4]. stderr: [h264 @ 000001a9ef8f0700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000001a9ef8f0700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000001a7e68fc880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000001a9f0d7a540] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:00:02 - shorts_processor - WARNING - Fallback render succeeded for short_004_229s_269s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 249.420 -t 32.505 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_005_249s_281s.mp4
+2026-04-15 00:00:04 - shorts_processor - ERROR - Short render failed [short_005_249s_281s.mp4]. stderr: [h264 @ 000002420c550700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000002420c550700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 00000240035fc880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000002420d9cb300] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:00:14 - shorts_processor - WARNING - Fallback render succeeded for short_005_249s_281s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 178.580 -t 27.970 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_006_178s_206s.mp4
+2026-04-15 00:00:15 - shorts_processor - ERROR - Short render failed [short_006_178s_206s.mp4]. stderr: [h264 @ 0000014c4cb80b00] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000014c4cb80b00] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 0000014a43bfc880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 0000014c4b94c700] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:00:23 - shorts_processor - WARNING - Fallback render succeeded for short_006_178s_206s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 263.640 -t 36.240 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_007_263s_299s.mp4
+2026-04-15 00:00:25 - shorts_processor - ERROR - Short render failed [short_007_263s_299s.mp4]. stderr: [h264 @ 000002036b000700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000002036b000700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000002016204c880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000002036c47a100] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:00:36 - shorts_processor - WARNING - Fallback render succeeded for short_007_263s_299s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 213.260 -t 20.100 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_008_213s_233s.mp4
+2026-04-15 00:00:37 - shorts_processor - ERROR - Short render failed [short_008_213s_233s.mp4]. stderr: [h264 @ 000001c3144f0700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000001c3144f0700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000001c10b56c880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000001c315979ec0] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:00:43 - shorts_processor - WARNING - Fallback render succeeded for short_008_213s_233s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 222.140 -t 17.920 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_009_222s_240s.mp4
+2026-04-15 00:00:45 - shorts_processor - ERROR - Short render failed [short_009_222s_240s.mp4]. stderr: [h264 @ 00000277d9020700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 00000277d9020700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 00000275d00ac880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 00000277da49a880] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:00:50 - shorts_processor - WARNING - Fallback render succeeded for short_009_222s_240s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 191.620 -t 23.730 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_010_191s_215s.mp4
+2026-04-15 00:00:52 - shorts_processor - ERROR - Short render failed [short_010_191s_215s.mp4]. stderr: [h264 @ 0000024573d80700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000024573d80700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000002436ad9c880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 00000245751ea980] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:00:59 - shorts_processor - WARNING - Fallback render succeeded for short_010_191s_215s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 204.260 -t 21.460 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_011_204s_225s.mp4
+2026-04-15 00:01:00 - shorts_processor - ERROR - Short render failed [short_011_204s_225s.mp4]. stderr: [h264 @ 00000263723d0700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 00000263723d0700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 00000261694dc880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000002637383a980] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:01:07 - shorts_processor - WARNING - Fallback render succeeded for short_011_204s_225s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 120.610 -t 24.835 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_012_120s_145s.mp4
+2026-04-15 00:01:09 - shorts_processor - ERROR - Short render failed [short_012_120s_145s.mp4]. stderr: [h264 @ 000002d0f7ad0700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000002d0f7ad0700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000002ceee9fc880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000002d0f8f39dc0] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:01:15 - shorts_processor - WARNING - Fallback render succeeded for short_012_120s_145s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+2026-04-15 00:01:25 - shorts_processor - ERROR - Short render failed [short_001_164s_195s.mp4]. stderr: [h264 @ 0000020657120700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 0000020657120700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 000002044e31c880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 00000206585ab400] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:01:34 - shorts_processor - WARNING - Fallback render succeeded for short_001_164s_195s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 130.320 -t 39.260 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_002_130s_169s.mp4
+2026-04-15 00:01:36 - shorts_processor - ERROR - Short render failed [short_002_130s_169s.mp4]. stderr: [h264 @ 00000249010b0700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 00000249010b0700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 00000246f822c880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000002490252adc0] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:01:47 - shorts_processor - WARNING - Fallback render succeeded for short_002_130s_169s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 145.445 -t 37.435 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_003_145s_182s.mp4
+2026-04-15 00:01:48 - shorts_processor - ERROR - Short render failed [short_003_145s_182s.mp4]. stderr: [h264 @ 00000255fecb0700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 00000255fecb0700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 00000253f5c4c880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000002560012a200] Nothing was written into output file, because at least one of its streams received no packets.
+
+2026-04-15 00:01:58 - shorts_processor - WARNING - Fallback render succeeded for short_003_145s_182s.mp4
+Render short: ffmpeg -hwaccel cuda -hwaccel_output_format cuda -nostdin -hide_banner -loglevel error -ss 229.660 -t 39.720 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=c=black:s=1080x1920,format=nv12,hwupload_cuda[base];[0:v]crop=815:458:0:0,format=nv12,hwupload_cuda,scale_cuda=1080:637[cam];[0:v]crop=1712:1440:497:0,format=nv12,hwupload_cuda,scale_cuda=1080:1280[game];[base][cam]overlay_cuda=0:0[tmp];[tmp][game]overlay_cuda=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_004_229s_269s.mp4
+2026-04-15 00:01:59 - shorts_processor - ERROR - Short render failed [short_004_229s_269s.mp4]. stderr: [h264 @ 000001765eb70700] decoder->cvdl->cuvidCreateDecoder(&decoder->decoder, params) failed -> CUDA_ERROR_INVALID_VALUE: invalid argument
+[h264 @ 000001765eb70700] Failed setup for format cuda: hwaccel initialisation returned error.
+Impossible to convert between the formats supported by the filter 'Parsed_overlay_cuda_12' and the filter 'auto_scale_2'
+[fc#0 @ 0000017455b7c880] Error reinitializing filters!
+Failed to inject frame into filter network: Function not implemented
+Error while filtering: Function not implemented
+[out#0/mp4 @ 000001765fff9880] Nothing was written into output file, because at least one of its streams received no packets.
+
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpqow8doti.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp7omlyr6b.wav
+2026-04-15 00:15:02 - shorts_processor - WARNING - Enterprise packet parse failed: Connection error.
+2026-04-15 00:15:10 - shorts_processor - WARNING - LLM rerank skipped: Connection error.
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]crop=815:458:0:0,scale=1080:637:flags=fast_bilinear[cam];[0:v]crop=1712:1440:497:0,scale=1080:1280:flags=fast_bilinear[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmp4vp7zyci.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmphxvtmx_v.wav
+2026-04-15 00:23:38 - shorts_processor - WARNING - Enterprise packet parse failed: Connection error.
+2026-04-15 00:23:45 - shorts_processor - WARNING - LLM rerank skipped: Connection error.
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmp9x98_9oe.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmphwkyj7tp.wav
+2026-04-15 00:24:38 - shorts_processor - WARNING - Enterprise packet parse failed: Connection error.
+2026-04-15 00:24:46 - shorts_processor - WARNING - LLM rerank skipped: Connection error.
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]crop=815:458:0:0,scale=1080:637:flags=fast_bilinear[cam];[0:v]crop=1712:1440:497:0,scale=1080:1280:flags=fast_bilinear[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpwbqocbk1.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpqi4nybal.wav
+2026-04-15 00:30:52 - shorts_processor - WARNING - Enterprise packet parse failed: Connection error.
+2026-04-15 00:31:00 - shorts_processor - WARNING - LLM rerank skipped: Connection error.
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,scale=1080:637:flags=fast_bilinear[cam];[src_game]crop=1712:1440:497:0,scale=1080:1280:flags=fast_bilinear[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpnznt6f3s.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpm4d4thwq.wav
+2026-04-15 00:36:09 - shorts_processor - WARNING - Enterprise packet parse failed: Connection error.
+2026-04-15 00:36:16 - shorts_processor - WARNING - LLM rerank skipped: Connection error.
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,scale=1080:637:flags=fast_bilinear[cam];[src_game]crop=1712:1440:497:0,scale=1080:1280:flags=fast_bilinear[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpqo0l4m4e.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpmylyj8hj.wav
+2026-04-15 00:43:47 - shorts_processor - WARNING - Enterprise packet parse failed: Request timed out.
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpq6nlqc8b.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpyg8y35p9.wav
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,scale=1080:637:flags=fast_bilinear[cam];[src_game]crop=1712:1440:497:0,scale=1080:1280:flags=fast_bilinear[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 164.060 -t 31.640 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex color=size=1080x1920:color=black[base];[0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,scale=1080:637:flags=fast_bilinear[cam];[src_game]crop=1712:1440:497:0,scale=1080:1280:flags=fast_bilinear[game];[base][cam]overlay=0:0[tmp];[tmp][game]overlay=0:640[vout] -map [vout] -map 0:a? -c:v libx264 -preset veryfast -crf 20 -threads 0 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5\short_001_164s_195s.mp4

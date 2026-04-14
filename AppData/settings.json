@@ -17,7 +17,7 @@
         "Gemini_API_Key": "",
         "Gemini_Model": "gemini-pro",
         "LLMService": "LM Studio",
-        "LmStudio_API_Base": "http://192.168.0.11:1234/v1",
+        "LmStudio_API_Base": "http://192.168.0.10:1234/v1",
         "LmStudio_API_Key": "lmstudio",
         "LmStudio_Model": "meta-llama-3.1-8b-instruct",
         "Ollama_API_Base": "http://localhost:11434/v1",
