@@ -397,8 +397,6 @@ class AutoShortsRenderThread(QThread):
         output_dir: str,
         layout_template: Dict = None,
         render_backend: str = "auto",
-        render_fps: str = "30",
-        render_quality: str = "standard",
     ):
         super().__init__()
         self.video_path = video_path
@@ -406,8 +404,6 @@ class AutoShortsRenderThread(QThread):
         self.output_dir = output_dir
         self.layout_template = layout_template or {}
         self.render_backend = (render_backend or "auto").strip().lower()
-        self.render_fps = str(render_fps or "30").strip().lower()
-        self.render_quality = str(render_quality or "standard").strip().lower()
         self._cancel_requested = False
 
     def request_cancel(self):
@@ -434,8 +430,6 @@ class AutoShortsRenderThread(QThread):
                 progress_cb=lambda p, m: self.progress.emit(p, m),
                 layout_template=self.layout_template,
                 render_backend=self.render_backend,
-                render_fps=self.render_fps,
-                render_quality=self.render_quality,
                 cancel_cb=lambda: self._cancel_requested,
             )
             if self._cancel_requested:

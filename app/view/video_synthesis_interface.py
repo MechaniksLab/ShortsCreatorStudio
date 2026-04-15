@@ -176,7 +176,7 @@ class VideoSynthesisInterface(QWidget):
                 border: 1px solid rgba(255,255, 255, 0.08);
             }
             QLineEdit:focus[transparent=true] {
-                border: 1px solid rgba(111, 91, 255, 0.58);
+                border: 1px solid rgba(47,141, 99, 0.48);
             }
         """
         )
@@ -197,7 +197,7 @@ class VideoSynthesisInterface(QWidget):
                 border: 1px solid rgba(255,255, 255, 0.08);
             }
             QLineEdit:focus[transparent=true] {
-                border: 1px solid rgba(111, 91, 255, 0.58);
+                border: 1px solid rgba(47,141, 99, 0.48);
             }
         """
         )

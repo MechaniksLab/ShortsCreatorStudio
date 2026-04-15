@@ -2,10 +2,10 @@ import logging
 import os
 from pathlib import Path
 
-VERSION = "v1.4.0"
+VERSION = "v1.3.3"
 YEAR = 2025
-APP_NAME = "MechaniksLab Creator Studio"
-AUTHOR = "MechaniksGameLab"
+APP_NAME = "VideoCaptioner"
+AUTHOR = "Weifeng"
 
 HELP_URL = "https://github.com/WEIFENG2333/VideoCaptioner"
 GITHUB_REPO_URL = "https://github.com/WEIFENG2333/VideoCaptioner"

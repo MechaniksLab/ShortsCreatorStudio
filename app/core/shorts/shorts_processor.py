@@ -692,8 +692,6 @@ def render_shorts(
     vertical_resolution: str = "1080x1920",
     layout_template: Optional[Dict] = None,
     render_backend: str = "auto",
-    render_fps: str = "30",
-    render_quality: str = "standard",
     cancel_cb: Optional[Callable[[], bool]] = None,
 ) -> List[str]:
     backend = (render_backend or "auto").strip().lower()
@@ -820,13 +818,10 @@ def render_shorts(
             return False
 
     input_has_audio = _probe_has_audio(input_video)
-    rfps = str(render_fps or "30").strip().lower()
-    if rfps == "source":
-        target_fps = int(min(60, max(24, round(src_fps))))
-    elif rfps in {"24", "30", "60"}:
-        target_fps = int(rfps)
-    else:
-        target_fps = int(min(30, max(24, round(src_fps))))
+    # Для Auto Shorts высокий FPS (например, 60) резко замедляет montage pipeline,
+    # особенно при CPU filter graph (даже с NVENC энкодером).
+    # Ограничиваем целевой FPS до 30 для более предсказуемой скорости.
+    target_fps = int(min(30, max(24, round(src_fps))))
     _append_render_debug(
         f"SOURCE meta={src_w_i}x{src_h_i}@{round(src_fps, 3)}fps target_fps={target_fps} (capped_to_30_for_speed)"
     )
@@ -871,22 +866,8 @@ def render_shorts(
             pass
         return cpu_args, "cpu/libx264"
 
-    rq = str(render_quality or "standard").strip().lower()
-    quality_map_cpu = {
-        "draft": ["-c:v", "libx264", "-preset", "ultrafast", "-crf", "24", "-threads", "0"],
-        "standard": ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-threads", "0"],
-        "high": ["-c:v", "libx264", "-preset", "medium", "-crf", "17", "-threads", "0"],
-    }
-    quality_map_nvenc = {
-        "draft": ["-c:v", "h264_nvenc", "-preset", "p1", "-tune", "ll", "-rc", "vbr", "-cq", "27", "-b:v", "0", "-bf", "0"],
-        "standard": ["-c:v", "h264_nvenc", "-preset", "p1", "-tune", "ll", "-rc", "vbr", "-cq", "21", "-b:v", "0", "-bf", "0"],
-        "high": ["-c:v", "h264_nvenc", "-preset", "p4", "-rc", "vbr", "-cq", "17", "-b:v", "0", "-bf", "2"],
-    }
-
-    cpu_video_codec_args = quality_map_cpu.get(rq, quality_map_cpu["standard"])
+    cpu_video_codec_args = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-threads", "0"]
     detected_video_codec_args, detected_encoder_label = _detect_best_encoder()
-    if detected_encoder_label == "gpu/nvenc":
-        detected_video_codec_args = quality_map_nvenc.get(rq, quality_map_nvenc["standard"])
 
     if backend == "cpu":
         selected_video_codec_args, selected_encoder_label = cpu_video_codec_args, "cpu/libx264(forced)"
@@ -1128,15 +1109,8 @@ def render_shorts(
             _append_render_debug(f"CANCELLED before clip {i}/{total}")
             break
 
-        # Добавляем небольшой pre/post-roll, чтобы фразы не обрезались по ASR-границам.
-        # Это особенно важно для концов реплик, где ASR может дать чуть ранний end_time.
-        pre_roll_ms = 220
-        post_roll_ms = 550
-        clip_start_ms = max(0, int(c.start_ms) - pre_roll_ms)
-        clip_end_ms = max(clip_start_ms + 200, int(c.end_ms) + post_roll_ms)
-
-        start_s = max(0.0, clip_start_ms / 1000.0)
-        end_s = max(start_s + 0.2, clip_end_ms / 1000.0)
+        start_s = max(0.0, c.start_ms / 1000.0)
+        end_s = max(start_s + 0.2, c.end_ms / 1000.0)
         duration_s = max(0.2, end_s - start_s)
         title_part = _safe_filename(c.title or c.excerpt or "short")
         out_name = f"шорт_{i:03d}_{title_part}_{int(start_s)}-{int(end_s)}с.mp4"
@@ -1145,23 +1119,23 @@ def render_shorts(
         def _normalize_candidate_ranges() -> List[Tuple[int, int]]:
             raw = getattr(c, "speech_ranges", None) or []
             if not raw:
-                return [(clip_start_ms, clip_end_ms)]
+                return [(c.start_ms, c.end_ms)]
             norm: List[Tuple[int, int]] = []
             # Небольшой контекст до/после речи, чтобы не рубить слова на стыках.
             # Это заметно смягчает "телепорт" между репликами.
-            pre_pad_ms = 180
-            post_pad_ms = 260
+            pre_pad_ms = 120
+            post_pad_ms = 170
             for it in raw:
                 try:
                     s, e = int(it[0]), int(it[1])
                 except Exception:
                     continue
-                s = max(clip_start_ms, s - pre_pad_ms)
-                e = min(clip_end_ms, e + post_pad_ms)
+                s = max(c.start_ms, s - pre_pad_ms)
+                e = min(c.end_ms, e + post_pad_ms)
                 if e - s >= 140:
                     norm.append((s, e))
             if not norm:
-                return [(clip_start_ms, clip_end_ms)]
+                return [(c.start_ms, c.end_ms)]
             norm.sort(key=lambda x: x[0])
             merged: List[Tuple[int, int]] = [norm[0]]
             for s, e in norm[1:]:
@@ -1172,32 +1146,20 @@ def render_shorts(
                     merged[-1] = (ps, max(pe, e))
                 else:
                     merged.append((s, e))
-
-            # Если паузы между речью несущественные, сохраняем цельный фрагмент:
-            # это лучше держит смысл сцен и снижает ощущение «не тех событий» в шортсе.
-            if len(merged) >= 2:
-                gaps = [max(0, merged[k + 1][0] - merged[k][1]) for k in range(len(merged) - 1)]
-                max_gap = max(gaps) if gaps else 0
-                kept_ms = sum(max(0, e - s) for s, e in merged)
-                clip_ms = max(1, clip_end_ms - clip_start_ms)
-                keep_ratio = kept_ms / clip_ms
-                if max_gap < 420 or keep_ratio >= 0.88:
-                    return [(clip_start_ms, clip_end_ms)]
-
             kept_ms = sum(max(0, e - s) for s, e in merged)
             # Если есть 2+ диапазона, это уже реальный сигнал для склейки
             # (даже если суммарная речь короткая).
             if len(merged) >= 2:
                 return merged
             if kept_ms < 900:
-                return [(clip_start_ms, clip_end_ms)]
+                return [(c.start_ms, c.end_ms)]
             return merged
 
         candidate_ranges = _normalize_candidate_ranges()
         has_internal_cuts = not (
             len(candidate_ranges) == 1
-            and abs(candidate_ranges[0][0] - clip_start_ms) <= 120
-            and abs(candidate_ranges[0][1] - clip_end_ms) <= 120
+            and abs(candidate_ranges[0][0] - c.start_ms) <= 120
+            and abs(candidate_ranges[0][1] - c.end_ms) <= 120
         )
 
         src_ref = "0:v"
@@ -1207,8 +1169,8 @@ def render_shorts(
             trim_parts = []
             audio_parts = []
             for idx_r, (rs, re_) in enumerate(candidate_ranges):
-                rel_s = max(0.0, (rs - clip_start_ms) / 1000.0)
-                rel_e = max(rel_s + 0.05, (re_ - clip_start_ms) / 1000.0)
+                rel_s = max(0.0, (rs - c.start_ms) / 1000.0)
+                rel_e = max(rel_s + 0.05, (re_ - c.start_ms) / 1000.0)
                 trim_parts.append(
                     f"[0:v]trim=start={rel_s:.3f}:end={rel_e:.3f},setpts=PTS-STARTPTS[vp{idx_r}]"
                 )

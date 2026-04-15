@@ -202,14 +202,14 @@ class SettingInterface(ScrollArea):
             "Открыть страницу помощи",
             FIF.HELP,
             "Помощь",
-            "Новые функции и советы по использованию MechaniksLab Creator Studio",
+            "Новые функции и советы по использованию VideoCaptioner",
             self.aboutGroup,
         )
         self.feedbackCard = PrimaryPushSettingCard(
             "Оставить отзыв",
             FIF.FEEDBACK,
             "Оставить отзыв",
-            "Ваш отзыв помогает улучшать MechaniksLab Creator Studio",
+            "Ваш отзыв помогает улучшать VideoCaptioner",
             self.aboutGroup,
         )
         self.aboutCard = PrimaryPushSettingCard(
@@ -263,7 +263,7 @@ class SettingInterface(ScrollArea):
             "https://api.videocaptioner.cn/register?aff=UrLB",
             "Перейти",
             FIF.DEVELOPER_TOOLS,
-            "Официальный API MechaniksLab Creator Studio",
+            "Официальный API VideoCaptioner",
             "Интеграция нескольких LLM, поддержка быстрой оптимизации и перевода",
             self.llmGroup,
         )

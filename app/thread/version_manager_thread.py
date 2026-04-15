@@ -13,7 +13,7 @@ from pathlib import Path
 import requests
 from PyQt5.QtCore import QObject, QSettings, QVersionNumber, pyqtSignal
 
-from app.config import APP_NAME, ROOT_PATH, VERSION
+from app.config import ROOT_PATH, VERSION
 from app.core.utils.logger import setup_logger
 
 # 配置日志
@@ -41,7 +41,7 @@ class VersionManager(QObject):
 
         # 修改 QSettings 的初始化方式，指定完整的组织和应用名称，并设置为 IniFormat
         self.settings = QSettings(
-            QSettings.IniFormat, QSettings.UserScope, "MechaniksGameLab", APP_NAME
+            QSettings.IniFormat, QSettings.UserScope, "VideoCaptioner", "VideoCaptioner"
         )
 
     def getLatestVersionInfo(self):
@@ -190,9 +190,7 @@ class VersionManager(QObject):
             self.settings.sync()
 
             # 发送版本更新信息作为公告
-            update_announcement = (
-                f"欢迎使用新版本 {APP_NAME} {self.currentVersion}\n\n更新内容：\n{self.updateInfo}"
-            )
+            update_announcement = f"欢迎使用新版本 VideoCaptioner {self.currentVersion}\n\n更新内容：\n{self.updateInfo}"
             self.announcementAvailable.emit(update_announcement)
             logger.info(
                 "New version announcement shown for version: %s", self.currentVersion
