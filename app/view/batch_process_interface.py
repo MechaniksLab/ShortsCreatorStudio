@@ -52,26 +52,26 @@ class BatchProcessInterface(QWidget):
         self.setup_connections()
 
     def init_ui(self):
-        # 创建主布局
+        # Создаём основной макет
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(16, 16, 16, 16)
         main_layout.setSpacing(8)
 
-        # 顶部控制区域
+        # Верхняя панель управления
         top_layout = QHBoxLayout()
         top_layout.setSpacing(8)
 
-        # 任务类型选择
+        # Выбор типа задачи
         self.task_type_combo = ComboBox()
         self.task_type_combo.addItems([str(task_type) for task_type in BatchTaskType])
         self.task_type_combo.setCurrentText(str(BatchTaskType.FULL_PROCESS))
 
-        # 控制按钮
+        # Кнопки управления
         self.add_file_btn = PushButton("Добавить файлы", icon=FIF.ADD)
         self.start_all_btn = PushButton("Запустить обработку", icon=FIF.PLAY)
         self.clear_btn = PushButton("Очистить список", icon=FIF.DELETE)
 
-        # 添加到顶部布局
+        # Добавляем элементы на верхнюю панель
         top_layout.addWidget(self.task_type_combo)
         top_layout.addWidget(self.add_file_btn)
         top_layout.addWidget(self.clear_btn)
@@ -79,52 +79,52 @@ class BatchProcessInterface(QWidget):
         top_layout.addStretch()
         top_layout.addWidget(self.start_all_btn)
 
-        # 创建任务表格
+        # Создаём таблицу задач
         self.task_table = TableWidget()
         self.task_table.setColumnCount(3)
         self.task_table.setHorizontalHeaderLabels(["Имя файла", "Прогресс", "Статус"])
 
-        # 设置表格样式
+        # Настройки внешнего вида таблицы
         self.task_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.task_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Fixed)
         self.task_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
-        self.task_table.setColumnWidth(1, 250)  # 进度条列宽
-        self.task_table.setColumnWidth(2, 160)  # 状态列宽
+        self.task_table.setColumnWidth(1, 250)  # ширина колонки прогресса
+        self.task_table.setColumnWidth(2, 160)  # ширина колонки статуса
 
-        # 设置行高
-        self.task_table.verticalHeader().setDefaultSectionSize(40)  # 设置默认行高
+        # Высота строк
+        self.task_table.verticalHeader().setDefaultSectionSize(40)  # высота строки по умолчанию
 
-        # 设置表格边框
+        # Границы таблицы
         self.task_table.setBorderVisible(True)
         self.task_table.setBorderRadius(12)
 
-        # 设置表格不可编辑
+        # Запрещаем редактирование таблицы
         self.task_table.setEditTriggers(QTableWidget.NoEditTriggers)
 
-        # 设置表格大小策略
+        # Политика изменения размера таблицы
         self.task_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.task_table.setMinimumHeight(300)  # 设置最小高度
+        self.task_table.setMinimumHeight(300)  # минимальная высота
 
-        # 连接双击信号
+        # Подключаем сигнал двойного клика
         self.task_table.doubleClicked.connect(self.on_table_double_clicked)
 
-        # 添加到主布局
+        # Добавляем в основной макет
         main_layout.addLayout(top_layout)
         main_layout.addWidget(self.task_table)
 
-        # 连接信号
+        # Подключаем сигналы
         self.add_file_btn.clicked.connect(self.on_add_file_clicked)
         self.start_all_btn.clicked.connect(self.start_all_tasks)
         self.clear_btn.clicked.connect(self.clear_tasks)
         self.task_type_combo.currentTextChanged.connect(self.on_task_type_changed)
 
     def setup_connections(self):
-        # 批处理线程信号连接
+        # Сигналы потока пакетной обработки
         self.batch_thread.task_progress.connect(self.update_task_progress)
         self.batch_thread.task_error.connect(self.on_task_error)
         self.batch_thread.task_completed.connect(self.on_task_completed)
 
-        # 表格右键菜单
+        # Контекстное меню таблицы
         self.task_table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.task_table.customContextMenuRequested.connect(self.show_context_menu)
 
@@ -136,13 +136,13 @@ class BatchProcessInterface(QWidget):
             BatchTaskType.TRANS_SUB,
             BatchTaskType.FULL_PROCESS,
         ]:
-            # 获取所有支持的音视频格式
+            # Получаем все поддерживаемые аудио/видео форматы
             audio_formats = [f"*.{fmt.value}" for fmt in SupportedAudioFormats]
             video_formats = [f"*.{fmt.value}" for fmt in SupportedVideoFormats]
             formats = audio_formats + video_formats
             file_filter = f"Аудио/видео файлы ({' '.join(formats)})"
         elif task_type == BatchTaskType.SUBTITLE:
-            # 获取所有支持的字幕格式
+            # Получаем все поддерживаемые форматы субтитров
             subtitle_formats = [f"*.{fmt.value}" for fmt in SupportedSubtitleFormats]
             file_filter = f"Файлы субтитров ({' '.join(subtitle_formats)})"
 
@@ -163,7 +163,7 @@ class BatchProcessInterface(QWidget):
     def add_files(self, file_paths):
         task_type = BatchTaskType(self.task_type_combo.currentText())
 
-        # 检查文件是否存在并收集不存在的文件
+        # Проверяем существование файлов и собираем отсутствующие
         non_existent_files = []
         valid_files = []
         for file_path in file_paths:
@@ -172,7 +172,7 @@ class BatchProcessInterface(QWidget):
             else:
                 valid_files.append(file_path)
 
-        # 如果有不存在的文件，显示警告
+        # Если есть отсутствующие файлы — показываем предупреждение
         if non_existent_files:
             InfoBar.warning(
                 title="Файлы не найдены",
@@ -182,14 +182,14 @@ class BatchProcessInterface(QWidget):
                 parent=self,
             )
 
-        # 如果没有有效文件，直接返回
+        # Если нет валидных файлов — выходим
         if not valid_files:
             return
 
-        # 对有效文件按文件名排序
+        # Сортируем валидные файлы по имени
         valid_files.sort(key=lambda x: os.path.basename(x).lower())
 
-        # 如果表格为空，自动检测文件类型并设置任务类型
+        # Если таблица пустая, автодетектим тип файла и переключаем тип задачи
         if self.task_table.rowCount() == 0 and self.task_type_combo.currentIndex() == 0:
             first_file = valid_files[0].lower()
             is_subtitle = any(
@@ -207,7 +207,7 @@ class BatchProcessInterface(QWidget):
             #     self.task_type_combo.setCurrentText(str(BatchTaskType.FULL_PROCESS))
             #     task_type = BatchTaskType.FULL_PROCESS
 
-        # 过滤文件类型
+        # Фильтруем файлы по типу
         valid_files = self.filter_files(valid_files, task_type)
 
         if not valid_files:
@@ -221,7 +221,7 @@ class BatchProcessInterface(QWidget):
             return
 
         for file_path in valid_files:
-            # 检查是否已存在相同任务
+            # Проверяем, не добавлена ли уже такая задача
             exists = False
             for row in range(self.task_table.rowCount()):
                 if self.task_table.item(row, 0).toolTip() == file_path:
@@ -241,7 +241,7 @@ class BatchProcessInterface(QWidget):
     def filter_files(self, file_paths, task_type: BatchTaskType):
         valid_extensions = {}
 
-        # 根据任务类型设置有效的扩展名
+        # Поддерживаемые расширения зависят от типа задачи
         if task_type in [
             BatchTaskType.TRANSCRIBE,
             BatchTaskType.TRANS_SUB,
@@ -263,22 +263,22 @@ class BatchProcessInterface(QWidget):
         row = self.task_table.rowCount()
         self.task_table.insertRow(row)
 
-        # 文件名
+        # Имя файла
         file_name = QTableWidgetItem(os.path.basename(file_path))
         file_name.setToolTip(file_path)
         self.task_table.setItem(row, 0, file_name)
 
-        # 进度条
+        # Прогресс-бар
         progress_bar = ProgressBar()
         progress_bar.setRange(0, 100)
         progress_bar.setValue(0)
         progress_bar.setFixedHeight(18)
         self.task_table.setCellWidget(row, 1, progress_bar)
 
-        # 状态
+        # Статус
         status = QTableWidgetItem(str(BatchTaskStatus.WAITING))
         status.setTextAlignment(Qt.AlignCenter)
-        status.setForeground(Qt.gray)  # 设置字体颜色为灰色
+        status.setForeground(Qt.gray)  # цвет текста статуса по умолчанию
         font = QFont()
         font.setBold(True)
         status.setFont(font)
@@ -312,27 +312,27 @@ class BatchProcessInterface(QWidget):
         menu.exec_(self.task_table.viewport().mapToGlobal(pos))
 
     def open_output_folder(self, file_path: str):
-        # 根据任务类型和文件路径确定输出文件夹
+        # Определяем папку вывода по типу задачи и пути файла
         task_type = BatchTaskType(self.task_type_combo.currentText())
         file_dir = os.path.dirname(file_path)
 
         if task_type == BatchTaskType.FULL_PROCESS:
-            # 对于全流程任务，输出在视频同目录下
+            # Для полного процесса вывод рядом с исходным видео
             output_dir = file_dir
         else:
-            # 其他任务输出在文件同目录下
+            # Для остальных задач вывод рядом с исходным файлом
             output_dir = file_dir
 
-        # 打开文件夹
+        # Открываем папку
         QDesktopServices.openUrl(QUrl.fromLocalFile(output_dir))
 
     def update_task_progress(self, file_path: str, progress: int, status: str):
         for row in range(self.task_table.rowCount()):
             if self.task_table.item(row, 0).toolTip() == file_path:
-                # 更新进度条
+                # Обновляем прогресс-бар
                 progress_bar = self.task_table.cellWidget(row, 1)
                 progress_bar.setValue(progress)
-                # 更新状态
+                # Обновляем статус
                 self.task_table.item(row, 2).setText(status)
                 break
 
@@ -352,7 +352,7 @@ class BatchProcessInterface(QWidget):
                 break
 
     def start_all_tasks(self):
-        # 检查是否有任务
+        # Проверяем, есть ли задачи
         if self.task_table.rowCount() == 0:
             InfoBar.warning(
                 title="Нет задач",
@@ -363,7 +363,7 @@ class BatchProcessInterface(QWidget):
             )
             return
 
-        # 检查是否有等待处理的任务
+        # Проверяем, есть ли задачи в ожидании
         waiting_tasks = 0
         for row in range(self.task_table.rowCount()):
             if self.task_table.item(row, 2).text() == str(BatchTaskStatus.WAITING):
@@ -379,7 +379,7 @@ class BatchProcessInterface(QWidget):
             )
             return
 
-        # 显示开始处理的提示
+        # Показываем уведомление о старте обработки
         InfoBar.success(
             title="Запуск обработки",
             content=f"Запущена обработка задач: {waiting_tasks}",
@@ -387,7 +387,7 @@ class BatchProcessInterface(QWidget):
             position=InfoBarPosition.TOP,
             parent=self,
         )
-        # 开始处理任务
+        # Запускаем обработку задач
         for row in range(self.task_table.rowCount()):
             file_path = self.task_table.item(row, 0).toolTip()
             status = self.task_table.item(row, 2).text()
@@ -397,7 +397,7 @@ class BatchProcessInterface(QWidget):
                 self.batch_thread.add_task(batch_task)
 
     def start_task(self, file_path: str):
-        # 显示开始处理的提示
+        # Показываем уведомление о старте обработки
         file_name = os.path.basename(file_path)
         InfoBar.success(
             title="Запуск обработки",
@@ -407,14 +407,14 @@ class BatchProcessInterface(QWidget):
             parent=self,
         )
 
-        # 创建并添加单个任务
+        # Создаём и добавляем одну задачу
         task_type = BatchTaskType(self.task_type_combo.currentText())
         batch_task = BatchTask(file_path, task_type)
         self.batch_thread.add_task(batch_task)
 
     def cancel_task(self, file_path: str):
         self.batch_thread.stop_task(file_path)
-        # 从表格中移除任务
+        # Удаляем задачу из таблицы
         for row in range(self.task_table.rowCount()):
             if self.task_table.item(row, 0).toolTip() == file_path:
                 self.task_table.removeRow(row)
@@ -425,7 +425,7 @@ class BatchProcessInterface(QWidget):
         self.task_table.setRowCount(0)
 
     def on_task_type_changed(self, task_type):
-        # 清空当前任务列表
+        # Очищаем текущий список задач
         self.clear_tasks()
 
     def closeEvent(self, event):
@@ -433,7 +433,7 @@ class BatchProcessInterface(QWidget):
         super().closeEvent(event)
 
     def on_table_double_clicked(self, index):
-        """处理表格双击事件"""
+        """Обрабатывает двойной клик по строке таблицы."""
         row = index.row()
         file_path = self.task_table.item(row, 0).toolTip()
         self.open_output_folder(file_path)

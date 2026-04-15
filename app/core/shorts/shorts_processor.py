@@ -692,6 +692,7 @@ def render_shorts(
     vertical_resolution: str = "1080x1920",
     layout_template: Optional[Dict] = None,
     render_backend: str = "auto",
+    render_options: Optional[Dict] = None,
     cancel_cb: Optional[Callable[[], bool]] = None,
 ) -> List[str]:
     backend = (render_backend or "auto").strip().lower()
@@ -705,6 +706,7 @@ def render_shorts(
 
     out_w, out_h = vertical_resolution.split("x")
     out_w_i, out_h_i = int(out_w), int(out_h)
+    render_options = render_options or {}
 
     def _safe_filename(name: str, max_len: int = 72) -> str:
         raw = (name or "").strip()
@@ -773,6 +775,22 @@ def render_shorts(
 
     src_w_i, src_h_i, src_fps = _probe_video_meta(input_video)
 
+    resolution_mode = str(render_options.get("resolution_mode", "fixed") or "fixed").strip().lower()
+    resolution_raw = str(render_options.get("resolution", f"{out_w_i}x{out_h_i}") or f"{out_w_i}x{out_h_i}").strip().lower()
+    if resolution_mode == "source" or resolution_raw == "source":
+        target_w_i, target_h_i = int(src_w_i), int(src_h_i)
+    else:
+        try:
+            rw, rh = resolution_raw.replace("×", "x").split("x", 1)
+            rw_i, rh_i = int(rw), int(rh)
+            if rw_i >= 2 and rh_i >= 2:
+                target_w_i, target_h_i = rw_i, rh_i
+        except Exception:
+            target_w_i, target_h_i = out_w_i, out_h_i
+
+    sx = target_w_i / max(1, out_w_i)
+    sy = target_h_i / max(1, out_h_i)
+
     def _layer_fx_tail(layer_cfg: Dict) -> str:
         fx = layer_cfg if isinstance(layer_cfg, dict) else {}
         brightness = float(fx.get("brightness", 0.0) or 0.0)
@@ -818,16 +836,42 @@ def render_shorts(
             return False
 
     input_has_audio = _probe_has_audio(input_video)
-    # Для Auto Shorts высокий FPS (например, 60) резко замедляет montage pipeline,
-    # особенно при CPU filter graph (даже с NVENC энкодером).
-    # Ограничиваем целевой FPS до 30 для более предсказуемой скорости.
-    target_fps = int(min(30, max(24, round(src_fps))))
+    fps_mode = str(render_options.get("fps_mode", "30") or "30").strip().lower()
+    if fps_mode in {"source", "src", "original", "исходный"}:
+        target_fps = int(max(1, round(src_fps)))
+    elif fps_mode in {"60", "59.94"}:
+        target_fps = 60
+    else:
+        target_fps = 30
+    target_fps = max(1, min(120, target_fps))
     _append_render_debug(
-        f"SOURCE meta={src_w_i}x{src_h_i}@{round(src_fps, 3)}fps target_fps={target_fps} (capped_to_30_for_speed)"
+        f"SOURCE meta={src_w_i}x{src_h_i}@{round(src_fps, 3)}fps target={target_w_i}x{target_h_i}@{target_fps}fps"
     )
 
+    quality_profile = str(render_options.get("quality_profile", "balanced") or "balanced").strip().lower()
+
+    def _cpu_codec_args_by_quality(profile: str) -> List[str]:
+        if profile == "high":
+            return ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-threads", "0"]
+        if profile == "fast":
+            return ["-c:v", "libx264", "-preset", "ultrafast", "-crf", "24", "-threads", "0"]
+        return ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-threads", "0"]
+
+    def _nvenc_codec_args_by_quality(profile: str) -> List[str]:
+        if profile == "high":
+            return [
+                "-c:v", "h264_nvenc", "-preset", "p5", "-tune", "hq", "-rc", "vbr", "-cq", "18", "-b:v", "0", "-bf", "2",
+            ]
+        if profile == "fast":
+            return [
+                "-c:v", "h264_nvenc", "-preset", "p1", "-tune", "ll", "-rc", "vbr", "-cq", "25", "-b:v", "0", "-bf", "0",
+            ]
+        return [
+            "-c:v", "h264_nvenc", "-preset", "p3", "-tune", "hq", "-rc", "vbr", "-cq", "21", "-b:v", "0", "-bf", "0",
+        ]
+
     def _detect_best_encoder() -> Tuple[List[str], str]:
-        cpu_args = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-threads", "0"]
+        cpu_args = _cpu_codec_args_by_quality(quality_profile)
         try:
             p = subprocess.run(
                 ["ffmpeg", "-hide_banner", "-encoders"],
@@ -838,22 +882,7 @@ def render_shorts(
             )
             encoders_txt = (p.stdout or "") + "\n" + (p.stderr or "")
             if "h264_nvenc" in encoders_txt:
-                nvenc_args = [
-                    "-c:v",
-                    "h264_nvenc",
-                    "-preset",
-                    "p1",
-                    "-tune",
-                    "ll",
-                    "-rc",
-                    "vbr",
-                    "-cq",
-                    "21",
-                    "-b:v",
-                    "0",
-                    "-bf",
-                    "0",
-                ]
+                nvenc_args = _nvenc_codec_args_by_quality(quality_profile)
                 return (
                     nvenc_args,
                     "gpu/nvenc",
@@ -866,7 +895,7 @@ def render_shorts(
             pass
         return cpu_args, "cpu/libx264"
 
-    cpu_video_codec_args = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-threads", "0"]
+    cpu_video_codec_args = _cpu_codec_args_by_quality(quality_profile)
     detected_video_codec_args, detected_encoder_label = _detect_best_encoder()
 
     if backend == "cpu":

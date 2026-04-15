@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
-from PyQt5.QtCore import QPointF, QRect, QRectF, Qt, QStandardPaths, pyqtSignal
+from PyQt5.QtCore import QPointF, QRect, QRectF, Qt, QStandardPaths, QTimer, pyqtSignal
 from PyQt5.QtGui import QColor, QPainter, QPen, QPixmap
 from PyQt5.QtWidgets import (
     QFileDialog,
@@ -55,6 +55,15 @@ class LayerPreviewWidget(QWidget):
         self.resize_anchor = QPointF(0, 0)
         self.keep_aspect = False
         self.resize_aspect_ratio = 1.0
+        self.interactive = True
+        self.show_layer_overlay = True
+
+    def set_interactive(self, value: bool):
+        self.interactive = bool(value)
+
+    def set_show_layer_overlay(self, value: bool):
+        self.show_layer_overlay = bool(value)
+        self.update()
 
     def set_keep_aspect(self, value: bool):
         self.keep_aspect = bool(value)
@@ -148,6 +157,8 @@ class LayerPreviewWidget(QWidget):
         return handle.contains(view_pos)
 
     def mousePressEvent(self, event):
+        if not self.interactive:
+            return
         if event.button() != Qt.LeftButton:
             return
         vp = QPointF(event.pos())
@@ -168,6 +179,8 @@ class LayerPreviewWidget(QWidget):
         self.update()
 
     def mouseMoveEvent(self, event):
+        if not self.interactive:
+            return
         if self.drag_mode == "none":
             return
         cp = self._view_to_canvas(QPointF(event.pos()))
@@ -203,6 +216,8 @@ class LayerPreviewWidget(QWidget):
         self.update()
 
     def mouseReleaseEvent(self, event):
+        if not self.interactive:
+            return
         self.drag_mode = "none"
 
     def paintEvent(self, event):
@@ -218,23 +233,24 @@ class LayerPreviewWidget(QWidget):
         p.setPen(QPen(QColor(120, 120, 120) if self.dark_theme else QColor(210, 214, 220), 1))
         p.drawRect(area)
 
-        for name in ["game", "webcam"]:
-            r = self.layers[name]
-            tl = self._canvas_to_view(r.topLeft())
-            br = self._canvas_to_view(r.bottomRight())
-            vr = QRectF(tl, br)
+        if self.show_layer_overlay:
+            for name in ["game", "webcam"]:
+                r = self.layers[name]
+                tl = self._canvas_to_view(r.topLeft())
+                br = self._canvas_to_view(r.bottomRight())
+                vr = QRectF(tl, br)
 
-            color = self.colors[name]
-            p.setPen(QPen(color, 2 if name == self.active_layer else 1, Qt.SolidLine))
-            fill = QColor(color)
-            fill.setAlpha(50)
-            p.fillRect(vr, fill)
-            p.drawRect(vr)
-            p.drawText(vr.adjusted(6, 6, -6, -6), Qt.AlignLeft | Qt.AlignTop, name.upper())
+                color = self.colors[name]
+                p.setPen(QPen(color, 2 if name == self.active_layer else 1, Qt.SolidLine))
+                fill = QColor(color)
+                fill.setAlpha(50)
+                p.fillRect(vr, fill)
+                p.drawRect(vr)
+                p.drawText(vr.adjusted(6, 6, -6, -6), Qt.AlignLeft | Qt.AlignTop, name.upper())
 
-            hs = 12
-            handle = QRectF(vr.right() - hs, vr.bottom() - hs, hs, hs)
-            p.fillRect(handle, color)
+                hs = 12
+                handle = QRectF(vr.right() - hs, vr.bottom() - hs, hs, hs)
+                p.fillRect(handle, color)
 
     def _clamp_all(self):
         for k in self.layers:
@@ -363,6 +379,11 @@ class AutoShortsInterface(QWidget):
         self.selected_start_s = 0
         self.selected_end_s = 1
 
+        self._fx_preview_timer = QTimer(self)
+        self._fx_preview_timer.setSingleShot(True)
+        self._fx_preview_timer.setInterval(24)
+        self._fx_preview_timer.timeout.connect(self._render_fx_preview_now)
+
         self._init_ui()
         self._apply_theme_style()
 
@@ -487,15 +508,34 @@ class AutoShortsInterface(QWidget):
         template_layout.addWidget(BodyLabel("1) На исходном кадре перетяните и растяните области WEBCAM и GAME (кроп)."))
         self.source_preview = LayerPreviewWidget(1920, 1080, self)
         self.source_preview.set_keep_aspect(True)
+        self.source_preview.setMinimumHeight(420)
         template_layout.addWidget(self.source_preview)
 
-        template_layout.addWidget(BodyLabel("2) На вертикальном кадре 1080x1920 перетяните и растяните размещение слоёв."))
+        template_layout.addWidget(BodyLabel("2) На вертикальном кадре 1080x1920 настройте монтаж слоёв."))
+        montage_row = QHBoxLayout()
+        montage_row.setSpacing(14)
+
         self.output_preview = LayerPreviewWidget(1080, 1920, self)
         self.output_preview.set_keep_aspect(True)
         self.output_preview.set_background(QPixmap())
+        self.output_preview.setMinimumHeight(620)
+        montage_row.addWidget(self.output_preview, 1)
+
+        self.effects_preview = LayerPreviewWidget(1080, 1920, self)
+        self.effects_preview.set_keep_aspect(True)
+        self.effects_preview.set_background(QPixmap())
+        self.effects_preview.setMinimumHeight(620)
+        self.effects_preview.set_interactive(False)
+        self.effects_preview.set_show_layer_overlay(False)
+        montage_row.addWidget(self.effects_preview, 1)
+        template_layout.addLayout(montage_row)
+
+        fx_hint = BodyLabel("3) Предпросмотр эффектов справа: без выделяемых рамок, обновляется мгновенно при движении ползунков.")
+        fx_hint.setWordWrap(True)
+        template_layout.addWidget(fx_hint)
+
         self.source_preview.changed.connect(lambda _: self._refresh_output_composite_preview())
         self.output_preview.changed.connect(lambda _: self._refresh_output_composite_preview())
-        template_layout.addWidget(self.output_preview)
 
         row_tpl_actions = QHBoxLayout()
         self.dual_layer_enabled = CheckBox("Включить двухслойный шаблон")
@@ -645,6 +685,22 @@ class AutoShortsInterface(QWidget):
         self.render_backend_combo.addItems(["Auto", "CPU", "GPU", "CUDA"])
         self.render_backend_combo.setCurrentIndex(self._backend_to_index(str(cfg.auto_shorts_render_backend.value or "auto")))
         self.render_backend_combo.currentIndexChanged.connect(self._on_render_backend_changed)
+
+        self.render_fps_label = BodyLabel("FPS:")
+        self.render_fps_combo = ComboBox(self)
+        self.render_fps_combo.addItems(["Исходный", "30", "60"])
+        self.render_fps_combo.setCurrentIndex(1)
+
+        self.render_resolution_label = BodyLabel("Разрешение:")
+        self.render_resolution_combo = ComboBox(self)
+        self.render_resolution_combo.addItems(["1080x1920", "720x1280", "1440x2560", "Исходное"])
+        self.render_resolution_combo.setCurrentIndex(0)
+
+        self.render_quality_label = BodyLabel("Качество:")
+        self.render_quality_combo = ComboBox(self)
+        self.render_quality_combo.addItems(["Высокое", "Сбалансированное", "Быстрое"])
+        self.render_quality_combo.setCurrentIndex(1)
+
         self.render_btn = PrimaryPushButton("Сделать шортсы из выбранных")
         self.render_btn.clicked.connect(self._start_render)
         self.stop_render_btn = PushButton("Стоп")
@@ -654,6 +710,12 @@ class AutoShortsInterface(QWidget):
         bottom_layout.addWidget(self.clear_select_btn)
         bottom_layout.addWidget(self.render_backend_label)
         bottom_layout.addWidget(self.render_backend_combo)
+        bottom_layout.addWidget(self.render_fps_label)
+        bottom_layout.addWidget(self.render_fps_combo)
+        bottom_layout.addWidget(self.render_resolution_label)
+        bottom_layout.addWidget(self.render_resolution_combo)
+        bottom_layout.addWidget(self.render_quality_label)
+        bottom_layout.addWidget(self.render_quality_combo)
         bottom_layout.addStretch(1)
         bottom_layout.addWidget(self.stop_render_btn)
         bottom_layout.addWidget(self.render_btn)
@@ -701,11 +763,13 @@ class AutoShortsInterface(QWidget):
         enabled = self.keep_aspect_checkbox.isChecked()
         self.source_preview.set_keep_aspect(enabled)
         self.output_preview.set_keep_aspect(enabled)
+        self.effects_preview.set_keep_aspect(enabled)
 
     def _apply_theme_style(self):
         dark = isDarkTheme()
         self.source_preview.set_theme(dark)
         self.output_preview.set_theme(dark)
+        self.effects_preview.set_theme(dark)
 
         if dark:
             self.setStyleSheet(
@@ -977,6 +1041,7 @@ class AutoShortsInterface(QWidget):
             output_dir,
             layout_template=self._build_layout_template(),
             render_backend=self._get_render_backend(),
+            render_options=self._build_render_options(),
         )
         self.render_thread.progress.connect(self._on_progress)
         self.render_thread.finished.connect(self._on_render_finished)
@@ -1153,13 +1218,13 @@ class AutoShortsInterface(QWidget):
     def _link_fx_control_pair(self, spin: SpinBox, slider: QSlider):
         spin.valueChanged.connect(slider.setValue)
         slider.valueChanged.connect(spin.setValue)
-        spin.valueChanged.connect(lambda _v: self._refresh_output_composite_preview())
+        spin.valueChanged.connect(lambda _v: self._schedule_fx_preview_refresh())
 
     @staticmethod
     def _clamp_u8(v: float) -> int:
         return max(0, min(255, int(round(v))))
 
-    def _apply_fx_preview(self, pixmap: QPixmap, layer: str) -> QPixmap:
+    def _apply_fx_preview(self, pixmap: QPixmap, layer: str, fast_mode: bool = True) -> QPixmap:
         if pixmap.isNull():
             return pixmap
 
@@ -1182,7 +1247,20 @@ class AutoShortsInterface(QWidget):
         ):
             return pixmap
 
-        img = pixmap.toImage().convertToFormat(4)  # QImage.Format_ARGB32
+        work_pix = pixmap
+        if fast_mode:
+            max_side = 220
+            side = max(work_pix.width(), work_pix.height())
+            if side > max_side:
+                scale = max_side / float(side)
+                work_pix = work_pix.scaled(
+                    max(1, int(work_pix.width() * scale)),
+                    max(1, int(work_pix.height() * scale)),
+                    Qt.IgnoreAspectRatio,
+                    Qt.SmoothTransformation,
+                )
+
+        img = work_pix.toImage().convertToFormat(4)  # QImage.Format_ARGB32
         w, h = img.width(), img.height()
         bright_add = brightness * 255.0
         local_contrast = 1.0 + sharpness * 0.25  # лёгкая имитация резкости в превью
@@ -1208,7 +1286,14 @@ class AutoShortsInterface(QWidget):
                     QColor(self._clamp_u8(r), self._clamp_u8(g), self._clamp_u8(b), a),
                 )
 
-        return QPixmap.fromImage(img)
+        result = QPixmap.fromImage(img)
+        if fast_mode and result.size() != pixmap.size():
+            return result.scaled(
+                pixmap.size(),
+                Qt.IgnoreAspectRatio,
+                Qt.SmoothTransformation,
+            )
+        return result
 
     def _populate_rendered_list(self, files: List[str]):
         self.rendered_list.clear()
@@ -1329,10 +1414,9 @@ class AutoShortsInterface(QWidget):
         except Exception:
             pass
 
-    def _refresh_output_composite_preview(self):
+    def _compose_output_canvas(self, apply_fx: bool = False, fx_fast_mode: bool = True) -> QPixmap:
         if self.source_frame_pixmap.isNull():
-            self.output_preview.set_background(QPixmap())
-            return
+            return QPixmap()
 
         out_w, out_h = 1080, 1920
         canvas = QPixmap(out_w, out_h)
@@ -1368,12 +1452,29 @@ class AutoShortsInterface(QWidget):
                 crop = self.source_frame_pixmap.copy(sx, sy, sw, sh)
                 if crop.isNull():
                     continue
-                crop = self._apply_fx_preview(crop, key)
+                if apply_fx:
+                    crop = self._apply_fx_preview(crop, key, fast_mode=fx_fast_mode)
                 painter.drawPixmap(QRectF(dx, dy, dw, dh), crop, QRectF(0, 0, crop.width(), crop.height()))
         finally:
             painter.end()
 
+        return canvas
+
+    def _schedule_fx_preview_refresh(self):
+        if not hasattr(self, "effects_preview"):
+            return
+        self._fx_preview_timer.start()
+
+    def _render_fx_preview_now(self):
+        if not hasattr(self, "effects_preview"):
+            return
+        fx_canvas = self._compose_output_canvas(apply_fx=True, fx_fast_mode=True)
+        self.effects_preview.set_background(fx_canvas)
+
+    def _refresh_output_composite_preview(self):
+        canvas = self._compose_output_canvas(apply_fx=False)
         self.output_preview.set_background(canvas)
+        self._schedule_fx_preview_refresh()
 
     def _select_all(self):
         for row in range(self.table.rowCount()):
@@ -1407,6 +1508,36 @@ class AutoShortsInterface(QWidget):
             cfg.set(cfg.auto_shorts_render_backend, self._get_render_backend())
         except Exception:
             pass
+
+    def _build_render_options(self) -> Dict:
+        fps_text = (self.render_fps_combo.currentText() or "30").strip()
+        if fps_text == "Исходный":
+            fps_mode = "source"
+        elif fps_text == "60":
+            fps_mode = "60"
+        else:
+            fps_mode = "30"
+
+        resolution_text = (self.render_resolution_combo.currentText() or "1080x1920").strip()
+        if resolution_text == "Исходное":
+            resolution_mode = "source"
+            resolution_value = "source"
+        else:
+            resolution_mode = "fixed"
+            resolution_value = resolution_text
+
+        quality_text = (self.render_quality_combo.currentText() or "Сбалансированное").strip()
+        quality_profile = {
+            "Высокое": "high",
+            "Быстрое": "fast",
+        }.get(quality_text, "balanced")
+
+        return {
+            "fps_mode": fps_mode,
+            "resolution_mode": resolution_mode,
+            "resolution": resolution_value,
+            "quality_profile": quality_profile,
+        }
 
     @staticmethod
     def _fmt_s(total: int) -> str:
