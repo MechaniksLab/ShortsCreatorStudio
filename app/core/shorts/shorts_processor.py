@@ -79,7 +79,7 @@ class ShortsProcessor:
         if llm_candidates:
             # Не полагаемся только на LLM: домешиваем эвристику,
             # чтобы не получать 1-2 скучных кандидата на всём диапазоне.
-            candidates = llm_candidates + heuristic_candidates[:140]
+            candidates = llm_candidates + heuristic_candidates[:260]
             candidates.sort(key=lambda x: x.score, reverse=True)
             candidates = self._deduplicate(candidates)
         else:
@@ -87,7 +87,7 @@ class ShortsProcessor:
 
         # Если после всех фильтров кандидатов всё ещё мало,
         # делаем расширенный проход с более мягкими порогами.
-        if len(candidates) < 6:
+        if len(candidates) < 12:
             expanded = self._build_heuristic_candidates(asr_data, relaxed=True)
             candidates = self._deduplicate((candidates + expanded) if candidates else expanded)
             candidates.sort(key=lambda x: x.score, reverse=True)
@@ -96,6 +96,7 @@ class ShortsProcessor:
             progress_cb(55, f"Найдено кандидатов (эвристика): {len(candidates)}")
 
         reranked = self._try_llm_rerank(candidates)
+        reranked = self._diversify_by_timeline(reranked)
         if progress_cb:
             progress_cb(85, f"Кандидаты после ранжирования: {len(reranked)}")
         final_candidates = reranked[:MAX_HEURISTIC_CANDIDATES]
@@ -106,6 +107,37 @@ class ShortsProcessor:
 
     def _llm_ready(self) -> bool:
         return bool(self.llm_model and self.llm_base_url and self.llm_api_key)
+
+    @staticmethod
+    def _diversify_by_timeline(candidates: List[ShortCandidate]) -> List[ShortCandidate]:
+        """Сохраняем разнообразие по таймлайну, чтобы список не состоял из соседних однотипных кусков."""
+        if not candidates:
+            return []
+        # Сначала оставляем в каждой 20-сек корзине лучший кандидат.
+        bucket_best: Dict[int, ShortCandidate] = {}
+        for c in sorted(candidates, key=lambda x: x.score, reverse=True):
+            bucket = int(c.start_ms // 20000)
+            prev = bucket_best.get(bucket)
+            if prev is None or c.score > prev.score:
+                bucket_best[bucket] = c
+
+        seeded = sorted(bucket_best.values(), key=lambda x: x.score, reverse=True)
+        used = {(c.start_ms, c.end_ms) for c in seeded}
+
+        # Затем добавляем оставшиеся сильные, но не слишком близкие к уже выбранным.
+        extra: List[ShortCandidate] = []
+        for c in sorted(candidates, key=lambda x: x.score, reverse=True):
+            key = (c.start_ms, c.end_ms)
+            if key in used:
+                continue
+            too_close = any(abs(c.start_ms - s.start_ms) < 7000 for s in seeded[:80])
+            if too_close and c.score < 78:
+                continue
+            extra.append(c)
+
+        out = seeded + extra
+        out.sort(key=lambda x: x.score, reverse=True)
+        return out
 
     def _build_enterprise_llm_candidates(
         self,
@@ -260,8 +292,6 @@ class ShortsProcessor:
         windows: List[ShortCandidate] = []
         n_prepared = len(prepared)
         if n_prepared > 900:
-            start_step = 3
-        elif n_prepared > 450:
             start_step = 2
         else:
             start_step = 1
@@ -306,9 +336,9 @@ class ShortsProcessor:
 
                 # Отсекаем "пустые"/скучные фрагменты: мало речи, много пауз, много филлеров.
                 if relaxed:
-                    skip_window = speech_ratio < 0.48 or pause_ratio > 0.36 or filler_ratio > 0.52
+                    skip_window = speech_ratio < 0.44 or pause_ratio > 0.42 or filler_ratio > 0.56
                 else:
-                    skip_window = speech_ratio < 0.58 or pause_ratio > 0.24 or filler_ratio > 0.40
+                    skip_window = speech_ratio < 0.54 or pause_ratio > 0.30 or filler_ratio > 0.45
                 if skip_window:
                     continue
 
@@ -322,7 +352,7 @@ class ShortsProcessor:
                 )
                 if score <= 0:
                     continue
-                if score < (39 if relaxed else 46):
+                if score < (36 if relaxed else 43):
                     continue
 
                 punch = max(punch, score)
@@ -342,7 +372,7 @@ class ShortsProcessor:
                 )
 
                 # если уже очень сильный фрагмент — можно не расширять дальше
-                if punch > (97 if relaxed else 95):
+                if punch > (98 if relaxed else 96):
                     break
 
         windows.sort(key=lambda x: x.score, reverse=True)
@@ -381,7 +411,10 @@ class ShortsProcessor:
             "смотри", "прикол", "история", "секрет", "факт", "топ", "не поверишь", "важно", "лайфхак",
             "подожди", "сейчас", "вот", "чел", "дальше",
         ]
-        hype_kw = ["имба", "жёстко", "клатч", "тащит", "топ", "легенд", "финал", "камбэк"]
+        hype_kw = [
+            "имба", "жёстко", "клатч", "тащит", "топ", "легенд", "финал", "камбэк",
+            "нокаут", "ваншот", "ульт", "разнос", "фейл", "поворот", "драма", "пранк",
+        ]
 
         funny_hits = sum(1 for k in funny_kw if k in lowered)
         hook_hits = sum(1 for k in hook_kw if k in lowered)
@@ -390,6 +423,8 @@ class ShortsProcessor:
         caps_bonus = min(8, len(re.findall(r"[A-ZА-ЯЁ]{3,}", txt)) * 2)
         digit_bonus = 4 if re.search(r"\d", txt) else 0
         quote_bonus = 4 if any(sym in txt for sym in ["—", "«", "»", "\"", "'"]) else 0
+        early_text = " ".join(words[:10]).lower()
+        early_hook_bonus = 7 if any(k in early_text for k in hook_kw + ["но", "вдруг", "прикинь", "короче"]) else 0
 
         duration_target_bonus = 14 if 16 <= duration_s <= 42 else (6 if 12 <= duration_s <= 55 else 0)
         density_bonus = max(0, min(22, (density - 1.45) * 10))
@@ -410,12 +445,15 @@ class ShortsProcessor:
             + caps_bonus
             + digit_bonus
             + quote_bonus
+            + early_hook_bonus
             + diversity_bonus
             + anti_wall_penalty
             + pause_penalty
             + filler_penalty
             + low_speech_penalty
         )
+        if funny_hits == 0 and hook_hits == 0 and hype_hits == 0 and punct_bonus <= 0 and density < 1.2:
+            score -= 8
         return round(min(100.0, score), 2)
 
     def _try_llm_rerank(self, candidates: List[ShortCandidate]) -> List[ShortCandidate]:
@@ -499,10 +537,10 @@ class ShortsProcessor:
                 a_tokens = self._token_set(a.excerpt or a.title)
                 text_sim = self._jaccard(c_tokens, a_tokens)
 
-                if inter / short > 0.62:
+                if inter / short > 0.72:
                     overlap = True
                     break
-                if iou > 0.42 and text_sim > 0.52:
+                if iou > 0.50 and text_sim > 0.58:
                     overlap = True
                     break
                 if temporal_close and text_sim > 0.72 and inter / long > 0.22:

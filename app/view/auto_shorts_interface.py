@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
-from PyQt5.QtCore import QPointF, QRectF, Qt, QStandardPaths, pyqtSignal
+from PyQt5.QtCore import QPointF, QRect, QRectF, Qt, QStandardPaths, pyqtSignal
 from PyQt5.QtGui import QColor, QPainter, QPen, QPixmap
 from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QLabel, QScrollArea, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
 from qfluentwidgets import Action, BodyLabel, CardWidget, CheckBox, ComboBox, CommandBar, FluentIcon, InfoBar, InfoBarPosition, PrimaryPushButton, ProgressBar, PushButton, StrongBodyLabel, SpinBox, isDarkTheme
@@ -242,6 +242,97 @@ class LayerPreviewWidget(QWidget):
             self.layers[k] = r
 
 
+class TimeRangeSlider(QWidget):
+    rangeChanged = pyqtSignal(int, int)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.minimum = 0
+        self.maximum = 100
+        self.start_value = 0
+        self.end_value = 100
+        self._active_handle = None  # "start" | "end"
+        self.setMinimumHeight(36)
+
+    def set_bounds(self, minimum: int, maximum: int):
+        self.minimum = max(0, int(minimum))
+        self.maximum = max(self.minimum + 1, int(maximum))
+        self.set_values(self.start_value, self.end_value, emit_signal=False)
+        self.update()
+
+    def set_values(self, start_value: int, end_value: int, emit_signal: bool = True):
+        s = max(self.minimum, min(int(start_value), self.maximum - 1))
+        e = max(s + 1, min(int(end_value), self.maximum))
+        changed = (s != self.start_value) or (e != self.end_value)
+        self.start_value, self.end_value = s, e
+        if changed:
+            self.update()
+            if emit_signal:
+                self.rangeChanged.emit(self.start_value, self.end_value)
+
+    def _track_rect(self) -> QRect:
+        margin = 12
+        h = 8
+        y = (self.height() - h) // 2
+        return QRect(margin, y, max(30, self.width() - margin * 2), h)
+
+    def _value_to_x(self, value: int) -> int:
+        tr = self._track_rect()
+        ratio = (value - self.minimum) / max(1, self.maximum - self.minimum)
+        return tr.x() + int(round(ratio * tr.width()))
+
+    def _x_to_value(self, x: int) -> int:
+        tr = self._track_rect()
+        clamped_x = max(tr.left(), min(tr.right(), x))
+        ratio = (clamped_x - tr.x()) / max(1, tr.width())
+        return self.minimum + int(round(ratio * (self.maximum - self.minimum)))
+
+    def mousePressEvent(self, event):
+        if event.button() != Qt.LeftButton:
+            return
+        x = event.pos().x()
+        sx = self._value_to_x(self.start_value)
+        ex = self._value_to_x(self.end_value)
+        self._active_handle = "start" if abs(x - sx) <= abs(x - ex) else "end"
+        self._apply_drag_x(x)
+
+    def mouseMoveEvent(self, event):
+        if not self._active_handle:
+            return
+        self._apply_drag_x(event.pos().x())
+
+    def mouseReleaseEvent(self, event):
+        self._active_handle = None
+
+    def _apply_drag_x(self, x: int):
+        v = self._x_to_value(x)
+        if self._active_handle == "start":
+            self.set_values(v, self.end_value)
+        elif self._active_handle == "end":
+            self.set_values(self.start_value, v)
+
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+
+        tr = self._track_rect()
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(120, 120, 120, 90))
+        p.drawRoundedRect(tr, 4, 4)
+
+        sx = self._value_to_x(self.start_value)
+        ex = self._value_to_x(self.end_value)
+        sel = QRect(min(sx, ex), tr.y(), max(2, abs(ex - sx)), tr.height())
+        p.setBrush(QColor(59, 130, 246, 190))
+        p.drawRoundedRect(sel, 4, 4)
+
+        p.setBrush(QColor(245, 245, 245))
+        p.setPen(QPen(QColor(70, 70, 70), 1))
+        r = 7
+        p.drawEllipse(QPointF(sx, tr.center().y()), r, r)
+        p.drawEllipse(QPointF(ex, tr.center().y()), r, r)
+
+
 class AutoShortsInterface(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -255,6 +346,9 @@ class AutoShortsInterface(QWidget):
         self.source_width = 1920
         self.source_height = 1080
         self.source_frame_pixmap = QPixmap()
+        self.video_duration_s = 0
+        self.selected_start_s = 0
+        self.selected_end_s = 1
 
         self._init_ui()
         self._apply_theme_style()
@@ -310,10 +404,6 @@ class AutoShortsInterface(QWidget):
         title_row = QHBoxLayout()
         title_row.addWidget(StrongBodyLabel("Параметры поиска"))
         title_row.addStretch(1)
-        self.fast_test_checkbox = CheckBox("Тестовый диапазон")
-        self.fast_test_checkbox.setChecked(False)
-        self.fast_test_checkbox.stateChanged.connect(self._on_range_toggle)
-        title_row.addWidget(self.fast_test_checkbox)
         control_layout.addLayout(title_row)
 
         params_row = QHBoxLayout()
@@ -329,28 +419,32 @@ class AutoShortsInterface(QWidget):
         self.max_duration.setValue(60)
         params_row.addWidget(self.max_duration)
 
-        params_row.addWidget(BodyLabel("С (сек):"))
-        self.range_start = SpinBox(self)
-        self.range_start.setRange(0, 24 * 3600)
-        self.range_start.setValue(0)
-        self.range_start.setEnabled(False)
-        params_row.addWidget(self.range_start)
-
-        params_row.addWidget(BodyLabel("До (сек):"))
-        self.range_end = SpinBox(self)
-        self.range_end.setRange(0, 24 * 3600)
-        self.range_end.setValue(300)
-        self.range_end.setEnabled(False)
-        params_row.addWidget(self.range_end)
-
         self.analyze_btn = PrimaryPushButton("Найти интересные моменты")
         self.analyze_btn.clicked.connect(self._start_analyze)
         params_row.addStretch(1)
         params_row.addWidget(self.analyze_btn)
         control_layout.addLayout(params_row)
 
+        control_layout.addWidget(BodyLabel("Диапазон анализа (всегда активен):"))
+        self.range_slider = TimeRangeSlider(self)
+        self.range_slider.set_bounds(0, 1)
+        self.range_slider.set_values(0, 1, emit_signal=False)
+        self.range_slider.rangeChanged.connect(self._on_range_slider_changed)
+        control_layout.addWidget(self.range_slider)
+
+        range_info_row = QHBoxLayout()
+        self.range_start_label = BodyLabel("С: 00:00")
+        self.range_end_label = BodyLabel("До: 00:01")
+        self.range_span_label = BodyLabel("Длительность: 00:01")
+        range_info_row.addWidget(self.range_start_label)
+        range_info_row.addStretch(1)
+        range_info_row.addWidget(self.range_end_label)
+        range_info_row.addStretch(1)
+        range_info_row.addWidget(self.range_span_label)
+        control_layout.addLayout(range_info_row)
+
         hint = BodyLabel(
-            "Подсказка: включите 'Тестовый диапазон', чтобы анализировать только часть видео и ускорить поиск."
+            "По умолчанию выбран весь ролик. Перемещайте левый и правый маркеры, чтобы ограничить промежуток анализа."
         )
         hint.setWordWrap(True)
         control_layout.addWidget(hint)
@@ -539,6 +633,7 @@ class AutoShortsInterface(QWidget):
             self.candidates = []
             self.table.setRowCount(0)
             self._set_stage(1)
+            self._sync_range_with_video_duration(file_path)
             self._load_source_preview_frame(file_path, self.preview_time_s.value())
 
     def _reload_preview_frame(self):
@@ -546,10 +641,58 @@ class AutoShortsInterface(QWidget):
             return
         self._load_source_preview_frame(self.video_path, self.preview_time_s.value())
 
-    def _on_range_toggle(self):
-        enabled = self.fast_test_checkbox.isChecked()
-        self.range_start.setEnabled(enabled)
-        self.range_end.setEnabled(enabled)
+    def _sync_range_with_video_duration(self, video_path: str):
+        duration_s = self._probe_video_duration_s(video_path)
+        self.video_duration_s = max(1, duration_s)
+        self.selected_start_s = 0
+        self.selected_end_s = self.video_duration_s
+        self.range_slider.set_bounds(0, self.video_duration_s)
+        self.range_slider.set_values(self.selected_start_s, self.selected_end_s, emit_signal=False)
+        self._update_range_labels()
+
+    def _on_range_slider_changed(self, start_s: int, end_s: int):
+        self.selected_start_s = int(start_s)
+        self.selected_end_s = int(end_s)
+        if self.selected_end_s <= self.selected_start_s:
+            self.selected_end_s = min(self.video_duration_s, self.selected_start_s + 1)
+        self._update_range_labels()
+
+    def _update_range_labels(self):
+        self.range_start_label.setText(f"С: {self._fmt_s(self.selected_start_s)}")
+        self.range_end_label.setText(f"До: {self._fmt_s(self.selected_end_s)}")
+        self.range_span_label.setText(
+            f"Длительность: {self._fmt_s(max(1, self.selected_end_s - self.selected_start_s))}"
+        )
+
+    @staticmethod
+    def _probe_video_duration_s(video_path: str) -> int:
+        try:
+            p = subprocess.run(
+                [
+                    "ffprobe",
+                    "-v",
+                    "error",
+                    "-show_entries",
+                    "format=duration",
+                    "-of",
+                    "default=noprint_wrappers=1:nokey=1",
+                    video_path,
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
+            )
+            if p.returncode == 0:
+                raw = (p.stdout or "").strip().splitlines()
+                if raw:
+                    return max(1, int(float(raw[0])))
+        except Exception:
+            pass
+        return 1
 
     def _start_analyze(self):
         if not self.video_path:
@@ -579,13 +722,12 @@ class AutoShortsInterface(QWidget):
         self.progress_bar.setValue(0)
         self.progress_label.setText("Анализ...")
 
-        range_enabled = self.fast_test_checkbox.isChecked()
-        range_start = self.range_start.value()
-        range_end = self.range_end.value()
-        if range_enabled and range_end <= range_start:
+        range_start = int(self.selected_start_s)
+        range_end = int(self.selected_end_s)
+        if range_end <= range_start:
             InfoBar.warning(
                 "Внимание",
-                "Для тестового диапазона: время 'До' должно быть больше 'С'",
+                "Время конца диапазона должно быть больше времени старта",
                 duration=2500,
                 position=InfoBarPosition.TOP,
                 parent=self,
@@ -597,7 +739,7 @@ class AutoShortsInterface(QWidget):
             self.video_path,
             min_d,
             max_d,
-            range_enabled=range_enabled,
+            range_enabled=True,
             range_start_s=range_start,
             range_end_s=range_end,
         )
@@ -949,9 +1091,7 @@ class AutoShortsInterface(QWidget):
         h = total // 3600
         m = (total % 3600) // 60
         s = total % 60
-        if h > 0:
-            return f"{h:02}:{m:02}:{s:02}"
-        return f"{m:02}:{s:02}"
+        return f"{h:02}:{m:02}:{s:02}"
 
     def closeEvent(self, event):
         # Тихо сохраняем последний шаблон при закрытии, чтобы он сохранялся между перезапусками
