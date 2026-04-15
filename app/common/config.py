@@ -365,6 +365,18 @@ class Config(QConfig):
         "auto",
         OptionsValidator(["auto", "cpu", "gpu", "cuda"]),
     )
+    auto_shorts_render_fps = OptionsConfigItem(
+        "MainWindow",
+        "AutoShortsRenderFps",
+        "30",
+        OptionsValidator(["source", "24", "30", "60"]),
+    )
+    auto_shorts_render_quality = OptionsConfigItem(
+        "MainWindow",
+        "AutoShortsRenderQuality",
+        "standard",
+        OptionsValidator(["draft", "standard", "high"]),
+    )
 
     # ------------------- 更新配置 -------------------
     checkUpdateAtStartUp = ConfigItem(
@@ -374,5 +386,6 @@ class Config(QConfig):
 
 cfg = Config()
 cfg.themeMode.value = Theme.DARK
-cfg.themeColor.value = QColor("#ff28f08b")
+# Базовая тема бренда: тёмно-синий с фиолетовым оттенком.
+cfg.themeColor.value = QColor("#ff6f5bff")
 qconfig.load(SETTINGS_PATH, cfg)

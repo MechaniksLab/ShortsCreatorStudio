@@ -1,6 +1,8 @@
 {
     "MainWindow": {
         "AutoShortsRenderBackend": "gpu",
+        "AutoShortsRenderFps": "source",
+        "AutoShortsRenderQuality": "standard",
         "DpiScale": "Auto",
         "Language": "Auto",
         "MicaEnabled": false

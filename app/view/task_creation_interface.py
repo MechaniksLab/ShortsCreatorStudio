@@ -106,7 +106,7 @@ class TaskCreationInterface(QWidget):
                 border: 1px solid rgba(255,255, 255, 0.08);
             }
             QLineEdit:focus[transparent=true] {
-                border: 1px solid rgba(47,141, 99, 0.48);
+                border: 1px solid rgba(111, 91, 255, 0.58);
             }
             
         """
@@ -118,13 +118,13 @@ class TaskCreationInterface(QWidget):
             + """
             QToolButton {
                 border-radius: 20px;
-                background-color: #2F8D63;
+                background-color: #6F5BFF;
             }
             QToolButton:hover {
-                background-color: #2E805C;
+                background-color: #5D4CE0;
             }
             QToolButton:pressed {
-                background-color: #2E905C;
+                background-color: #4E40C2;
             }
         """
         )
@@ -163,7 +163,7 @@ class TaskCreationInterface(QWidget):
             + """
             QPushButton {
                 font-size: 12px;
-                color: #2F8D63;
+                color: #6F5BFF;
                 text-decoration: underline;
             }
         """
@@ -176,7 +176,7 @@ class TaskCreationInterface(QWidget):
             + """
             QPushButton {
                 font-size: 12px;
-                color: #2F8D63;
+                color: #6F5BFF;
                 text-decoration: underline;
             }
         """
@@ -184,7 +184,7 @@ class TaskCreationInterface(QWidget):
 
         # 添加版权信息标签
         self.info_label = BodyLabel(
-            self.tr(f"©VideoCaptioner {VERSION} • By Weifeng"), self
+            self.tr(f"©MechaniksLab Creator Studio {VERSION} • By MechaniksGameLab"), self
         )
         self.info_label.setAlignment(Qt.AlignCenter)
         self.info_label.setStyleSheet("font-size: 12px; color: #888888;")

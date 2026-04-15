@@ -7,8 +7,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
-from PyQt5.QtCore import QPointF, QRect, QRectF, Qt, QStandardPaths, pyqtSignal
-from PyQt5.QtGui import QColor, QPainter, QPen, QPixmap
+from PyQt5.QtCore import QPointF, QRect, QRectF, Qt, QStandardPaths, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QImage, QPainter, QPen, QPixmap
 from PyQt5.QtWidgets import (
     QFileDialog,
     QHBoxLayout,
@@ -362,6 +362,17 @@ class AutoShortsInterface(QWidget):
         self.video_duration_s = 0
         self.selected_start_s = 0
         self.selected_end_s = 1
+        self._preview_refresh_timer = QTimer(self)
+        self._preview_refresh_timer.setSingleShot(True)
+        self._preview_refresh_timer.setInterval(120)
+        self._preview_refresh_timer.timeout.connect(self._refresh_output_composite_preview)
+        self._preview_refresh_in_progress = False
+        self._preview_refresh_pending = False
+        self._restoring_layout_template = False
+        self._template_save_timer = QTimer(self)
+        self._template_save_timer.setSingleShot(True)
+        self._template_save_timer.setInterval(450)
+        self._template_save_timer.timeout.connect(self._persist_layout_template_silent)
 
         self._init_ui()
         self._apply_theme_style()
@@ -424,12 +435,14 @@ class AutoShortsInterface(QWidget):
         self.min_duration = SpinBox(self)
         self.min_duration.setRange(8, 90)
         self.min_duration.setValue(15)
+        self.min_duration.valueChanged.connect(lambda _v: self._schedule_template_persist())
         params_row.addWidget(self.min_duration)
 
         params_row.addWidget(BodyLabel("Макс. длительность (сек):"))
         self.max_duration = SpinBox(self)
         self.max_duration.setRange(20, 300)
         self.max_duration.setValue(90)
+        self.max_duration.valueChanged.connect(lambda _v: self._schedule_template_persist())
         params_row.addWidget(self.max_duration)
 
         self.analyze_btn = PrimaryPushButton("Найти интересные моменты")
@@ -443,6 +456,7 @@ class AutoShortsInterface(QWidget):
         self.range_slider.set_bounds(0, 1)
         self.range_slider.set_values(0, 1, emit_signal=False)
         self.range_slider.rangeChanged.connect(self._on_range_slider_changed)
+        self.range_slider.rangeChanged.connect(lambda _s, _e: self._schedule_template_persist())
         control_layout.addWidget(self.range_slider)
 
         range_info_row = QHBoxLayout()
@@ -473,6 +487,7 @@ class AutoShortsInterface(QWidget):
         self.preview_time_s = SpinBox(self)
         self.preview_time_s.setRange(0, 24 * 3600)
         self.preview_time_s.setValue(2)
+        self.preview_time_s.valueChanged.connect(lambda _v: self._schedule_template_persist())
         frame_row.addWidget(self.preview_time_s)
         self.refresh_preview_btn = PushButton("Обновить кадр")
         self.refresh_preview_btn.clicked.connect(self._reload_preview_frame)
@@ -481,6 +496,7 @@ class AutoShortsInterface(QWidget):
         self.keep_aspect_checkbox = CheckBox("Сохранять пропорции")
         self.keep_aspect_checkbox.setChecked(True)
         self.keep_aspect_checkbox.stateChanged.connect(self._on_keep_aspect_changed)
+        self.keep_aspect_checkbox.stateChanged.connect(lambda _v: self._schedule_template_persist())
         frame_row.addWidget(self.keep_aspect_checkbox)
         template_layout.addLayout(frame_row)
 
@@ -493,13 +509,16 @@ class AutoShortsInterface(QWidget):
         self.output_preview = LayerPreviewWidget(1080, 1920, self)
         self.output_preview.set_keep_aspect(True)
         self.output_preview.set_background(QPixmap())
-        self.source_preview.changed.connect(lambda _: self._refresh_output_composite_preview())
-        self.output_preview.changed.connect(lambda _: self._refresh_output_composite_preview())
+        self.source_preview.changed.connect(lambda _: self._schedule_preview_refresh())
+        self.output_preview.changed.connect(lambda _: self._schedule_preview_refresh())
+        self.source_preview.changed.connect(lambda _: self._schedule_template_persist())
+        self.output_preview.changed.connect(lambda _: self._schedule_template_persist())
         template_layout.addWidget(self.output_preview)
 
         row_tpl_actions = QHBoxLayout()
         self.dual_layer_enabled = CheckBox("Включить двухслойный шаблон")
         self.dual_layer_enabled.setChecked(True)
+        self.dual_layer_enabled.stateChanged.connect(lambda _v: self._schedule_template_persist())
         self.reset_template_btn = PushButton("Сбросить шаблон")
         self.reset_template_btn.clicked.connect(self._reset_layout_template)
         self.load_template_btn = PushButton("Загрузить шаблон")
@@ -645,6 +664,19 @@ class AutoShortsInterface(QWidget):
         self.render_backend_combo.addItems(["Auto", "CPU", "GPU", "CUDA"])
         self.render_backend_combo.setCurrentIndex(self._backend_to_index(str(cfg.auto_shorts_render_backend.value or "auto")))
         self.render_backend_combo.currentIndexChanged.connect(self._on_render_backend_changed)
+
+        self.render_fps_label = BodyLabel("FPS:")
+        self.render_fps_combo = ComboBox(self)
+        self.render_fps_combo.addItems(["Source", "24", "30", "60"])
+        self.render_fps_combo.setCurrentText(str(cfg.auto_shorts_render_fps.value or "30").capitalize())
+        self.render_fps_combo.currentIndexChanged.connect(self._on_render_fps_changed)
+
+        self.render_quality_label = BodyLabel("Качество:")
+        self.render_quality_combo = ComboBox(self)
+        self.render_quality_combo.addItems(["Draft", "Standard", "High"])
+        self.render_quality_combo.setCurrentText(str(cfg.auto_shorts_render_quality.value or "standard").capitalize())
+        self.render_quality_combo.currentIndexChanged.connect(self._on_render_quality_changed)
+
         self.render_btn = PrimaryPushButton("Сделать шортсы из выбранных")
         self.render_btn.clicked.connect(self._start_render)
         self.stop_render_btn = PushButton("Стоп")
@@ -654,6 +686,10 @@ class AutoShortsInterface(QWidget):
         bottom_layout.addWidget(self.clear_select_btn)
         bottom_layout.addWidget(self.render_backend_label)
         bottom_layout.addWidget(self.render_backend_combo)
+        bottom_layout.addWidget(self.render_fps_label)
+        bottom_layout.addWidget(self.render_fps_combo)
+        bottom_layout.addWidget(self.render_quality_label)
+        bottom_layout.addWidget(self.render_quality_combo)
         bottom_layout.addStretch(1)
         bottom_layout.addWidget(self.stop_render_btn)
         bottom_layout.addWidget(self.render_btn)
@@ -679,10 +715,16 @@ class AutoShortsInterface(QWidget):
         rendered_layout.addWidget(self.rendered_list)
 
         rendered_actions = QHBoxLayout()
+        self.select_all_rendered_btn = PushButton("Выделить все")
+        self.select_all_rendered_btn.clicked.connect(self._rendered_select_all)
+        self.clear_rendered_selection_btn = PushButton("Снять выделение")
+        self.clear_rendered_selection_btn.clicked.connect(self._rendered_clear_all)
         self.open_selected_short_btn = PushButton("Открыть выбранный")
         self.open_selected_short_btn.clicked.connect(self._open_selected_rendered)
         self.send_to_batch_btn = PrimaryPushButton("Отправить выбранные в пакетные субтитры")
         self.send_to_batch_btn.clicked.connect(self._send_selected_to_batch)
+        rendered_actions.addWidget(self.select_all_rendered_btn)
+        rendered_actions.addWidget(self.clear_rendered_selection_btn)
         rendered_actions.addWidget(self.open_selected_short_btn)
         rendered_actions.addStretch(1)
         rendered_actions.addWidget(self.send_to_batch_btn)
@@ -716,10 +758,12 @@ class AutoShortsInterface(QWidget):
                 QLabel, BodyLabel, StrongBodyLabel { color: #EDEDED; }
                 CardWidget { border-radius: 10px; }
                 CardWidget#shortsVideoCard, CardWidget#shortsStageCard, CardWidget#shortsControlCard,
-                CardWidget#shortsTemplateCard, CardWidget#shortsBottomCard {
+                CardWidget#shortsTemplateCard, CardWidget#shortsBottomCard, CardWidget#shortsRenderedCard {
                     background: #2A2B2E;
                     border: 1px solid #3A3D42;
                 }
+                QSlider::groove:horizontal { height: 6px; background: #3A3D42; border-radius: 3px; }
+                QSlider::handle:horizontal { width: 14px; margin: -5px 0; background: #5AA9FF; border-radius: 7px; }
                 QTableWidget { background: #2A2B2E; color: #EDEDED; gridline-color: #3A3D42; }
                 QTableWidget::item { background: #2A2B2E; color: #EDEDED; }
                 QTableWidget::item:alternate { background: #242529; color: #EDEDED; }
@@ -735,10 +779,12 @@ class AutoShortsInterface(QWidget):
                 QScrollArea > QWidget > QWidget { background: #f5f6f8; }
                 CardWidget { border-radius: 10px; }
                 CardWidget#shortsVideoCard, CardWidget#shortsStageCard, CardWidget#shortsControlCard,
-                CardWidget#shortsTemplateCard, CardWidget#shortsBottomCard {
+                CardWidget#shortsTemplateCard, CardWidget#shortsBottomCard, CardWidget#shortsRenderedCard {
                     background: #FFFFFF;
                     border: 1px solid #E5E7EB;
                 }
+                QSlider::groove:horizontal { height: 6px; background: #D1D5DB; border-radius: 3px; }
+                QSlider::handle:horizontal { width: 14px; margin: -5px 0; background: #3B82F6; border-radius: 7px; }
                 QTableWidget { background: #FFFFFF; color: #202124; gridline-color: #E5E7EB; }
                 QTableWidget::item { background: #FFFFFF; color: #202124; }
                 QTableWidget::item:alternate { background: #F9FAFB; color: #202124; }
@@ -977,6 +1023,8 @@ class AutoShortsInterface(QWidget):
             output_dir,
             layout_template=self._build_layout_template(),
             render_backend=self._get_render_backend(),
+            render_fps=self._get_render_fps(),
+            render_quality=self._get_render_quality(),
         )
         self.render_thread.progress.connect(self._on_progress)
         self.render_thread.finished.connect(self._on_render_finished)
@@ -1116,9 +1164,26 @@ class AutoShortsInterface(QWidget):
             if not self.template_path.exists():
                 return
             data = json.loads(self.template_path.read_text(encoding="utf-8"))
+            self._restoring_layout_template = True
             wc = data.get("webcam", {})
             gm = data.get("game", {})
             self.dual_layer_enabled.setChecked(bool(data.get("enabled", True)))
+
+            # Восстанавливаем все параметры UI, чтобы после перезапуска
+            # вкладка возвращалась в прежнее состояние.
+            self.min_duration.setValue(int(data.get("min_duration_s", self.min_duration.value())))
+            self.max_duration.setValue(int(data.get("max_duration_s", self.max_duration.value())))
+            self.preview_time_s.setValue(int(data.get("preview_time_s", self.preview_time_s.value())))
+            self.keep_aspect_checkbox.setChecked(bool(data.get("keep_aspect", self.keep_aspect_checkbox.isChecked())))
+
+            rs = int(data.get("range_start_s", self.selected_start_s))
+            re = int(data.get("range_end_s", self.selected_end_s))
+            # bounds могут ещё не знать длительность видео при холодном старте
+            rs = max(0, rs)
+            re = max(rs + 1, re)
+            self.selected_start_s, self.selected_end_s = rs, re
+            self.range_slider.set_values(rs, re, emit_signal=False)
+            self._update_range_labels()
 
             self.source_preview.set_layers(
                 QRectF(int(wc.get("crop_x", 0)), int(wc.get("crop_y", 0)), int(wc.get("crop_w", 320)), int(wc.get("crop_h", 240))),
@@ -1149,11 +1214,29 @@ class AutoShortsInterface(QWidget):
             self._refresh_output_composite_preview()
         except Exception:
             pass
+        finally:
+            self._restoring_layout_template = False
 
     def _link_fx_control_pair(self, spin: SpinBox, slider: QSlider):
         spin.valueChanged.connect(slider.setValue)
         slider.valueChanged.connect(spin.setValue)
-        spin.valueChanged.connect(lambda _v: self._refresh_output_composite_preview())
+        spin.valueChanged.connect(lambda _v: self._schedule_preview_refresh())
+        spin.valueChanged.connect(lambda _v: self._schedule_template_persist())
+
+    def _schedule_template_persist(self):
+        if self._restoring_layout_template:
+            return
+        self._template_save_timer.start()
+
+    def _persist_layout_template_silent(self):
+        try:
+            self.template_path.parent.mkdir(parents=True, exist_ok=True)
+            self.template_path.write_text(
+                json.dumps(self._build_layout_template(), ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception:
+            pass
 
     @staticmethod
     def _clamp_u8(v: float) -> int:
@@ -1182,20 +1265,30 @@ class AutoShortsInterface(QWidget):
         ):
             return pixmap
 
-        img = pixmap.toImage().convertToFormat(4)  # QImage.Format_ARGB32
+        img = pixmap.toImage().convertToFormat(QImage.Format_ARGB32)
         w, h = img.width(), img.height()
         bright_add = brightness * 255.0
         local_contrast = 1.0 + sharpness * 0.25  # лёгкая имитация резкости в превью
         contrast_total = contrast * local_contrast
+
+        lut_r = [0] * 256
+        lut_g = [0] * 256
+        lut_b = [0] * 256
+        for i in range(256):
+            v = (i - 127.5) * contrast_total + 127.5 + bright_add
+            vv = self._clamp_u8(v)
+            lut_r[i] = vv
+            lut_g[i] = vv
+            lut_b[i] = vv
 
         for y in range(h):
             for x in range(w):
                 c = img.pixelColor(x, y)
                 r, g, b, a = c.red(), c.green(), c.blue(), c.alpha()
 
-                r = (r - 127.5) * contrast_total + 127.5 + bright_add
-                g = (g - 127.5) * contrast_total + 127.5 + bright_add
-                b = (b - 127.5) * contrast_total + 127.5 + bright_add
+                r = lut_r[r]
+                g = lut_g[g]
+                b = lut_b[b]
 
                 lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
                 r = lum + (r - lum) * saturation
@@ -1330,8 +1423,14 @@ class AutoShortsInterface(QWidget):
             pass
 
     def _refresh_output_composite_preview(self):
+        if self._preview_refresh_in_progress:
+            self._preview_refresh_pending = True
+            return
+
+        self._preview_refresh_in_progress = True
         if self.source_frame_pixmap.isNull():
             self.output_preview.set_background(QPixmap())
+            self._preview_refresh_in_progress = False
             return
 
         out_w, out_h = 1080, 1920
@@ -1368,12 +1467,40 @@ class AutoShortsInterface(QWidget):
                 crop = self.source_frame_pixmap.copy(sx, sy, sw, sh)
                 if crop.isNull():
                     continue
-                crop = self._apply_fx_preview(crop, key)
-                painter.drawPixmap(QRectF(dx, dy, dw, dh), crop, QRectF(0, 0, crop.width(), crop.height()))
+                # Для быстрого отклика фильтры применяются на уменьшенной копии превью,
+                # затем масштабируются до зоны слоя.
+                preview_w = max(1, min(dw, 420))
+                preview_h = max(1, min(dh, 720))
+                fast_crop = crop.scaled(preview_w, preview_h, Qt.IgnoreAspectRatio, Qt.FastTransformation)
+                fast_crop = self._apply_fx_preview(fast_crop, key)
+                painter.drawPixmap(
+                    QRectF(dx, dy, dw, dh),
+                    fast_crop,
+                    QRectF(0, 0, fast_crop.width(), fast_crop.height()),
+                )
         finally:
             painter.end()
 
         self.output_preview.set_background(canvas)
+        self._preview_refresh_in_progress = False
+        if self._preview_refresh_pending:
+            self._preview_refresh_pending = False
+            self._preview_refresh_timer.start()
+
+    def _schedule_preview_refresh(self):
+        self._preview_refresh_timer.start()
+
+    def _rendered_select_all(self):
+        for i in range(self.rendered_list.count()):
+            item = self.rendered_list.item(i)
+            if item:
+                item.setCheckState(Qt.Checked)
+
+    def _rendered_clear_all(self):
+        for i in range(self.rendered_list.count()):
+            item = self.rendered_list.item(i)
+            if item:
+                item.setCheckState(Qt.Unchecked)
 
     def _select_all(self):
         for row in range(self.table.rowCount()):
@@ -1405,6 +1532,25 @@ class AutoShortsInterface(QWidget):
     def _on_render_backend_changed(self, _index: int):
         try:
             cfg.set(cfg.auto_shorts_render_backend, self._get_render_backend())
+        except Exception:
+            pass
+
+    def _get_render_fps(self) -> str:
+        txt = (self.render_fps_combo.currentText() or "30").strip().lower()
+        return "source" if txt == "source" else txt
+
+    def _get_render_quality(self) -> str:
+        return (self.render_quality_combo.currentText() or "standard").strip().lower()
+
+    def _on_render_fps_changed(self, _index: int):
+        try:
+            cfg.set(cfg.auto_shorts_render_fps, self._get_render_fps())
+        except Exception:
+            pass
+
+    def _on_render_quality_changed(self, _index: int):
+        try:
+            cfg.set(cfg.auto_shorts_render_quality, self._get_render_quality())
         except Exception:
             pass
 

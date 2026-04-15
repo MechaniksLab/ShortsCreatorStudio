@@ -15,7 +15,7 @@ from qfluentwidgets import (
 
 from app.common.config import cfg
 from app.components.DonateDialog import DonateDialog
-from app.config import ASSETS_PATH, GITHUB_REPO_URL
+from app.config import APP_NAME, ASSETS_PATH, GITHUB_REPO_URL
 from app.thread.version_manager_thread import VersionManager
 from app.view.batch_process_interface import BatchProcessInterface
 from app.view.home_interface import HomeInterface
@@ -88,7 +88,7 @@ class MainWindow(FluentWindow):
         if interface.windowTitle():
             self.setWindowTitle(interface.windowTitle())
         else:
-            self.setWindowTitle("VideoCaptioner")
+            self.setWindowTitle(APP_NAME)
         self.stackedWidget.setCurrentWidget(interface, popOut=False)
 
     def initWindow(self):
@@ -96,7 +96,7 @@ class MainWindow(FluentWindow):
         self.resize(1050, 800)
         self.setMinimumWidth(700)
         self.setWindowIcon(QIcon(str(LOGO_PATH)))
-        self.setWindowTitle("VideoCaptioner")
+        self.setWindowTitle(APP_NAME)
 
         self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 
@@ -117,7 +117,7 @@ class MainWindow(FluentWindow):
         """打开GitHub"""
         w = MessageBox(
             "Информация о GitHub",
-            "VideoCaptioner разработан автором как независимый проект и размещён на GitHub."
+            "MechaniksLab Creator Studio разработан как независимый проект и размещён на GitHub."
             " Буду рад вашим Star и Fork. Если столкнётесь с проблемами или багами —"
             " пожалуйста, создайте Issue.\n\n https://github.com/WEIFENG2333/VideoCaptioner",
             self,

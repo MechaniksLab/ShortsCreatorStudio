@@ -11340,3 +11340,427 @@ CUDA可用
 视频总时长: 32.43秒
 视频合成完成
 视频合成完成，保存路径: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_163414\【卡卡】шорт_004_Что известно о девиантах_1532-1572с.mp4
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpga_v60k2.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpsa607gw3.wav
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmps0f3wexy\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmps0f3wexy\audio.wav
+6% |  27/416 | 00:05<<01:17 |  5.03 audio seconds/s
+12% |  51/416 | 00:10<<01:16 |  4.77 audio seconds/s
+19% |  81/416 | 00:18<<01:15 |  4.45 audio seconds/s
+26% | 108/416 | 00:25<<01:12 |  4.24 audio seconds/s
+33% | 136/416 | 00:30<<01:02 |  4.51 audio seconds/s
+38% | 160/416 | 00:34<<00:55 |  4.58 audio seconds/s
+47% | 195/416 | 00:41<<00:47 |  4.69 audio seconds/s
+54% | 224/416 | 00:49<<00:42 |  4.51 audio seconds/s
+59% | 245/416 | 00:53<<00:37 |  4.58 audio seconds/s
+66% | 273/416 | 01:00<<00:31 |  4.54 audio seconds/s
+72% | 299/416 | 01:08<<00:26 |  4.37 audio seconds/s
+79% | 329/416 | 01:17<<00:20 |  4.24 audio seconds/s
+86% | 356/416 | 01:25<<00:14 |  4.15 audio seconds/s
+93% | 385/416 | 01:33<<00:07 |  4.10 audio seconds/s
+99% | 413/416 | 01:41<<00:00 |  4.08 audio seconds/s
+100% | 416/416 | 01:42<<00:00 |  4.05 audio seconds/s
+Transcription speed: 4.04 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmps0f3wexy' directory.
+Operation finished in:  0:01:44.945
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+2026-04-15 16:45:34 - shorts_processor - WARNING - Enterprise packet parse failed: Error code: 400 - {'error': 'The number of tokens to keep from the initial prompt is greater than the context length (n_keep: 5491>= n_ctx: 5120). Try to load the model with a larger context length, or provide a shorter input.'}
+2026-04-15 16:45:34 - shorts_processor - WARNING - Enterprise packet parse failed: Error code: 400 - {'error': 'The number of tokens to keep from the initial prompt is greater than the context length (n_keep: 5769>= n_ctx: 5120). Try to load the model with a larger context length, or provide a shorter input.'}
+2026-04-15 16:45:34 - shorts_processor - WARNING - Enterprise packet parse failed: Error code: 400 - {'error': 'The number of tokens to keep from the initial prompt is greater than the context length (n_keep: 5783>= n_ctx: 5120). Try to load the model with a larger context length, or provide a shorter input.'}
+2026-04-15 16:45:35 - shorts_processor - WARNING - Enterprise packet parse failed: Error code: 400 - {'error': 'The number of tokens to keep from the initial prompt is greater than the context length (n_keep: 5820>= n_ctx: 5120). Try to load the model with a larger context length, or provide a shorter input.'}
+2026-04-15 16:45:35 - shorts_processor - WARNING - Enterprise packet parse failed: Error code: 400 - {'error': 'The number of tokens to keep from the initial prompt is greater than the context length (n_keep: 5450>= n_ctx: 5120). Try to load the model with a larger context length, or provide a shorter input.'}
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1505.280 -t 41.460 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=3.450,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.720:end=4.170,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.514:end=17.550,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=18.940:end=22.651,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=24.187:end=25.603,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=26.040:end=29.470,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=30.180:end=31.490,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=32.247:end=33.243,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=33.760:end=37.582,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=37.981:end=41.460,setpts=PTS-STARTPTS[vp9];[0:a]atrim=start=0.000:end=3.450,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.720:end=4.170,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.514:end=17.550,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=18.940:end=22.651,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=24.187:end=25.603,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=26.040:end=29.470,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=30.180:end=31.490,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=32.247:end=33.243,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=33.760:end=37.582,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=37.981:end=41.460,asetpts=PTS-STARTPTS[ap9];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9]concat=n=10:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1483.600 -t 39.100 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=6.610,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=7.180:end=8.290,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=9.400:end=11.110,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.325:end=13.305,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.054:end=16.110,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=17.100:end=18.309,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=18.946:end=20.144,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=20.934:end=25.130,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=25.400:end=25.850,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=27.194:end=39.100,setpts=PTS-STARTPTS[vp9];[0:a]atrim=start=0.000:end=6.610,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=7.180:end=8.290,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=9.400:end=11.110,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.325:end=13.305,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.054:end=16.110,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=17.100:end=18.309,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=18.946:end=20.144,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=20.934:end=25.130,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=25.400:end=25.850,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=27.194:end=39.100,asetpts=PTS-STARTPTS[ap9];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9]concat=n=10:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_002_'Надо же от чего-то умереть.'_1483-1522с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1587.180 -t 28.400 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=0.890,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.320:end=2.461,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=2.800:end=7.310,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=7.543:end=8.910,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=10.956:end=13.390,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=14.280:end=16.410,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=19.396:end=23.226,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=24.520:end=28.400,setpts=PTS-STARTPTS[vp7];[0:a]atrim=start=0.000:end=0.890,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.320:end=2.461,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=2.800:end=7.310,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=7.543:end=8.910,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=10.956:end=13.390,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=14.280:end=16.410,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=19.396:end=23.226,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=24.520:end=28.400,asetpts=PTS-STARTPTS[ap7];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7]concat=n=8:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_003_'Девочку я спас.'_1587-1615с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1418.920 -t 18.340 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=5.360,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.420:end=10.450,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=11.073:end=13.270,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=13.872:end=17.129,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=17.380:end=18.340,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.000:end=5.360,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.420:end=10.450,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=11.073:end=13.270,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=13.872:end=17.129,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=17.380:end=18.340,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1531.400 -t 40.960 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=3.350,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.060:end=5.370,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.127:end=7.123,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=7.640:end=11.462,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=11.861:end=15.470,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.067:end=21.787,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=22.060:end=24.113,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=24.740:end=26.196,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=27.140:end=30.290,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=30.580:end=33.153,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=35.500:end=38.910,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=39.160:end=40.960,setpts=PTS-STARTPTS[vp11];[0:a]atrim=start=0.000:end=3.350,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.060:end=5.370,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.127:end=7.123,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=7.640:end=11.462,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=11.861:end=15.470,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.067:end=21.787,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=22.060:end=24.113,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=24.740:end=26.196,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=27.140:end=30.290,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=30.580:end=33.153,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=35.500:end=38.910,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=39.160:end=40.960,asetpts=PTS-STARTPTS[ap11];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11]concat=n=12:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_005_Нет, надо о чем-то отличенном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1465.680 -t 42.000 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=3.286,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.500:end=5.850,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.120:end=7.510,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=8.080:end=9.430,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.576:end=15.874,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=17.854:end=24.530,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=25.100:end=26.210,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=27.320:end=29.030,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=30.245:end=31.225,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=31.974:end=34.030,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=35.020:end=36.229,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=36.866:end=38.064,setpts=PTS-STARTPTS[vp11];[0:v]trim=start=38.854:end=42.000,setpts=PTS-STARTPTS[vp12];[0:a]atrim=start=0.000:end=3.286,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.500:end=5.850,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.120:end=7.510,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=8.080:end=9.430,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.576:end=15.874,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=17.854:end=24.530,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=25.100:end=26.210,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=27.320:end=29.030,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=30.245:end=31.225,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=31.974:end=34.030,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=35.020:end=36.229,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=36.866:end=38.064,asetpts=PTS-STARTPTS[ap11];[0:a]atrim=start=38.854:end=42.000,asetpts=PTS-STARTPTS[ap12];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11][vp12][ap12]concat=n=13:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_006_я думаю, ваши друзья занимаются нелегальной деятельностью. Всякие в это…_1465-1507с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1411.620 -t 17.300 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=1.381,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.940:end=4.590,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.120:end=12.660,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=13.720:end=17.300,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.000:end=1.381,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.940:end=4.590,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.120:end=12.660,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=13.720:end=17.300,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1381.160 -t 16.300 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=1.530,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=2.220:end=4.390,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=4.800:end=5.730,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=6.000:end=6.850,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=7.617:end=8.513,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=8.900:end=14.210,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=14.660:end=16.300,setpts=PTS-STARTPTS[vp6];[0:a]atrim=start=0.000:end=1.530,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=2.220:end=4.390,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=4.800:end=5.730,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=6.000:end=6.850,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=7.617:end=8.513,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=8.900:end=14.210,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=14.660:end=16.300,asetpts=PTS-STARTPTS[ap6];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6]concat=n=7:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_008_прошло не лучшим образом. Следует забыть об этом, начать заново. Что ск…_1381-1397с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1607.420 -t 16.240 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=2.986,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.280:end=8.290,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=9.570:end=13.578,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=14.391:end=16.240,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.000:end=2.986,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.280:end=8.290,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=9.570:end=13.578,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=14.391:end=16.240,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_009_правда, конечно. Я знаю, что учебу вы закончили с отличием. Быстро сдел…_1607-1623с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1267.040 -t 18.040 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=1.710,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.024:end=4.986,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.584:end=7.910,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=8.780:end=12.644,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.140:end=16.270,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.480:end=18.040,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.000:end=1.710,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.024:end=4.986,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.584:end=7.910,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=8.780:end=12.644,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.140:end=16.270,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.480:end=18.040,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1275.940 -t 21.160 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=3.744,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.240:end=7.370,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=7.580:end=9.310,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.180:end=10.850,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=11.700:end=12.350,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=12.700:end=13.290,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=15.144:end=17.171,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=17.504:end=21.160,setpts=PTS-STARTPTS[vp7];[0:a]atrim=start=0.000:end=3.744,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.240:end=7.370,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=7.580:end=9.310,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.180:end=10.850,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=11.700:end=12.350,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=12.700:end=13.290,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=15.144:end=17.171,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=17.504:end=21.160,asetpts=PTS-STARTPTS[ap7];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7]concat=n=8:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_011_Боле, боле. Твоя прошлая железная наводка стоила мне недельной зарплаты…_1275-1297с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1220.880 -t 18.180 -i E:/Render/Detroit Become Human 5.mp4 -filter_complex [0:v]trim=start=0.000:end=3.310,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.680:end=5.789,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.940:end=8.210,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=9.320:end=10.170,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=10.780:end=13.770,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=15.214:end=18.180,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.000:end=3.310,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.680:end=5.789,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.940:end=8.210,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=9.320:end=10.170,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=10.780:end=13.770,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=15.214:end=18.180,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=815:458:0:0,eq=brightness=0.100:contrast=1.310:saturation=1.000,scale=1080:638:flags=fast_bilinear[cam];[src_game]crop=1692:1440:497:0,eq=brightness=0.150:contrast=1.450:saturation=1.000,unsharp=5:5:0.10:5:5:0.00,scale=1080:1282:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p1 -tune ll -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_012_Так, это... Просто как это статью не почитал. Чё-то не нашёл. Чё-то тож…_1220-1239с.mp4
+
+===========转录任务开始===========
+时间：2026-04-15 16:51:47.987335
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpol3ropsf.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmpnwo_gp_g\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpnwo_gp_g\audio.wav
+79% | 27/34 | 00:05<<00:01 |  5.21 audio seconds/s
+100% | 34/34 | 00:07<<00:00 |  4.43 audio seconds/s
+Transcription speed: 4.28 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpnwo_gp_g' directory.
+Operation finished in:  0:00:09.863
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с\subtitle\【原始字幕】шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-15 16:51:59.246199
+写入处理后字幕缓存：E:\Neyro\VideoCaptionerEnchanted\AppData\cache\processed_subtitles\204d3e4e96c529f0265d27c0dd74901b.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с\subtitle\【样式字幕】шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\VideoCaptionerEnchanted\work-dir\subtitle_diagnostics_20260415_165159.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-15 16:51:59.261199
+开始合成视频: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с.mp4" -acodec copy -vcodec libx264 -preset medium -vf ass='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с.mp4"
+视频总时长: 34.11秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_001_'Конноре. Вы хотите узнать что-то обо мне О, нет. Хотя, да.'_1505-1546с.mp4
+
+===========转录任务开始===========
+时间：2026-04-15 16:52:12.967956
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_002_'Надо же от чего-то умереть.'_1483-1522с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpopdfwb6p.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmp4596es8u\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp4596es8u\audio.wav
+87% | 27/31 | 00:07<<00:01 |  3.62 audio seconds/s
+100% | 31/31 | 00:09<<00:00 |  3.19 audio seconds/s
+Transcription speed: 3.14 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp4596es8u' directory.
+Operation finished in:  0:00:11.798
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_002_'Надо же от чего-то умереть.'_1483-1522с\subtitle\【原始字幕】шорт_002_'Надо же от чего-то умереть.'_1483-1522с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-15 16:52:26.220048
+写入处理后字幕缓存：E:\Neyro\VideoCaptionerEnchanted\AppData\cache\processed_subtitles\426fe0393f132033adbce43cbfd64727.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_002_'Надо же от чего-то умереть.'_1483-1522с\subtitle\【样式字幕】шорт_002_'Надо же от чего-то умереть.'_1483-1522с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\VideoCaptionerEnchanted\work-dir\subtitle_diagnostics_20260415_165226.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-15 16:52:26.233518
+开始合成视频: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_002_'Надо же от чего-то умереть.'_1483-1522с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_002_'Надо же от чего-то умереть.'_1483-1522с.mp4" -acodec copy -vcodec libx264 -preset medium -vf ass='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_002_'Надо же от чего-то умереть.'_1483-1522с.mp4"
+视频总时长: 31.45秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_002_'Надо же от чего-то умереть.'_1483-1522с.mp4
+
+===========转录任务开始===========
+时间：2026-04-15 16:52:38.344697
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_003_'Девочку я спас.'_1587-1615с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp7ja66asi.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmpjl6ls_fq\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpjl6ls_fq\audio.wav
+100% | 20/20 | 00:05<<00:00 |  3.64 audio seconds/s
+Transcription speed: 3.49 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpjl6ls_fq' directory.
+Operation finished in:  0:00:07.562
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_003_'Девочку я спас.'_1587-1615с\subtitle\【原始字幕】шорт_003_'Девочку я спас.'_1587-1615с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-15 16:52:47.322085
+写入处理后字幕缓存：E:\Neyro\VideoCaptionerEnchanted\AppData\cache\processed_subtitles\a6497c0dfc4f670c06ecc0b7e7f760c1.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_003_'Девочку я спас.'_1587-1615с\subtitle\【样式字幕】шорт_003_'Девочку я спас.'_1587-1615с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\VideoCaptionerEnchanted\work-dir\subtitle_diagnostics_20260415_165247.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-15 16:52:47.332641
+开始合成视频: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_003_'Девочку я спас.'_1587-1615с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_003_'Девочку я спас.'_1587-1615с.mp4" -acodec copy -vcodec libx264 -preset medium -vf ass='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_003_'Девочку я спас.'_1587-1615с.mp4"
+视频总时长: 20.21秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_003_'Девочку я спас.'_1587-1615с.mp4
+
+===========转录任务开始===========
+时间：2026-04-15 16:52:55.458181
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp0ezlp9u7.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmp046khkgf\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp046khkgf\audio.wav
+100% | 16/16 | 00:05<<00:00 |  2.75 audio seconds/s
+Transcription speed: 2.59 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp046khkgf' directory.
+Operation finished in:  0:00:07.863
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с\subtitle\【原始字幕】шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-15 16:53:04.659400
+写入处理后字幕缓存：E:\Neyro\VideoCaptionerEnchanted\AppData\cache\processed_subtitles\ddeb0ed22f3e7ec85d94f8bf28d9e4c0.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с\subtitle\【样式字幕】шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\VideoCaptionerEnchanted\work-dir\subtitle_diagnostics_20260415_165304.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-15 16:53:04.667400
+开始合成视频: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с.mp4" -acodec copy -vcodec libx264 -preset medium -vf ass='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с.mp4"
+视频总时长: 15.81秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_004_про тебя всё знаю, понял Нет, я тебя вообще сейчас всё раскушу, тебя в…_1418-1437с.mp4
+
+===========转录任务开始===========
+时间：2026-04-15 16:53:12.092456
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_005_Нет, надо о чем-то отличенном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp4vdondts.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmp8efk7v9y\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp8efk7v9y\audio.wav
+85% | 28/33 | 00:10<<00:01 |  2.68 audio seconds/s
+100% | 33/33 | 00:13<<00:00 |  2.40 audio seconds/s
+Transcription speed: 2.37 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp8efk7v9y' directory.
+Operation finished in:  0:00:15.846
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+2026-04-15 16:53:29 - transcript_thread - ERROR - 转录过程中发生错误: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_005_Нет, надо о чем-то отличенном. Рассказать вам что известно о девиантах.…_1531-1572с\\subtitle\\.【原始字幕】шорт_005_Нет, надо о чем-то отличенном. Рассказать вам что известно о девиантах.…_1531-1572с-FasterWhisper ✨-俄语.srt.tmp'
+Traceback (most recent call last):
+  File "E:\Neyro\VideoCaptionerEnchanted\app\thread\transcript_thread.py", line 136, in run
+    asr_data.to_srt(save_path=str(output_path))
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\bk_asr\asr_data.py", line 339, in to_srt
+    atomic_write_text(save_path, srt_text, encoding="utf-8")
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\utils\io_utils.py", line 13, in atomic_write_text
+    with open(tmp_path, "w", encoding=encoding) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_005_Нет, надо о чем-то отличенном. Рассказать вам что известно о девиантах.…_1531-1572с\\subtitle\\.【原始字幕】шорт_005_Нет, надо о чем-то отличенном. Рассказать вам что известно о девиантах.…_1531-1572с-FasterWhisper ✨-俄语.srt.tmp'
+
+===========转录任务开始===========
+时间：2026-04-15 16:53:29.384234
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_006_я думаю, ваши друзья занимаются нелегальной деятельностью. Всякие в это…_1465-1507с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpiiav9llv.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmpcd99nnrz\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpcd99nnrz\audio.wav
+100% | 28/28 | 00:12<<00:00 |  2.32 audio seconds/s
+Transcription speed: 2.24 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpcd99nnrz' directory.
+Operation finished in:  0:00:14.161
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+2026-04-15 16:53:44 - transcript_thread - ERROR - 转录过程中发生错误: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_006_я думаю, ваши друзья занимаются нелегальной деятельностью. Всякие в это…_1465-1507с\\subtitle\\.【原始字幕】шорт_006_я думаю, ваши друзья занимаются нелегальной деятельностью. Всякие в это…_1465-1507с-FasterWhisper ✨-俄语.srt.tmp'
+Traceback (most recent call last):
+  File "E:\Neyro\VideoCaptionerEnchanted\app\thread\transcript_thread.py", line 136, in run
+    asr_data.to_srt(save_path=str(output_path))
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\bk_asr\asr_data.py", line 339, in to_srt
+    atomic_write_text(save_path, srt_text, encoding="utf-8")
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\utils\io_utils.py", line 13, in atomic_write_text
+    with open(tmp_path, "w", encoding=encoding) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_006_я думаю, ваши друзья занимаются нелегальной деятельностью. Всякие в это…_1465-1507с\\subtitle\\.【原始字幕】шорт_006_я думаю, ваши друзья занимаются нелегальной деятельностью. Всякие в это…_1465-1507с-FasterWhisper ✨-俄语.srt.tmp'
+
+===========转录任务开始===========
+时间：2026-04-15 16:53:44.970499
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmppmmriypb.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmpey5gii_5\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpey5gii_5\audio.wav
+100% | 14/14 | 00:05<<00:00 |  2.53 audio seconds/s
+Transcription speed: 2.43 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpey5gii_5' directory.
+Operation finished in:  0:00:07.586
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с\subtitle\【原始字幕】шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-15 16:53:54.003345
+写入处理后字幕缓存：E:\Neyro\VideoCaptionerEnchanted\AppData\cache\processed_subtitles\c7f8ae675da46f8efbca25a743c11816.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с\subtitle\【样式字幕】шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\VideoCaptionerEnchanted\work-dir\subtitle_diagnostics_20260415_165354.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-15 16:53:54.015764
+开始合成视频: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с.mp4" -acodec copy -vcodec libx264 -preset medium -vf ass='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с.mp4"
+视频总时长: 14.15秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_007_Что ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я п…_1411-1428с.mp4
+
+===========转录任务开始===========
+时间：2026-04-15 16:54:00.500237
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_008_прошло не лучшим образом. Следует забыть об этом, начать заново. Что ск…_1381-1397с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpry83plnf.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmpfbjde_xm\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpfbjde_xm\audio.wav
+100% | 13/13 | 00:04<<00:00 |  2.72 audio seconds/s
+Transcription speed: 2.62 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpfbjde_xm' directory.
+Operation finished in:  0:00:06.850
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+2026-04-15 16:54:08 - transcript_thread - ERROR - 转录过程中发生错误: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_008_прошло не лучшим образом. Следует забыть об этом, начать заново. Что ск…_1381-1397с\\subtitle\\.【原始字幕】шорт_008_прошло не лучшим образом. Следует забыть об этом, начать заново. Что ск…_1381-1397с-FasterWhisper ✨-俄语.srt.tmp'
+Traceback (most recent call last):
+  File "E:\Neyro\VideoCaptionerEnchanted\app\thread\transcript_thread.py", line 136, in run
+    asr_data.to_srt(save_path=str(output_path))
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\bk_asr\asr_data.py", line 339, in to_srt
+    atomic_write_text(save_path, srt_text, encoding="utf-8")
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\utils\io_utils.py", line 13, in atomic_write_text
+    with open(tmp_path, "w", encoding=encoding) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_008_прошло не лучшим образом. Следует забыть об этом, начать заново. Что ск…_1381-1397с\\subtitle\\.【原始字幕】шорт_008_прошло не лучшим образом. Следует забыть об этом, начать заново. Что ск…_1381-1397с-FasterWhisper ✨-俄语.srt.tmp'
+
+===========转录任务开始===========
+时间：2026-04-15 16:54:08.741666
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_009_правда, конечно. Я знаю, что учебу вы закончили с отличием. Быстро сдел…_1607-1623с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpnuitmxx1.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmp73dyexto\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp73dyexto\audio.wav
+100% | 13/13 | 00:04<<00:00 |  2.62 audio seconds/s
+Transcription speed: 2.44 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp73dyexto' directory.
+Operation finished in:  0:00:07.030
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+2026-04-15 16:54:17 - transcript_thread - ERROR - 转录过程中发生错误: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_009_правда, конечно. Я знаю, что учебу вы закончили с отличием. Быстро сдел…_1607-1623с\\subtitle\\.【原始字幕】шорт_009_правда, конечно. Я знаю, что учебу вы закончили с отличием. Быстро сдел…_1607-1623с-FasterWhisper ✨-俄语.srt.tmp'
+Traceback (most recent call last):
+  File "E:\Neyro\VideoCaptionerEnchanted\app\thread\transcript_thread.py", line 136, in run
+    asr_data.to_srt(save_path=str(output_path))
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\bk_asr\asr_data.py", line 339, in to_srt
+    atomic_write_text(save_path, srt_text, encoding="utf-8")
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\utils\io_utils.py", line 13, in atomic_write_text
+    with open(tmp_path, "w", encoding=encoding) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_009_правда, конечно. Я знаю, что учебу вы закончили с отличием. Быстро сдел…_1607-1623с\\subtitle\\.【原始字幕】шорт_009_правда, конечно. Я знаю, что учебу вы закончили с отличием. Быстро сдел…_1607-1623с-FasterWhisper ✨-俄语.srt.tmp'
+
+===========转录任务开始===========
+时间：2026-04-15 16:54:17.185707
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpcc9r8d8x.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmp2syr2r8h\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp2syr2r8h\audio.wav
+100% | 13/13 | 00:03<<00:00 |  3.36 audio seconds/s
+Transcription speed: 3.0 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp2syr2r8h' directory.
+Operation finished in:  0:00:05.955
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с\subtitle\【原始字幕】шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-15 16:54:24.536497
+写入处理后字幕缓存：E:\Neyro\VideoCaptionerEnchanted\AppData\cache\processed_subtitles\2f4484798b1163af26ed46211dfcbf4b.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с\subtitle\【样式字幕】шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\VideoCaptionerEnchanted\work-dir\subtitle_diagnostics_20260415_165424.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-15 16:54:24.547109
+开始合成视频: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с.mp4" -acodec copy -vcodec libx264 -preset medium -vf ass='C\:/Temp/VideoCaptioner/temp_subtitle..ass' -y "E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с.mp4"
+视频总时长: 12.55秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\【卡卡】шорт_010_Зуб даю, всех пыли оставит. Осмотримся. Ставить будешь Боле, боле. Тво…_1267-1285с.mp4
+
+===========转录任务开始===========
+时间：2026-04-15 16:54:30.786624
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_011_Боле, боле. Твоя прошлая железная наводка стоила мне недельной зарплаты…_1275-1297с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpz0x8nr5w.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmpvfscjb2g\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpvfscjb2g\audio.wav
+100% | 16/16 | 00:07<<00:00 |  2.07 audio seconds/s
+Transcription speed: 2.02 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpvfscjb2g' directory.
+Operation finished in:  0:00:09.827
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+2026-04-15 16:54:41 - transcript_thread - ERROR - 转录过程中发生错误: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_011_Боле, боле. Твоя прошлая железная наводка стоила мне недельной зарплаты…_1275-1297с\\subtitle\\.【原始字幕】шорт_011_Боле, боле. Твоя прошлая железная наводка стоила мне недельной зарплаты…_1275-1297с-FasterWhisper ✨-俄语.srt.tmp'
+Traceback (most recent call last):
+  File "E:\Neyro\VideoCaptionerEnchanted\app\thread\transcript_thread.py", line 136, in run
+    asr_data.to_srt(save_path=str(output_path))
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\bk_asr\asr_data.py", line 339, in to_srt
+    atomic_write_text(save_path, srt_text, encoding="utf-8")
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\utils\io_utils.py", line 13, in atomic_write_text
+    with open(tmp_path, "w", encoding=encoding) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_011_Боле, боле. Твоя прошлая железная наводка стоила мне недельной зарплаты…_1275-1297с\\subtitle\\.【原始字幕】шорт_011_Боле, боле. Твоя прошлая железная наводка стоила мне недельной зарплаты…_1275-1297с-FasterWhisper ✨-俄语.srt.tmp'
+
+===========转录任务开始===========
+时间：2026-04-15 16:54:42.039890
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\VideoCaptionerEnchanted\work-dir\shorts\shorts_Detroit Become Human 5_20260415_164656\шорт_012_Так, это... Просто как это статью не почитал. Чё-то не нашёл. Чё-то тож…_1220-1239с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp4lak66u5.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmpv5d0600r\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpv5d0600r\audio.wav
+92% | 12/13 | 00:04<<00:00 |  2.41 audio seconds/s
+100% | 13/13 | 00:05<<00:00 |  2.46 audio seconds/s
+Transcription speed: 2.37 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpv5d0600r' directory.
+Operation finished in:  0:00:07.053
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+2026-04-15 16:54:50 - transcript_thread - ERROR - 转录过程中发生错误: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_012_Так, это... Просто как это статью не почитал. Чё-то не нашёл. Чё-то тож…_1220-1239с\\subtitle\\.【原始字幕】шорт_012_Так, это... Просто как это статью не почитал. Чё-то не нашёл. Чё-то тож…_1220-1239с-FasterWhisper ✨-俄语.srt.tmp'
+Traceback (most recent call last):
+  File "E:\Neyro\VideoCaptionerEnchanted\app\thread\transcript_thread.py", line 136, in run
+    asr_data.to_srt(save_path=str(output_path))
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\bk_asr\asr_data.py", line 339, in to_srt
+    atomic_write_text(save_path, srt_text, encoding="utf-8")
+  File "E:\Neyro\VideoCaptionerEnchanted\app\core\utils\io_utils.py", line 13, in atomic_write_text
+    with open(tmp_path, "w", encoding=encoding) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'E:\\Neyro\\VideoCaptioner\\work-dir\\шорт_012_Так, это... Просто как это статью не почитал. Чё-то не нашёл. Чё-то тож…_1220-1239с\\subtitle\\.【原始字幕】шорт_012_Так, это... Просто как это статью не почитал. Чё-то не нашёл. Чё-то тож…_1220-1239с-FasterWhisper ✨-俄语.srt.tmp'
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpv_8wwenn.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp5rjcrsub.wav
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\VideoCaptionerEnchanted\AppData\models C:\Temp\bk_asr\tmp8yehhw3q\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp8yehhw3q\audio.wav
+5% |  25/477 | 00:04<<01:23 |  5.42 audio seconds/s
+11% |  54/477 | 00:10<<01:24 |  5.00 audio seconds/s
+16% |  78/477 | 00:16<<01:22 |  4.82 audio seconds/s
+23% | 108/477 | 00:23<<01:19 |  4.64 audio seconds/s
+28% | 135/477 | 00:30<<01:17 |  4.42 audio seconds/s
+34% | 163/477 | 00:35<<01:07 |  4.62 audio seconds/s
+39% | 188/477 | 00:41<<01:04 |  4.51 audio seconds/s
+47% | 222/477 | 00:48<<00:56 |  4.54 audio seconds/s
+53% | 251/477 | 00:57<<00:51 |  4.40 audio seconds/s
+57% | 272/477 | 01:00<<00:45 |  4.46 audio seconds/s
+62% | 294/477 | 01:06<<00:41 |  4.39 audio seconds/s

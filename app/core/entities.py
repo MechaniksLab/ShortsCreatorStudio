@@ -852,10 +852,10 @@ class FullProcessTask:
 class BatchTaskType(Enum):
     """批量处理任务类型"""
 
-    TRANSCRIBE = "批量转录"
-    SUBTITLE = "批量字幕"
-    TRANS_SUB = "转录+字幕"
-    FULL_PROCESS = "全流程处理"
+    TRANSCRIBE = "Пакетная транскрибация"
+    SUBTITLE = "Пакетные субтитры"
+    TRANS_SUB = "Транскрибация + субтитры"
+    FULL_PROCESS = "Полный цикл"
 
     def __str__(self):
         return self.value
@@ -864,10 +864,10 @@ class BatchTaskType(Enum):
 class BatchTaskStatus(Enum):
     """批量处理任务状态"""
 
-    WAITING = "等待中"
-    RUNNING = "处理中"
-    COMPLETED = "已完成"
-    FAILED = "失败"
+    WAITING = "Ожидает"
+    RUNNING = "В обработке"
+    COMPLETED = "Завершено"
+    FAILED = "Ошибка"
 
     def __str__(self):
         return self.value
