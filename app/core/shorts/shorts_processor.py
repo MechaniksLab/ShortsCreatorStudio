@@ -1166,6 +1166,24 @@ def render_shorts(
                 else:
                     merged.append((s, e))
             kept_ms = sum(max(0, e - s) for s, e in merged)
+
+            raw_total_ms = max(1, c.end_ms - c.start_ms)
+            gaps = []
+            for idx in range(1, len(merged)):
+                prev_e = merged[idx - 1][1]
+                cur_s = merged[idx][0]
+                gaps.append(max(0, cur_s - prev_e))
+            avg_gap_ms = (sum(gaps) / len(gaps)) if gaps else 0.0
+
+            # Защита от "обрыва слов":
+            # если после агрессивной чистки остаётся слишком мало покрытия
+            # или разрывы между фразами в среднем маленькие,
+            # лучше отдать цельный клип без внутренних склеек.
+            if kept_ms / raw_total_ms < 0.74:
+                return [(c.start_ms, c.end_ms)]
+            if len(merged) >= 4 and avg_gap_ms < 320:
+                return [(c.start_ms, c.end_ms)]
+
             # Если есть 2+ диапазона, это уже реальный сигнал для склейки
             # (даже если суммарная речь короткая).
             if len(merged) >= 2:

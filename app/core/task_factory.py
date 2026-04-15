@@ -1,4 +1,6 @@
 import datetime
+import hashlib
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -22,6 +24,26 @@ from app.core.entities import (
 
 class TaskFactory:
     """任务工厂类，用于创建各种类型的任务"""
+
+    @staticmethod
+    def _safe_fs_name(name: str, max_len: int = 72) -> str:
+        """Безопасное имя для Windows-путей: чистим спецсимволы и ограничиваем длину."""
+        raw = (name or "").strip()
+        if not raw:
+            return "untitled"
+
+        raw = re.sub(r'[<>:"/\\|?*]+', " ", raw)
+        raw = re.sub(r"[\x00-\x1F]", "", raw)
+        raw = re.sub(r"\s+", " ", raw).strip(" .")
+        if not raw:
+            raw = "untitled"
+
+        if len(raw) <= max_len:
+            return raw
+
+        digest = hashlib.md5(raw.encode("utf-8", errors="ignore")).hexdigest()[:8]
+        head = raw[: max(16, max_len - 10)].rstrip(" .")
+        return f"{head}_{digest}"
 
     @staticmethod
     def get_subtitle_style(style_name: str) -> str:
@@ -60,14 +82,15 @@ class TaskFactory:
 
         # 获取文件名
         file_name = Path(file_path).stem
+        safe_file_name = TaskFactory._safe_fs_name(file_name, max_len=72)
 
         # 构建输出路径
         if need_next_task:
             output_path = str(
                 Path(cfg.work_dir.value)
-                / file_name
+                / safe_file_name
                 / "subtitle"
-                / f"【原始字幕】{file_name}-{cfg.transcribe_model.value.value}-{cfg.transcribe_language.value.value}.srt"
+                / f"【原始字幕】{safe_file_name}-{cfg.transcribe_model.value.value}-{cfg.transcribe_language.value.value}.srt"
             )
         else:
             if cfg.transcribe_model.value == TranscribeModelEnum.FASTER_WHISPER:
@@ -122,6 +145,7 @@ class TaskFactory:
             .stem.replace("【原始字幕】", "")
             .replace(f"【下载字幕】", "")
         )
+        output_name_safe = TaskFactory._safe_fs_name(output_name, max_len=72)
         # 只在需要翻译时添加翻译服务后缀
         suffix = (
             f"-{cfg.translator_service.value.value}" if cfg.need_translate.value else ""
@@ -129,11 +153,11 @@ class TaskFactory:
 
         if need_next_task:
             output_path = str(
-                Path(file_path).parent / f"【样式字幕】{output_name}{suffix}.ass"
+                Path(file_path).parent / f"【样式字幕】{output_name_safe}{suffix}.ass"
             )
         else:
             output_path = str(
-                Path(file_path).parent / f"【字幕】{output_name}{suffix}.srt"
+                Path(file_path).parent / f"【字幕】{output_name_safe}{suffix}.srt"
             )
 
         split_type_cfg = cfg.split_type.value
