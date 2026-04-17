@@ -22,6 +22,15 @@ class GitHubUpdateManager:
         self.updater_root = CACHE_PATH / "updater"
         self.updater_root.mkdir(parents=True, exist_ok=True)
 
+    @staticmethod
+    def _creation_flags() -> int:
+        flags = 0
+        if hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP"):
+            flags |= subprocess.CREATE_NEW_PROCESS_GROUP
+        if hasattr(subprocess, "CREATE_NO_WINDOW"):
+            flags |= subprocess.CREATE_NO_WINDOW
+        return flags
+
     def _repo(self):
         # Репозиторий фиксирован внутри приложения (без UI-настроек)
         return UPDATE_REPO_OWNER, UPDATE_REPO_NAME, UPDATE_REPO_BRANCH
@@ -166,7 +175,7 @@ class GitHubUpdateManager:
         report(95, "Запуск применения обновления...")
         subprocess.Popen(
             ["cmd", "/c", str(script_path)],
-            creationflags=(subprocess.CREATE_NEW_PROCESS_GROUP if hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP") else 0),
+            creationflags=self._creation_flags(),
         )
 
         cfg.set(cfg.update_last_known_commit, sha)
@@ -251,7 +260,7 @@ class GitHubUpdateManager:
         script_path.write_text(script, encoding="utf-8")
         subprocess.Popen(
             ["cmd", "/c", str(script_path)],
-            creationflags=(subprocess.CREATE_NEW_PROCESS_GROUP if hasattr(subprocess, "CREATE_NEW_PROCESS_GROUP") else 0),
+            creationflags=self._creation_flags(),
         )
         return script_path
 
@@ -259,6 +268,12 @@ class GitHubUpdateManager:
         # В режиме exe
         if getattr(sys, "frozen", False):
             return f'"{Path(sys.executable)}"'
+
+        # Вне frozen: если рядом есть собранный GUI exe, предпочитаем его (без консоли)
+        for exe_name in ["ShortsCreatorStudio.exe", "Shorts creator studio.exe"]:
+            exe_path = self.app_root / exe_name
+            if exe_path.exists():
+                return f'"{exe_path}"'
 
         # В режиме разработки пробуем запускать текущий python + main.py (если есть)
         py = str(Path(sys.executable))
