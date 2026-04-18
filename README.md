@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icons/android-chrome-512x512.png" alt="Логотип ShortsCreatorStudio" />
+  <img src="icons/full.png" alt="Логотип ShortsCreatorStudio" />
 </p>
 
 # Лаборатория Механика — Студия создания шортсов
