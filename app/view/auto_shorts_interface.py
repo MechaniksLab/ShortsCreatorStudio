@@ -383,6 +383,7 @@ class AutoShortsInterface(QWidget):
         self.asr_payload: Dict = {}
         self._autonomous_run = False
         self._active_progress_stage = 0
+        self._fx_layer_cache: Dict[tuple, QPixmap] = {}
 
         self._fx_preview_timer = QTimer(self)
         self._fx_preview_timer.setSingleShot(True)
@@ -598,6 +599,13 @@ class AutoShortsInterface(QWidget):
         candidates_limit_row.addStretch(1)
         control_layout.addLayout(candidates_limit_row)
 
+        filter_row = QHBoxLayout()
+        self.auto_filter_weak_checkbox = CheckBox("Авто-фильтр слабых кандидатов")
+        self.auto_filter_weak_checkbox.setChecked(True)
+        filter_row.addWidget(self.auto_filter_weak_checkbox)
+        filter_row.addStretch(1)
+        control_layout.addLayout(filter_row)
+
         self.min_candidates_spin.valueChanged.connect(self._on_candidate_limits_changed)
         self.max_candidates_spin.valueChanged.connect(self._on_candidate_limits_changed)
 
@@ -717,6 +725,9 @@ class AutoShortsInterface(QWidget):
         self.refresh_preview_btn = PushButton("Обновить кадр")
         self.refresh_preview_btn.clicked.connect(self._reload_preview_frame)
         frame_row.addWidget(self.refresh_preview_btn)
+        self.exact_fx_preview_btn = PushButton("Точный FX-кадр (FFmpeg)")
+        self.exact_fx_preview_btn.clicked.connect(self._render_exact_fx_preview_frame)
+        frame_row.addWidget(self.exact_fx_preview_btn)
         frame_row.addStretch(1)
         self.keep_aspect_checkbox = CheckBox("Сохранять пропорции")
         self.keep_aspect_checkbox.setChecked(True)
@@ -752,6 +763,12 @@ class AutoShortsInterface(QWidget):
         fx_hint = BodyLabel("3) Предпросмотр эффектов справа: без выделяемых рамок, обновляется мгновенно при движении ползунков.")
         fx_hint.setWordWrap(True)
         template_layout.addWidget(fx_hint)
+        fx_exact_hint = BodyLabel(
+            "Кнопка «Точный FX-кадр (FFmpeg)» делает референсный кадр максимально близко к финальному рендеру "
+            "(полезно перед массовым запуском)."
+        )
+        fx_exact_hint.setWordWrap(True)
+        template_layout.addWidget(fx_exact_hint)
 
         self.source_preview.changed.connect(lambda _: self._on_layout_changed())
         self.output_preview.changed.connect(lambda _: self._on_layout_changed())
@@ -763,8 +780,14 @@ class AutoShortsInterface(QWidget):
         row_tpl_actions.addStretch(1)
         template_layout.addLayout(row_tpl_actions)
 
+        fx_title_row = QHBoxLayout()
         fx_title = StrongBodyLabel("Цветокоррекция слоёв")
-        template_layout.addWidget(fx_title)
+        fx_title_row.addWidget(fx_title)
+        fx_title_row.addStretch(1)
+        self.reset_fx_btn = PushButton("Сбросить FX")
+        self.reset_fx_btn.clicked.connect(self._reset_fx_controls)
+        fx_title_row.addWidget(self.reset_fx_btn)
+        template_layout.addLayout(fx_title_row)
 
         webcam_title = StrongBodyLabel("WEBCAM")
         template_layout.addWidget(webcam_title)
@@ -781,10 +804,14 @@ class AutoShortsInterface(QWidget):
         self.wc_saturation.setRange(50, 180)
         self.wc_saturation.setValue(100)
         self.wc_saturation.setAccelerated(True)
-        self.wc_sharpness = SpinBox(self)
-        self.wc_sharpness.setRange(0, 200)
-        self.wc_sharpness.setValue(0)
-        self.wc_sharpness.setAccelerated(True)
+        self.wc_gamma = SpinBox(self)
+        self.wc_gamma.setRange(70, 160)
+        self.wc_gamma.setValue(100)
+        self.wc_gamma.setAccelerated(True)
+        self.wc_temperature = SpinBox(self)
+        self.wc_temperature.setRange(-40, 40)
+        self.wc_temperature.setValue(0)
+        self.wc_temperature.setAccelerated(True)
         self.wc_brightness_slider = QSlider(Qt.Horizontal, self)
         self.wc_brightness_slider.setRange(-50, 50)
         self.wc_brightness_slider.setValue(0)
@@ -794,9 +821,12 @@ class AutoShortsInterface(QWidget):
         self.wc_saturation_slider = QSlider(Qt.Horizontal, self)
         self.wc_saturation_slider.setRange(50, 180)
         self.wc_saturation_slider.setValue(100)
-        self.wc_sharpness_slider = QSlider(Qt.Horizontal, self)
-        self.wc_sharpness_slider.setRange(0, 200)
-        self.wc_sharpness_slider.setValue(0)
+        self.wc_gamma_slider = QSlider(Qt.Horizontal, self)
+        self.wc_gamma_slider.setRange(70, 160)
+        self.wc_gamma_slider.setValue(100)
+        self.wc_temperature_slider = QSlider(Qt.Horizontal, self)
+        self.wc_temperature_slider.setRange(-40, 40)
+        self.wc_temperature_slider.setValue(0)
 
         webcam_controls_row = QHBoxLayout()
         webcam_controls_row.setSpacing(16)
@@ -825,7 +855,8 @@ class AutoShortsInterface(QWidget):
         _add_fx_column(webcam_controls_row, "Ярк.", self.wc_brightness, self.wc_brightness_slider)
         _add_fx_column(webcam_controls_row, "Контр.", self.wc_contrast, self.wc_contrast_slider)
         _add_fx_column(webcam_controls_row, "Насыщ.", self.wc_saturation, self.wc_saturation_slider)
-        _add_fx_column(webcam_controls_row, "Резкость", self.wc_sharpness, self.wc_sharpness_slider)
+        _add_fx_column(webcam_controls_row, "Гамма", self.wc_gamma, self.wc_gamma_slider)
+        _add_fx_column(webcam_controls_row, "Темп.", self.wc_temperature, self.wc_temperature_slider)
         webcam_controls_row.addStretch(1)
         template_layout.addLayout(webcam_controls_row)
 
@@ -844,10 +875,14 @@ class AutoShortsInterface(QWidget):
         self.gm_saturation.setRange(50, 180)
         self.gm_saturation.setValue(100)
         self.gm_saturation.setAccelerated(True)
-        self.gm_sharpness = SpinBox(self)
-        self.gm_sharpness.setRange(0, 200)
-        self.gm_sharpness.setValue(0)
-        self.gm_sharpness.setAccelerated(True)
+        self.gm_gamma = SpinBox(self)
+        self.gm_gamma.setRange(70, 160)
+        self.gm_gamma.setValue(100)
+        self.gm_gamma.setAccelerated(True)
+        self.gm_temperature = SpinBox(self)
+        self.gm_temperature.setRange(-40, 40)
+        self.gm_temperature.setValue(0)
+        self.gm_temperature.setAccelerated(True)
 
         self.gm_brightness_slider = QSlider(Qt.Horizontal, self)
         self.gm_brightness_slider.setRange(-50, 50)
@@ -858,9 +893,12 @@ class AutoShortsInterface(QWidget):
         self.gm_saturation_slider = QSlider(Qt.Horizontal, self)
         self.gm_saturation_slider.setRange(50, 180)
         self.gm_saturation_slider.setValue(100)
-        self.gm_sharpness_slider = QSlider(Qt.Horizontal, self)
-        self.gm_sharpness_slider.setRange(0, 200)
-        self.gm_sharpness_slider.setValue(0)
+        self.gm_gamma_slider = QSlider(Qt.Horizontal, self)
+        self.gm_gamma_slider.setRange(70, 160)
+        self.gm_gamma_slider.setValue(100)
+        self.gm_temperature_slider = QSlider(Qt.Horizontal, self)
+        self.gm_temperature_slider.setRange(-40, 40)
+        self.gm_temperature_slider.setValue(0)
 
         game_controls_row = QHBoxLayout()
         game_controls_row.setSpacing(16)
@@ -868,30 +906,45 @@ class AutoShortsInterface(QWidget):
         _add_fx_column(game_controls_row, "Ярк.", self.gm_brightness, self.gm_brightness_slider)
         _add_fx_column(game_controls_row, "Контр.", self.gm_contrast, self.gm_contrast_slider)
         _add_fx_column(game_controls_row, "Насыщ.", self.gm_saturation, self.gm_saturation_slider)
-        _add_fx_column(game_controls_row, "Резкость", self.gm_sharpness, self.gm_sharpness_slider)
+        _add_fx_column(game_controls_row, "Гамма", self.gm_gamma, self.gm_gamma_slider)
+        _add_fx_column(game_controls_row, "Темп.", self.gm_temperature, self.gm_temperature_slider)
         game_controls_row.addStretch(1)
         template_layout.addLayout(game_controls_row)
 
         self._link_fx_control_pair(self.wc_brightness, self.wc_brightness_slider)
         self._link_fx_control_pair(self.wc_contrast, self.wc_contrast_slider)
         self._link_fx_control_pair(self.wc_saturation, self.wc_saturation_slider)
-        self._link_fx_control_pair(self.wc_sharpness, self.wc_sharpness_slider)
+        self._link_fx_control_pair(self.wc_gamma, self.wc_gamma_slider)
+        self._link_fx_control_pair(self.wc_temperature, self.wc_temperature_slider)
         self._link_fx_control_pair(self.gm_brightness, self.gm_brightness_slider)
         self._link_fx_control_pair(self.gm_contrast, self.gm_contrast_slider)
         self._link_fx_control_pair(self.gm_saturation, self.gm_saturation_slider)
-        self._link_fx_control_pair(self.gm_sharpness, self.gm_sharpness_slider)
+        self._link_fx_control_pair(self.gm_gamma, self.gm_gamma_slider)
+        self._link_fx_control_pair(self.gm_temperature, self.gm_temperature_slider)
         self.main_layout.addWidget(self.template_card)
 
         self.main_layout.addWidget(StrongBodyLabel("Этап 3: Проверка и ручной выбор кандидатов"))
         self.table = QTableWidget(self)
-        self.table.setColumnCount(6)
+        self.table.setColumnCount(10)
         self.table.setHorizontalHeaderLabels(
-            ["Выбрать", "Таймкод", "Длит.", "Score", "Заголовок", "Причина / Фрагмент"]
+            [
+                "Выбрать",
+                "Таймкод",
+                "Длит.",
+                "Score",
+                "Q",
+                "Grade",
+                "Hook",
+                "Pause",
+                "Заголовок",
+                "Почему выбран",
+            ]
         )
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setAlternatingRowColors(False)
         self.table.verticalHeader().setDefaultSectionSize(64)
+        self.table.setSortingEnabled(True)
         self.main_layout.addWidget(self.table)
 
         self.main_layout.addWidget(StrongBodyLabel("Этап 4: Рендер выбранных шортсов"))
@@ -926,6 +979,7 @@ class AutoShortsInterface(QWidget):
         self.render_quality_combo = ComboBox(self)
         self.render_quality_combo.addItems(["Высокое", "Сбалансированное", "Быстрое"])
         self.render_quality_combo.setCurrentIndex(1)
+
 
         self.render_btn = PrimaryPushButton("Сделать шортсы из выбранных")
         self.render_btn.clicked.connect(self._start_render)
@@ -1348,6 +1402,7 @@ class AutoShortsInterface(QWidget):
             repeat_similarity_percent=self.repeat_similarity_spin.value(),
             min_candidates=self.min_candidates_spin.value(),
             max_candidates=self.max_candidates_spin.value(),
+            auto_filter_weak_candidates=bool(self.auto_filter_weak_checkbox.isChecked()),
         )
         self.candidate_thread.progress.connect(self._on_progress)
         self.candidate_thread.finished.connect(self._on_candidate_selection_finished)
@@ -1375,6 +1430,7 @@ class AutoShortsInterface(QWidget):
             self._start_render(autonomous=True)
 
     def _fill_table(self, candidates: List[Dict]):
+        self.table.setSortingEnabled(False)
         self.table.setRowCount(0)
         p = get_theme_palette()
         dark = bool(p.get("is_dark"))
@@ -1392,15 +1448,24 @@ class AutoShortsInterface(QWidget):
             timerange = f"{self._fmt_s(start_s)} - {self._fmt_s(end_s)}"
             duration = f"{(c['end_ms'] - c['start_ms']) / 1000:.1f}с"
 
-            self.table.setItem(row, 1, QTableWidgetItem(timerange))
+            timerange_item = QTableWidgetItem(timerange)
+            timerange_item.setData(Qt.UserRole, int(row))
+            self.table.setItem(row, 1, timerange_item)
             self.table.setItem(row, 2, QTableWidgetItem(duration))
             self.table.setItem(row, 3, QTableWidgetItem(str(c.get("score", ""))))
-            self.table.setItem(row, 4, QTableWidgetItem(str(c.get("title", ""))))
+            self.table.setItem(row, 4, QTableWidgetItem(str(c.get("quality_score", ""))))
+            self.table.setItem(row, 5, QTableWidgetItem(str(c.get("quality_grade", ""))))
+            self.table.setItem(row, 6, QTableWidgetItem(str(c.get("hook_score", ""))))
+            self.table.setItem(row, 7, QTableWidgetItem(str(c.get("pause_ratio", ""))))
+            self.table.setItem(row, 8, QTableWidgetItem(str(c.get("title", ""))))
             info_text = str(c.get("reason", ""))
             excerpt = str(c.get("excerpt", ""))
+            tags = c.get("explainability_tags") or []
+            if tags:
+                info_text = f"{info_text}\nТеги: {', '.join(str(t) for t in tags)}"
             if excerpt:
                 info_text = f"{info_text}\n{excerpt}"
-            self.table.setItem(row, 5, QTableWidgetItem(info_text))
+            self.table.setItem(row, 9, QTableWidgetItem(info_text))
 
             row_bg = bg_even if row % 2 == 0 else bg_odd
             for col in range(1, self.table.columnCount()):
@@ -1410,14 +1475,22 @@ class AutoShortsInterface(QWidget):
                     item.setBackground(row_bg)
 
         self.table.resizeColumnsToContents()
-        self.table.setColumnWidth(5, max(360, self.table.columnWidth(5)))
+        self.table.setColumnWidth(9, max(420, self.table.columnWidth(9)))
+        self.table.setSortingEnabled(True)
 
     def _collect_selected(self) -> List[Dict]:
         selected = []
         for row in range(self.table.rowCount()):
             cb = self.table.cellWidget(row, 0)
-            if cb and cb.isChecked() and row < len(self.candidates):
-                selected.append(self.candidates[row])
+            if not (cb and cb.isChecked()):
+                continue
+            idx_item = self.table.item(row, 1)
+            try:
+                src_idx = int(idx_item.data(Qt.UserRole)) if idx_item else row
+            except Exception:
+                src_idx = row
+            if 0 <= src_idx < len(self.candidates):
+                selected.append(self.candidates[src_idx])
         return selected
 
     def _start_render(self, autonomous: bool = None):
@@ -1547,13 +1620,15 @@ class AutoShortsInterface(QWidget):
                 "brightness": self.wc_brightness.value() / 100.0,
                 "contrast": self.wc_contrast.value() / 100.0,
                 "saturation": self.wc_saturation.value() / 100.0,
-                "sharpness": self.wc_sharpness.value() / 100.0,
+                "gamma": self.wc_gamma.value() / 100.0,
+                "temperature": self.wc_temperature.value() / 100.0,
             },
             "game_fx": {
                 "brightness": self.gm_brightness.value() / 100.0,
                 "contrast": self.gm_contrast.value() / 100.0,
                 "saturation": self.gm_saturation.value() / 100.0,
-                "sharpness": self.gm_sharpness.value() / 100.0,
+                "gamma": self.gm_gamma.value() / 100.0,
+                "temperature": self.gm_temperature.value() / 100.0,
             },
             "render_settings": {
                 "backend": self._get_render_backend(),
@@ -1593,19 +1668,38 @@ class AutoShortsInterface(QWidget):
         self.wc_brightness.setValue(0)
         self.wc_contrast.setValue(100)
         self.wc_saturation.setValue(100)
-        self.wc_sharpness.setValue(0)
+        self.wc_gamma.setValue(100)
+        self.wc_temperature.setValue(0)
         self.gm_brightness.setValue(0)
         self.gm_contrast.setValue(100)
         self.gm_saturation.setValue(100)
-        self.gm_sharpness.setValue(0)
+        self.gm_gamma.setValue(100)
+        self.gm_temperature.setValue(0)
         self.wc_brightness_slider.setValue(0)
         self.wc_contrast_slider.setValue(100)
         self.wc_saturation_slider.setValue(100)
-        self.wc_sharpness_slider.setValue(0)
+        self.wc_gamma_slider.setValue(100)
+        self.wc_temperature_slider.setValue(0)
         self.gm_brightness_slider.setValue(0)
         self.gm_contrast_slider.setValue(100)
         self.gm_saturation_slider.setValue(100)
-        self.gm_sharpness_slider.setValue(0)
+        self.gm_gamma_slider.setValue(100)
+        self.gm_temperature_slider.setValue(0)
+        self._refresh_output_composite_preview()
+
+    def _reset_fx_controls(self):
+        self.wc_brightness.setValue(0)
+        self.wc_contrast.setValue(100)
+        self.wc_saturation.setValue(100)
+        self.wc_gamma.setValue(100)
+        self.wc_temperature.setValue(0)
+
+        self.gm_brightness.setValue(0)
+        self.gm_contrast.setValue(100)
+        self.gm_saturation.setValue(100)
+        self.gm_gamma.setValue(100)
+        self.gm_temperature.setValue(0)
+
         self._refresh_output_composite_preview()
 
     def _save_layout_template(self):
@@ -1729,19 +1823,23 @@ class AutoShortsInterface(QWidget):
             self.wc_brightness.setValue(int(round(float(wfx.get("brightness", 0.0) or 0.0) * 100)))
             self.wc_contrast.setValue(int(round(float(wfx.get("contrast", 1.0) or 1.0) * 100)))
             self.wc_saturation.setValue(int(round(float(wfx.get("saturation", 1.0) or 1.0) * 100)))
-            self.wc_sharpness.setValue(int(round(float(wfx.get("sharpness", 0.0) or 0.0) * 100)))
+            self.wc_gamma.setValue(int(round(float(wfx.get("gamma", 1.0) or 1.0) * 100)))
+            self.wc_temperature.setValue(int(round(float(wfx.get("temperature", 0.0) or 0.0) * 100)))
             self.gm_brightness.setValue(int(round(float(gfx.get("brightness", 0.0) or 0.0) * 100)))
             self.gm_contrast.setValue(int(round(float(gfx.get("contrast", 1.0) or 1.0) * 100)))
             self.gm_saturation.setValue(int(round(float(gfx.get("saturation", 1.0) or 1.0) * 100)))
-            self.gm_sharpness.setValue(int(round(float(gfx.get("sharpness", 0.0) or 0.0) * 100)))
+            self.gm_gamma.setValue(int(round(float(gfx.get("gamma", 1.0) or 1.0) * 100)))
+            self.gm_temperature.setValue(int(round(float(gfx.get("temperature", 0.0) or 0.0) * 100)))
             self.wc_brightness_slider.setValue(self.wc_brightness.value())
             self.wc_contrast_slider.setValue(self.wc_contrast.value())
             self.wc_saturation_slider.setValue(self.wc_saturation.value())
-            self.wc_sharpness_slider.setValue(self.wc_sharpness.value())
+            self.wc_gamma_slider.setValue(self.wc_gamma.value())
+            self.wc_temperature_slider.setValue(self.wc_temperature.value())
             self.gm_brightness_slider.setValue(self.gm_brightness.value())
             self.gm_contrast_slider.setValue(self.gm_contrast.value())
             self.gm_saturation_slider.setValue(self.gm_saturation.value())
-            self.gm_sharpness_slider.setValue(self.gm_sharpness.value())
+            self.gm_gamma_slider.setValue(self.gm_gamma.value())
+            self.gm_temperature_slider.setValue(self.gm_temperature.value())
 
             render_settings = data.get("render_settings", {}) if isinstance(data, dict) else {}
             if isinstance(render_settings, dict):
@@ -2000,18 +2098,37 @@ class AutoShortsInterface(QWidget):
             brightness = self.wc_brightness.value() / 100.0
             contrast = self.wc_contrast.value() / 100.0
             saturation = self.wc_saturation.value() / 100.0
-            sharpness = self.wc_sharpness.value() / 100.0
+            gamma = self.wc_gamma.value() / 100.0
+            temperature = self.wc_temperature.value() / 100.0
         else:
             brightness = self.gm_brightness.value() / 100.0
             contrast = self.gm_contrast.value() / 100.0
             saturation = self.gm_saturation.value() / 100.0
-            sharpness = self.gm_sharpness.value() / 100.0
+            gamma = self.gm_gamma.value() / 100.0
+            temperature = self.gm_temperature.value() / 100.0
+
+        cache_key = (
+            str(layer),
+            bool(fast_mode),
+            int(pixmap.cacheKey()),
+            int(pixmap.width()),
+            int(pixmap.height()),
+            round(float(brightness), 4),
+            round(float(contrast), 4),
+            round(float(saturation), 4),
+            round(float(gamma), 4),
+            round(float(temperature), 4),
+        )
+        cached = self._fx_layer_cache.get(cache_key)
+        if cached is not None and not cached.isNull():
+            return QPixmap(cached)
 
         if (
             abs(brightness) < 1e-6
             and abs(contrast - 1.0) < 1e-6
             and abs(saturation - 1.0) < 1e-6
-            and sharpness < 1e-3
+            and abs(gamma - 1.0) < 1e-6
+            and abs(temperature) < 1e-6
         ):
             return pixmap
 
@@ -2031,8 +2148,14 @@ class AutoShortsInterface(QWidget):
         img = work_pix.toImage().convertToFormat(4)  # QImage.Format_ARGB32
         w, h = img.width(), img.height()
         bright_add = brightness * 255.0
-        local_contrast = 1.0 + sharpness * 0.25  # лёгкая имитация резкости в превью
-        contrast_total = contrast * local_contrast
+        gamma = max(0.3, min(3.0, float(gamma)))
+        warm = max(-0.4, min(0.4, float(temperature)))
+        red_gain = max(0.55, min(1.45, 1.0 + warm * 0.55))
+        blue_gain = max(0.55, min(1.45, 1.0 - warm * 0.55))
+        # Важно: финальный Auto Shorts рендер сейчас не применяет unsharp в filter graph
+        # (из-за проблем стабильности ffmpeg на части систем).
+        # Поэтому в превью НЕ добавляем имитацию резкости, чтобы кадр был ближе к результату рендера.
+        contrast_total = contrast
 
         for y in range(h):
             for x in range(w):
@@ -2048,6 +2171,13 @@ class AutoShortsInterface(QWidget):
                 g = lum + (g - lum) * saturation
                 b = lum + (b - lum) * saturation
 
+                # gamma и temperature применяем после базовой цветокоррекции
+                r = 255.0 * pow(max(0.0, min(255.0, r)) / 255.0, 1.0 / gamma)
+                g = 255.0 * pow(max(0.0, min(255.0, g)) / 255.0, 1.0 / gamma)
+                b = 255.0 * pow(max(0.0, min(255.0, b)) / 255.0, 1.0 / gamma)
+                r *= red_gain
+                b *= blue_gain
+
                 img.setPixelColor(
                     x,
                     y,
@@ -2056,12 +2186,241 @@ class AutoShortsInterface(QWidget):
 
         result = QPixmap.fromImage(img)
         if fast_mode and result.size() != pixmap.size():
-            return result.scaled(
+            result = result.scaled(
                 pixmap.size(),
                 Qt.IgnoreAspectRatio,
                 Qt.SmoothTransformation,
             )
+        if len(self._fx_layer_cache) > 96:
+            self._fx_layer_cache.clear()
+        self._fx_layer_cache[cache_key] = QPixmap(result)
         return result
+
+    @staticmethod
+    def _eq_tail_for_preview(layer_cfg: Dict) -> str:
+        fx = layer_cfg if isinstance(layer_cfg, dict) else {}
+        brightness = float(fx.get("brightness", 0.0) or 0.0)
+        contrast = float(fx.get("contrast", 1.0) or 1.0)
+        saturation = float(fx.get("saturation", 1.0) or 1.0)
+        gamma = float(fx.get("gamma", 1.0) or 1.0)
+        temperature = float(fx.get("temperature", 0.0) or 0.0)
+        parts = []
+        if (
+            abs(brightness) > 1e-6
+            or abs(contrast - 1.0) > 1e-6
+            or abs(saturation - 1.0) > 1e-6
+            or abs(gamma - 1.0) > 1e-6
+        ):
+            gamma = max(0.3, min(3.0, gamma))
+            parts.append(
+                f"eq=brightness={brightness:.3f}:contrast={contrast:.3f}:saturation={saturation:.3f}:gamma={gamma:.3f}"
+            )
+        if abs(temperature) > 1e-6:
+            warm = max(-0.4, min(0.4, temperature))
+            rr = max(0.55, min(1.45, 1.0 + warm * 0.55))
+            bb = max(0.55, min(1.45, 1.0 - warm * 0.55))
+            parts.append(f"colorchannelmixer=rr={rr:.3f}:bb={bb:.3f}")
+        return ("," + ",".join(parts)) if parts else ""
+
+    def _render_exact_fx_preview_frame(self):
+        if not self.video_path or not Path(self.video_path).exists():
+            InfoBar.warning(
+                "Внимание",
+                "Сначала выберите видео",
+                duration=2500,
+                position=InfoBarPosition.TOP,
+                parent=self,
+            )
+            return
+
+        fd, temp_img = tempfile.mkstemp(suffix=".jpg")
+        os.close(fd)
+        try:
+            tpl = self._build_layout_template()
+            out_w, out_h = 1080, 1920
+            raw_seek_s = max(0, int(self.preview_time_s.value()))
+            duration_s = max(1, int(self._probe_video_duration_s(self.video_path)))
+            seek_s = min(raw_seek_s, max(0, duration_s - 1))
+
+            def _looks_black_frame(pix: QPixmap) -> bool:
+                if pix.isNull():
+                    return True
+                img = pix.toImage()
+                if img.isNull():
+                    return True
+                w, h = img.width(), img.height()
+                step_x = max(1, w // 24)
+                step_y = max(1, h // 24)
+                for y in range(0, h, step_y):
+                    for x in range(0, w, step_x):
+                        c = img.pixelColor(x, y)
+                        if c.red() > 3 or c.green() > 3 or c.blue() > 3:
+                            return False
+                return True
+
+            def _run_ffmpeg(cmd: List[str]) -> subprocess.CompletedProcess:
+                return subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    errors="replace",
+                    creationflags=(
+                        subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                    ),
+                )
+
+            if bool(tpl.get("enabled", True)):
+                wc = tpl.get("webcam", {})
+                gm = tpl.get("game", {})
+                wc_fx = self._eq_tail_for_preview(tpl.get("webcam_fx", {}))
+                gm_fx = self._eq_tail_for_preview(tpl.get("game_fx", {}))
+
+                def _iv(d: Dict, k: str, default: int) -> int:
+                    try:
+                        return int(d.get(k, default))
+                    except Exception:
+                        return int(default)
+
+                wc_crop_x = max(0, _iv(wc, "crop_x", 0))
+                wc_crop_y = max(0, _iv(wc, "crop_y", 0))
+                wc_crop_w = max(2, _iv(wc, "crop_w", max(2, self.source_width // 2)))
+                wc_crop_h = max(2, _iv(wc, "crop_h", max(2, self.source_height // 3)))
+                wc_out_x = max(0, _iv(wc, "out_x", 0))
+                wc_out_y = max(0, _iv(wc, "out_y", 0))
+                wc_out_w = max(2, _iv(wc, "out_w", out_w))
+                wc_out_h = max(2, _iv(wc, "out_h", out_h // 3))
+
+                gm_crop_x = max(0, _iv(gm, "crop_x", 0))
+                gm_crop_y = max(0, _iv(gm, "crop_y", 0))
+                gm_crop_w = max(2, _iv(gm, "crop_w", max(2, self.source_width)))
+                gm_crop_h = max(2, _iv(gm, "crop_h", max(2, self.source_height // 2)))
+                gm_out_x = max(0, _iv(gm, "out_x", 0))
+                gm_out_y = max(0, _iv(gm, "out_y", out_h // 3))
+                gm_out_w = max(2, _iv(gm, "out_w", out_w))
+                gm_out_h = max(2, _iv(gm, "out_h", (out_h * 2) // 3))
+
+                filter_complex = (
+                    f"color=size={out_w}x{out_h}:color=black[base];"
+                    f"[0:v]split=2[src_cam][src_game];"
+                    f"[src_cam]crop={wc_crop_w}:{wc_crop_h}:{wc_crop_x}:{wc_crop_y}{wc_fx},"
+                    f"scale={wc_out_w}:{wc_out_h}:flags=lanczos[cam];"
+                    f"[src_game]crop={gm_crop_w}:{gm_crop_h}:{gm_crop_x}:{gm_crop_y}{gm_fx},"
+                    f"scale={gm_out_w}:{gm_out_h}:flags=lanczos[game];"
+                    f"[base][cam]overlay={wc_out_x}:{wc_out_y}[tmp];"
+                    f"[tmp][game]overlay={gm_out_x}:{gm_out_y}[vout]"
+                )
+                cmd_primary = [
+                    "ffmpeg",
+                    "-nostdin",
+                    "-hide_banner",
+                    "-loglevel",
+                    "error",
+                    "-ss",
+                    str(seek_s),
+                    "-i",
+                    self.video_path,
+                    "-frames:v",
+                    "1",
+                    "-filter_complex",
+                    filter_complex,
+                    "-map",
+                    "[vout]",
+                    "-y",
+                    temp_img,
+                ]
+
+                cmd_fallback = [
+                    "ffmpeg",
+                    "-nostdin",
+                    "-hide_banner",
+                    "-loglevel",
+                    "error",
+                    "-i",
+                    self.video_path,
+                    "-ss",
+                    str(seek_s),
+                    "-frames:v",
+                    "1",
+                    "-filter_complex",
+                    filter_complex,
+                    "-map",
+                    "[vout]",
+                    "-y",
+                    temp_img,
+                ]
+            else:
+                cmd_primary = [
+                    "ffmpeg",
+                    "-nostdin",
+                    "-hide_banner",
+                    "-loglevel",
+                    "error",
+                    "-ss",
+                    str(seek_s),
+                    "-i",
+                    self.video_path,
+                    "-frames:v",
+                    "1",
+                    "-vf",
+                    f"scale={out_w}:{out_h}:force_original_aspect_ratio=increase:flags=lanczos,crop={out_w}:{out_h}",
+                    "-y",
+                    temp_img,
+                ]
+                cmd_fallback = [
+                    "ffmpeg",
+                    "-nostdin",
+                    "-hide_banner",
+                    "-loglevel",
+                    "error",
+                    "-i",
+                    self.video_path,
+                    "-ss",
+                    str(seek_s),
+                    "-frames:v",
+                    "1",
+                    "-vf",
+                    f"scale={out_w}:{out_h}:force_original_aspect_ratio=increase:flags=lanczos,crop={out_w}:{out_h}",
+                    "-y",
+                    temp_img,
+                ]
+
+            proc = _run_ffmpeg(cmd_primary)
+            pix = QPixmap(temp_img) if Path(temp_img).exists() else QPixmap()
+
+            # На некоторых источниках ffmpeg с -ss до -i отдаёт «чёрный» кадр в filter_complex.
+            # Если кадр пустой/чёрный, повторяем рендер с -ss после -i (более надёжно).
+            if proc.returncode != 0 or pix.isNull() or _looks_black_frame(pix):
+                proc2 = _run_ffmpeg(cmd_fallback)
+                pix2 = QPixmap(temp_img) if Path(temp_img).exists() else QPixmap()
+                if proc2.returncode == 0 and not pix2.isNull() and not _looks_black_frame(pix2):
+                    pix = pix2
+                elif proc.returncode != 0 and proc2.returncode != 0:
+                    raise RuntimeError(((proc2.stderr or proc.stderr) or "Ошибка FFmpeg")[-800:])
+                elif pix.isNull() and pix2.isNull():
+                    raise RuntimeError("FFmpeg вернул пустой кадр")
+
+            self.effects_preview.set_background(pix)
+            InfoBar.success(
+                "Точный предпросмотр готов",
+                "Кадр справа обновлён через FFmpeg и ближе к итоговому рендеру",
+                duration=2200,
+                position=InfoBarPosition.TOP,
+                parent=self,
+            )
+        except Exception as e:
+            InfoBar.error(
+                "Ошибка предпросмотра",
+                f"Не удалось построить точный FX-кадр: {e}",
+                duration=3200,
+                position=InfoBarPosition.TOP,
+                parent=self,
+            )
+        finally:
+            try:
+                Path(temp_img).unlink(missing_ok=True)
+            except Exception:
+                pass
 
     def _populate_rendered_list(self, files: List[str]):
         self.rendered_list.clear()
@@ -2144,6 +2503,7 @@ class AutoShortsInterface(QWidget):
 
     def _load_source_preview_frame(self, video_path: str, seek_s: int = 2):
         try:
+            self._fx_layer_cache.clear()
             fd, temp_img = tempfile.mkstemp(suffix=".jpg")
             os.close(fd)
             cmd = [

@@ -1,5 +1,4 @@
 /AppData/cache/
-/AppData/logs/
 /AppData/models/
 /resource/bin/
 /runtime/
@@ -17,3 +16,5 @@
 /app/core/storage/__pycache__/
 /app/core/subtitle_processor/__pycache__/
 /app/core/utils/__pycache__/
+/AppData/logs/
+/app/core/shorts/__pycache__/

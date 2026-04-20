@@ -387,6 +387,7 @@ class AutoShortsCandidateThread(QThread):
         repeat_similarity_percent: int = 72,
         min_candidates: int = 8,
         max_candidates: int = 40,
+        auto_filter_weak_candidates: bool = True,
     ):
         super().__init__()
         self.asr_payload = asr_payload or {}
@@ -395,6 +396,7 @@ class AutoShortsCandidateThread(QThread):
         self.repeat_similarity_percent = max(40, min(100, int(repeat_similarity_percent or 72)))
         self.min_candidates = max(1, int(min_candidates or 1))
         self.max_candidates = max(self.min_candidates, int(max_candidates or self.min_candidates))
+        self.auto_filter_weak_candidates = bool(auto_filter_weak_candidates)
 
     def run(self):
         try:
@@ -417,6 +419,7 @@ class AutoShortsCandidateThread(QThread):
                 repeat_similarity_threshold=self.repeat_similarity_percent / 100.0,
                 min_candidates=self.min_candidates,
                 max_candidates=self.max_candidates,
+                auto_filter_weak_candidates=self.auto_filter_weak_candidates,
             )
 
             candidates = processor.find_candidates(
@@ -467,6 +470,7 @@ class AutoShortsRenderThread(QThread):
     def request_cancel(self):
         self._cancel_requested = True
 
+
     def run(self):
         try:
             candidates = [
@@ -481,6 +485,7 @@ class AutoShortsRenderThread(QThread):
                 )
                 for c in self.selected_candidates
             ]
+
             result = render_shorts(
                 input_video=self.video_path,
                 candidates=candidates,

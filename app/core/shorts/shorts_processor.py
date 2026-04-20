@@ -41,6 +41,13 @@ class ShortCandidate:
     reason: str
     excerpt: str
     speech_ranges: Optional[List[Tuple[int, int]]] = None
+    speech_density: float = 0.0
+    pause_ratio: float = 0.0
+    hook_score: float = 0.0
+    novelty_score: float = 0.0
+    quality_score: float = 0.0
+    quality_grade: str = "C"
+    explainability_tags: Optional[List[str]] = None
 
     @property
     def duration_ms(self) -> int:
@@ -61,6 +68,7 @@ class ShortsProcessor:
         repeat_similarity_threshold: float = 0.72,
         min_candidates: int = 8,
         max_candidates: int = 40,
+        auto_filter_weak_candidates: bool = True,
     ):
         self.min_duration_ms = int(min_duration_s * 1000)
         self.max_duration_ms = int(max_duration_s * 1000)
@@ -70,6 +78,7 @@ class ShortsProcessor:
         self.repeat_similarity_threshold = max(0.40, min(0.98, float(repeat_similarity_threshold or 0.72)))
         self.min_candidates = max(1, int(min_candidates or 1))
         self.max_candidates = max(self.min_candidates, int(max_candidates or self.min_candidates))
+        self.auto_filter_weak_candidates = bool(auto_filter_weak_candidates)
 
     def find_candidates(self, asr_data: ASRData, progress_cb: Optional[Callable] = None) -> List[ShortCandidate]:
         if progress_cb:
@@ -101,8 +110,31 @@ class ShortsProcessor:
         if progress_cb:
             progress_cb(55, f"Найдено кандидатов (эвристика): {len(candidates)}")
 
+        # Pass-2 (precision): локально ужесточаем качество до LLM rerank.
+        candidates = self._precision_pass(candidates)
+
         reranked = self._try_llm_rerank(candidates)
         reranked = self._diversify_by_timeline(reranked)
+
+        if self.auto_filter_weak_candidates:
+            weak_filtered = self._auto_filter_weak_candidates(reranked)
+            min_safe = max(3, int(self.min_candidates * 0.55))
+            if len(weak_filtered) >= min_safe:
+                reranked = weak_filtered
+            elif weak_filtered:
+                # Если фильтр слишком агрессивен — оставляем best effort микс.
+                reserve = sorted(reranked, key=lambda x: x.quality_score, reverse=True)
+                used = {(c.start_ms, c.end_ms) for c in weak_filtered}
+                mixed = list(weak_filtered)
+                for c in reserve:
+                    key = (c.start_ms, c.end_ms)
+                    if key in used:
+                        continue
+                    mixed.append(c)
+                    used.add(key)
+                    if len(mixed) >= self.min_candidates:
+                        break
+                reranked = mixed
 
         if len(reranked) < self.min_candidates:
             # Добираем до минимального числа из общего пула, сохраняя порядок по score
@@ -157,6 +189,43 @@ class ShortsProcessor:
 
         out = seeded + extra
         out.sort(key=lambda x: x.score, reverse=True)
+        return out
+
+    def _precision_pass(self, candidates: List[ShortCandidate]) -> List[ShortCandidate]:
+        if not candidates:
+            return []
+        passed: List[ShortCandidate] = []
+        for c in candidates:
+            quality = float(getattr(c, "quality_score", 0.0) or 0.0)
+            hook = float(getattr(c, "hook_score", 0.0) or 0.0)
+            pause_ratio = float(getattr(c, "pause_ratio", 1.0) or 1.0)
+            if quality < 40 and hook < 3.0:
+                continue
+            if pause_ratio > 0.56 and quality < 55:
+                continue
+            passed.append(c)
+        if len(passed) < max(3, int(self.min_candidates * 0.6)):
+            return candidates
+        return passed
+
+    def _auto_filter_weak_candidates(self, candidates: List[ShortCandidate]) -> List[ShortCandidate]:
+        if not candidates:
+            return []
+        out: List[ShortCandidate] = []
+        for c in candidates:
+            quality = float(getattr(c, "quality_score", 0.0) or 0.0)
+            hook = float(getattr(c, "hook_score", 0.0) or 0.0)
+            pause_ratio = float(getattr(c, "pause_ratio", 1.0) or 1.0)
+            speech_density = float(getattr(c, "speech_density", 0.0) or 0.0)
+            if quality < 48:
+                continue
+            if hook < 3.2:
+                continue
+            if pause_ratio > 0.48:
+                continue
+            if speech_density < 0.7 and quality < 62:
+                continue
+            out.append(c)
         return out
 
     def _build_enterprise_llm_candidates(
@@ -272,6 +341,28 @@ class ShortsProcessor:
 
                 excerpt = " ".join((by_idx[k].text or "").strip() for k in range(s_idx, e_idx + 1))
                 speech_ranges = self._build_speech_ranges_from_segments([by_idx[k] for k in range(s_idx, e_idx + 1)])
+                duration_s = max(0.8, duration / 1000.0)
+                token_count = self._count_tokens(excerpt)
+                speech_density = token_count / duration_s
+                kept_ms = sum(max(0, b - a) for a, b in (speech_ranges or []))
+                pause_ratio = max(0.0, min(1.0, 1.0 - (kept_ms / max(1, duration))))
+                hook_score = max(0.0, min(10.0, float(hook)))
+                novelty_score = max(0.0, min(10.0, float(novelty)))
+                quality_score = self._compute_quality_score(
+                    base_score=blended,
+                    speech_density=speech_density,
+                    pause_ratio=pause_ratio,
+                    hook_score=hook_score,
+                    novelty_score=novelty_score,
+                )
+                quality_grade = self._quality_grade(quality_score)
+                explainability_tags = self._build_explainability_tags(
+                    speech_density=speech_density,
+                    pause_ratio=pause_ratio,
+                    hook_score=hook_score,
+                    novelty_score=novelty_score,
+                    quality_grade=quality_grade,
+                )
                 result.append(
                     ShortCandidate(
                         start_ms=start_ms,
@@ -281,6 +372,13 @@ class ShortsProcessor:
                         reason=str(item.get("reason", "")).strip() or "AI Enterprise selection",
                         excerpt=self._shorten(excerpt, 220),
                         speech_ranges=speech_ranges,
+                        speech_density=round(speech_density, 3),
+                        pause_ratio=round(pause_ratio, 3),
+                        hook_score=round(hook_score, 2),
+                        novelty_score=round(novelty_score, 2),
+                        quality_score=round(quality_score, 2),
+                        quality_grade=quality_grade,
+                        explainability_tags=explainability_tags,
                     )
                 )
             except Exception:
@@ -379,6 +477,27 @@ class ShortsProcessor:
                 if score < (36 if relaxed else 43):
                     continue
 
+                duration_s = max(0.8, duration / 1000.0)
+                speech_density = token_sum / duration_s
+                unique_ratio = len(set(re.findall(r"[\w\u4e00-\u9fff]+", joined.lower()))) / max(1, token_sum)
+                hook_score = self._estimate_hook_score(joined)
+                novelty_score = self._estimate_novelty_score(joined, unique_ratio)
+                quality_score = self._compute_quality_score(
+                    base_score=score,
+                    speech_density=speech_density,
+                    pause_ratio=pause_ratio,
+                    hook_score=hook_score,
+                    novelty_score=novelty_score,
+                )
+                quality_grade = self._quality_grade(quality_score)
+                explainability_tags = self._build_explainability_tags(
+                    speech_density=speech_density,
+                    pause_ratio=pause_ratio,
+                    hook_score=hook_score,
+                    novelty_score=novelty_score,
+                    quality_grade=quality_grade,
+                )
+
                 punch = max(punch, score)
                 excerpt = self._shorten(joined, 220)
                 windows.append(
@@ -392,6 +511,13 @@ class ShortsProcessor:
                         speech_ranges=self._build_speech_ranges_from_segments(
                             [prepared[k]["seg"] for k in range(i, j + 1)]
                         ),
+                        speech_density=round(speech_density, 3),
+                        pause_ratio=round(pause_ratio, 3),
+                        hook_score=round(hook_score, 2),
+                        novelty_score=round(novelty_score, 2),
+                        quality_score=round(quality_score, 2),
+                        quality_grade=quality_grade,
+                        explainability_tags=explainability_tags,
                     )
                 )
 
@@ -480,6 +606,98 @@ class ShortsProcessor:
             score -= 8
         return round(min(100.0, score), 2)
 
+    @staticmethod
+    def _estimate_hook_score(text: str) -> float:
+        txt = (text or "").strip()
+        if not txt:
+            return 0.0
+        low = txt.lower()
+        words = re.findall(r"[\w\u4e00-\u9fff]+", txt, flags=re.UNICODE)
+        early_words = [w.lower() for w in words[:12]]
+        early_text = " ".join(early_words)
+
+        hook_kw = [
+            "смотри", "прикол", "не поверишь", "вот", "сейчас", "история", "секрет", "факт", "подожди",
+            "короче", "imagine", "wait", "look", "secret", "fact",
+        ]
+        filler_starts = ["ну", "эм", "ээ", "типа", "как бы", "uh", "um"]
+
+        score = 2.8
+        score += min(4.0, sum(1.2 for k in hook_kw if k in early_text))
+        score += min(1.8, txt.count("!") * 0.35 + txt.count("?") * 0.25)
+        if any(early_text.startswith(f) for f in filler_starts):
+            score -= 1.6
+        if len(words) >= 6:
+            score += 0.8
+        if len(words[:3]) < 2:
+            score -= 1.0
+        return round(max(0.0, min(10.0, score)), 2)
+
+    @staticmethod
+    def _estimate_novelty_score(text: str, unique_ratio: float) -> float:
+        low = (text or "").lower()
+        novelty_kw = [
+            "внезапно", "неожидан", "поворот", "камбэк", "разрыв", "шок", "впервые", "новый",
+            "twist", "unexpected", "plot twist", "suddenly", "new",
+        ]
+        novelty_hits = sum(1 for k in novelty_kw if k in low)
+        score = 3.2 + min(3.5, novelty_hits * 1.25) + max(0.0, min(3.3, (unique_ratio - 0.42) * 10))
+        return round(max(0.0, min(10.0, score)), 2)
+
+    @staticmethod
+    def _compute_quality_score(
+        base_score: float,
+        speech_density: float,
+        pause_ratio: float,
+        hook_score: float,
+        novelty_score: float,
+    ) -> float:
+        density_bonus = max(0.0, min(12.0, (speech_density - 1.0) * 5.2))
+        pause_penalty = max(0.0, min(18.0, pause_ratio * 26.0))
+        hook_bonus = max(0.0, min(12.0, hook_score * 1.15))
+        novelty_bonus = max(0.0, min(9.0, novelty_score * 0.85))
+        quality = 0.56 * float(base_score) + density_bonus + hook_bonus + novelty_bonus - pause_penalty
+        return round(max(0.0, min(100.0, quality)), 2)
+
+    @staticmethod
+    def _quality_grade(quality_score: float) -> str:
+        q = float(quality_score or 0.0)
+        if q >= 82:
+            return "A"
+        if q >= 68:
+            return "B"
+        if q >= 54:
+            return "C"
+        return "D"
+
+    @staticmethod
+    def _build_explainability_tags(
+        speech_density: float,
+        pause_ratio: float,
+        hook_score: float,
+        novelty_score: float,
+        quality_grade: str,
+    ) -> List[str]:
+        tags: List[str] = [f"grade:{quality_grade}"]
+        if hook_score >= 7.2:
+            tags.append("сильный_хук")
+        elif hook_score <= 3.0:
+            tags.append("слабый_хук")
+
+        if novelty_score >= 6.8:
+            tags.append("неожиданность")
+
+        if speech_density >= 1.9:
+            tags.append("плотная_речь")
+        elif speech_density < 1.0:
+            tags.append("разреженная_речь")
+
+        if pause_ratio <= 0.22:
+            tags.append("мало_пауз")
+        elif pause_ratio > 0.42:
+            tags.append("много_пауз")
+        return tags
+
     def _try_llm_rerank(self, candidates: List[ShortCandidate]) -> List[ShortCandidate]:
         if not candidates:
             return []
@@ -528,6 +746,14 @@ class ShortsProcessor:
                     continue
                 c = by_id[idx]
                 c.score = round(min(100.0, c.score + float(it.get("boost", 0))), 2)
+                c.quality_score = self._compute_quality_score(
+                    base_score=c.score,
+                    speech_density=float(getattr(c, "speech_density", 0.0) or 0.0),
+                    pause_ratio=float(getattr(c, "pause_ratio", 1.0) or 1.0),
+                    hook_score=float(getattr(c, "hook_score", 0.0) or 0.0),
+                    novelty_score=float(getattr(c, "novelty_score", 0.0) or 0.0),
+                )
+                c.quality_grade = self._quality_grade(c.quality_score)
                 title = (it.get("title") or "").strip()
                 reason = (it.get("reason") or "").strip()
                 if title:
@@ -867,12 +1093,25 @@ def render_shorts(
         brightness = float(fx.get("brightness", 0.0) or 0.0)
         contrast = float(fx.get("contrast", 1.0) or 1.0)
         saturation = float(fx.get("saturation", 1.0) or 1.0)
+        gamma = float(fx.get("gamma", 1.0) or 1.0)
+        temperature = float(fx.get("temperature", 0.0) or 0.0)
 
         parts = []
-        if abs(brightness) > 1e-6 or abs(contrast - 1.0) > 1e-6 or abs(saturation - 1.0) > 1e-6:
+        if (
+            abs(brightness) > 1e-6
+            or abs(contrast - 1.0) > 1e-6
+            or abs(saturation - 1.0) > 1e-6
+            or abs(gamma - 1.0) > 1e-6
+        ):
+            gamma = max(0.3, min(3.0, gamma))
             parts.append(
-                f"eq=brightness={brightness:.3f}:contrast={contrast:.3f}:saturation={saturation:.3f}"
+                f"eq=brightness={brightness:.3f}:contrast={contrast:.3f}:saturation={saturation:.3f}:gamma={gamma:.3f}"
             )
+        if abs(temperature) > 1e-6:
+            warm = max(-0.4, min(0.4, temperature))
+            rr = max(0.55, min(1.45, 1.0 + warm * 0.55))
+            bb = max(0.55, min(1.45, 1.0 - warm * 0.55))
+            parts.append(f"colorchannelmixer=rr={rr:.3f}:bb={bb:.3f}")
         # Важно: unsharp на части Windows-сборок ffmpeg/nvenc может приводить
         # к падению процесса ffmpeg без stderr (rc=3221226356), из-за чего
         # шортсы не создаются (0 байтов). Поэтому в рендере Auto Shorts
