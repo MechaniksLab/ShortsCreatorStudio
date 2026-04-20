@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import hashlib
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -27,6 +28,7 @@ from app.common.config import cfg
 from app.common.theme_manager import get_theme_palette
 from app.config import APPDATA_PATH, WORK_PATH
 from app.core.entities import BatchTaskType, SupportedAudioFormats, SupportedVideoFormats
+from app.core.task_factory import TaskFactory
 
 
 class LayerPreviewWidget(QWidget):
@@ -1634,8 +1636,7 @@ class AutoShortsInterface(QWidget):
         self._set_active_progress_stage(4)
         self._set_stage_progress(0, "Этап 4/4: Рендер шортсов...")
 
-        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_dir = str(WORK_PATH / "shorts" / f"shorts_{Path(self.video_path).stem}_{stamp}")
+        output_dir = str(self._build_safe_output_dir(self.video_path))
         self.last_output_dir = output_dir
         self.output_hint_label.setText(f"Папка результата: {output_dir}")
         self.render_thread = AutoShortsRenderThread(
@@ -1650,6 +1651,31 @@ class AutoShortsInterface(QWidget):
         self.render_thread.finished.connect(self._on_render_finished)
         self.render_thread.error.connect(self._on_error)
         self.render_thread.start()
+
+    @staticmethod
+    def _build_safe_output_dir(video_path: str) -> Path:
+        """Генерирует безопасную папку вывода шортсов с контролем длины пути."""
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        base_stem = TaskFactory._safe_fs_name(Path(video_path).stem, max_len=48)
+        dir_name = TaskFactory._safe_fs_name(
+            f"шорты_{base_stem}_{stamp}", max_len=120
+        ).replace(" ", "_")
+
+        root_dir = WORK_PATH / "shorts"
+        root_dir.mkdir(parents=True, exist_ok=True)
+
+        max_path_len = int(getattr(TaskFactory, "MAX_PATH_LEN", 240) or 240)
+        out_dir = root_dir / dir_name
+        if len(str(out_dir)) <= max_path_len:
+            return out_dir
+
+        digest = hashlib.md5(dir_name.encode("utf-8", errors="ignore")).hexdigest()[:8]
+        max_name_len = max(16, max_path_len - len(str(root_dir)) - 1)
+        head_len = max(6, max_name_len - 9)
+        short_name = dir_name[:head_len].rstrip(" ._")
+        if not short_name:
+            short_name = "шорты"
+        return root_dir / f"{short_name}_{digest}"
 
     def _on_render_finished(self, files: List[str]):
         self.transcribe_btn.setEnabled(True)

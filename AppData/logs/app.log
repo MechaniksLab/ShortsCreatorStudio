@@ -17986,3 +17986,1649 @@ Faster Whisper 识别完成
 字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_030_Мы можем выжить, только прячась. Наш единственный вых_293d80f3\subtitle\【样式字幕】шорт_030_Мы можем выжить, только прячась. Наш единственный вых_8f341507.ass
 诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173247.json
 优化完成
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-20 22:03:05.589607
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\ЛайкнутьИПодписаться.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmps341urbh.wav
+视频时长: 18.53秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp4j99d3vh\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp4j99d3vh\audio.wav
+89% | 17/19 | 00:04<<00:00 |  4.21 audio seconds/s
+100% | 19/19 | 00:04<<00:00 |  4.38 audio seconds/s
+Transcription speed: 4.27 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp4j99d3vh' directory.
+Operation finished in:  0:00:06.732
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\исх_ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 22:03:15.130510
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\17b0fecf5a0e0d78aee2fad281bc4d75.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\стил__ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_220315.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 22:03:15.168196
+开始合成视频: E:/Render/ЛайкнутьИПодписаться.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i E:/Render/ЛайкнутьИПодписаться.mp4 -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y E:\Render\видео_ЛайкнутьИПодписаться.mp4
+视频总时长: 18.53秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_ЛайкнутьИПодписаться.mp4
+2026-04-20 22:06:19 - VideoCaptioner - ERROR - Traceback (most recent call last):
+  File "E:\Neyro\ShortsCreatorStudio\runtime\Lib\site-packages\qfluentwidgets\components\widgets\info_bar.py", line 420, in eventFilter
+    return super().eventFilter(obj, e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type BottomInfoBarManager has been deleted
+
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-20 22:07:37.950720
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\ЛайкнутьИПодписаться.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpap9lbi8j.wav
+视频时长: 18.53秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\исх_ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 22:07:38.065107
+命中处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\17b0fecf5a0e0d78aee2fad281bc4d75.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\стил__ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_220738.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 22:07:38.111958
+开始合成视频: E:/Render/ЛайкнутьИПодписаться.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i E:/Render/ЛайкнутьИПодписаться.mp4 -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y E:\Render\видео_ЛайкнутьИПодписаться.mp4
+视频总时长: 18.53秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_ЛайкнутьИПодписаться.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 22:08:34.732630
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\ЛайкнутьИПодписаться.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpr84vg0pt.wav
+视频时长: 18.53秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpiqe1q1ck\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpiqe1q1ck\audio.wav
+89% | 17/19 | 00:03<<00:00 |  4.35 audio seconds/s
+100% | 19/19 | 00:04<<00:00 |  4.52 audio seconds/s
+Transcription speed: 4.4 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpiqe1q1ck' directory.
+Operation finished in:  0:00:06.009
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\исх_ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 22:08:42.154454
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\8bea36c1b998b0124bab652c7b4184dc.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\стил__ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_220842.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 22:08:42.183454
+开始合成视频: E:/Render/ЛайкнутьИПодписаться.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i E:/Render/ЛайкнутьИПодписаться.mp4 -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y E:\Render\видео_ЛайкнутьИПодписаться.mp4
+视频总时长: 18.53秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_ЛайкнутьИПодписаться.mp4
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-20 22:13:07.700092
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\ЛайкнутьИПодписаться.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp6n3nweaf.wav
+视频时长: 18.53秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\исх_ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 22:13:07.819418
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\5afcef453445a4e7f2c7b2aa6cb52f7e.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\стил__ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_221307.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 22:13:07.867329
+开始合成视频: E:/Render/ЛайкнутьИПодписаться.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i E:/Render/ЛайкнутьИПодписаться.mp4 -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y E:\Render\видео_ЛайкнутьИПодписаться.mp4
+视频总时长: 18.53秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_ЛайкнутьИПодписаться.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 22:14:49.777474
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\ЛайкнутьИПодписаться.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp1_f1xuko.wav
+视频时长: 18.53秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp4jmhzeun\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp4jmhzeun\audio.wav
+89% | 17/19 | 00:03<<00:00 |  4.54 audio seconds/s
+100% | 19/19 | 00:04<<00:00 |  4.70 audio seconds/s
+Transcription speed: 4.58 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp4jmhzeun' directory.
+Operation finished in:  0:00:05.946
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\исх_ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 22:14:57.131260
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\стил__ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_221457.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 22:14:57.153716
+开始合成视频: E:/Render/ЛайкнутьИПодписаться.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i E:/Render/ЛайкнутьИПодписаться.mp4 -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y E:\Render\видео_ЛайкнутьИПодписаться.mp4
+视频总时长: 18.53秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_ЛайкнутьИПодписаться.mp4
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-20 22:18:46.720865
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\ЛайкнутьИПодписаться.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp5fukpase.wav
+视频时长: 18.53秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpg9ccb187\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpg9ccb187\audio.wav
+89% | 17/19 | 00:03<<00:00 |  4.35 audio seconds/s
+100% | 19/19 | 00:04<<00:00 |  4.51 audio seconds/s
+Transcription speed: 4.39 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpg9ccb187' directory.
+Operation finished in:  0:00:06.110
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\исх_ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 22:18:54.325176
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-20 22:25:56.933391
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\ЛайкнутьИПодписаться.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp3bigo88d.wav
+视频时长: 18.53秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpagfvci96\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpagfvci96\audio.wav
+89% | 17/19 | 00:03<<00:00 |  4.51 audio seconds/s
+100% | 19/19 | 00:04<<00:00 |  4.67 audio seconds/s
+Transcription speed: 4.55 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpagfvci96' directory.
+Operation finished in:  0:00:05.902
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\исх_ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 22:26:04.370835
+sentence+karoake: локальная сборка предложений из word-level сегментов
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\ЛайкнутьИПодписаться\subtitle\стил__ЛайкнутьИПодписаться-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_222604.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 22:26:04.411333
+开始合成视频: E:/Render/ЛайкнутьИПодписаться.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i E:/Render/ЛайкнутьИПодписаться.mp4 -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y E:\Render\видео_ЛайкнутьИПодписаться.mp4
+视频总时长: 18.53秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_ЛайкнутьИПодписаться.mp4
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-20 22:32:31.581192
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Shorts creator studio.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp54i6mugm.wav
+视频时长: 847.9秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpnyle_h90\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpnyle_h90\audio.wav
+3% |  27/848 | 00:09<<04:47 |  2.86 audio seconds/s
+7% |  57/848 | 00:19<<04:30 |  2.93 audio seconds/s
+10% |  87/848 | 00:28<<04:11 |  3.02 audio seconds/s
+13% | 113/848 | 00:39<<04:14 |  2.88 audio seconds/s
+17% | 140/848 | 00:49<<04:08 |  2.84 audio seconds/s
+20% | 167/848 | 00:57<<03:54 |  2.90 audio seconds/s
+23% | 197/848 | 01:07<<03:41 |  2.93 audio seconds/s
+27% | 225/848 | 01:17<<03:34 |  2.90 audio seconds/s
+30% | 251/848 | 01:27<<03:27 |  2.88 audio seconds/s
+33% | 280/848 | 01:37<<03:18 |  2.87 audio seconds/s
+36% | 308/848 | 01:47<<03:08 |  2.87 audio seconds/s
+40% | 337/848 | 01:59<<03:01 |  2.82 audio seconds/s
+43% | 367/848 | 02:09<<02:49 |  2.84 audio seconds/s
+47% | 395/848 | 02:20<<02:41 |  2.80 audio seconds/s
+50% | 422/848 | 02:30<<02:32 |  2.80 audio seconds/s
+53% | 449/848 | 02:40<<02:22 |  2.80 audio seconds/s
+56% | 472/848 | 02:48<<02:14 |  2.80 audio seconds/s
+59% | 501/848 | 02:57<<02:03 |  2.82 audio seconds/s
+62% | 529/848 | 03:07<<01:52 |  2.83 audio seconds/s
+66% | 558/848 | 03:18<<01:42 |  2.82 audio seconds/s
+69% | 585/848 | 03:27<<01:33 |  2.82 audio seconds/s
+72% | 614/848 | 03:38<<01:23 |  2.81 audio seconds/s
+76% | 642/848 | 03:49<<01:13 |  2.80 audio seconds/s
+79% | 672/848 | 04:00<<01:02 |  2.80 audio seconds/s
+82% | 696/848 | 04:09<<00:54 |  2.79 audio seconds/s
+85% | 725/848 | 04:20<<00:44 |  2.79 audio seconds/s
+89% | 751/848 | 04:31<<00:35 |  2.76 audio seconds/s
+92% | 780/848 | 04:41<<00:24 |  2.77 audio seconds/s
+95% | 807/848 | 04:51<<00:14 |  2.77 audio seconds/s
+99% | 836/848 | 05:04<<00:04 |  2.75 audio seconds/s
+100% | 848/848 | 05:09<<00:00 |  2.74 audio seconds/s
+Transcription speed: 2.74 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpnyle_h90' directory.
+Operation finished in:  0:05:11.970
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Shorts creator studio\subtitle\исх_Shorts creator studio-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 22:37:45.990102
+sentence+karoake: локальная сборка предложений из word-level сегментов
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Shorts creator studio\subtitle\стил__Shorts creator studio-FasterWhisper ✨-俄语.ass
+Сохранён word-level SRT: E:\Render\Shorts creator studio-слова.srt
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_223746.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 22:37:46.071821
+开始合成视频: E:/Render/Shorts creator studio.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Shorts creator studio.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Shorts creator studio.mp4"
+视频总时长: 847.9秒
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-20 22:45:42.040277
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Shorts creator studio.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpfjjstqlp.wav
+视频时长: 847.9秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpgqhiuccr\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 0 --sentence --max_line_width 90 --max_line_count 1 --max_comma 20 --max_comma_cent 50 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpgqhiuccr\audio.wav
+3% |  27/848 | 00:09<<04:52 |  2.81 audio seconds/s
+7% |  57/848 | 00:19<<04:32 |  2.91 audio seconds/s
+10% |  87/848 | 00:29<<04:14 |  2.99 audio seconds/s
+13% | 113/848 | 00:39<<04:17 |  2.86 audio seconds/s
+17% | 140/848 | 00:49<<04:11 |  2.82 audio seconds/s
+20% | 167/848 | 00:57<<03:56 |  2.88 audio seconds/s
+23% | 197/848 | 01:07<<03:42 |  2.92 audio seconds/s
+27% | 225/848 | 01:17<<03:34 |  2.90 audio seconds/s
+30% | 251/848 | 01:27<<03:26 |  2.88 audio seconds/s
+33% | 280/848 | 01:37<<03:17 |  2.88 audio seconds/s
+36% | 308/848 | 01:47<<03:07 |  2.87 audio seconds/s
+40% | 337/848 | 01:58<<03:00 |  2.83 audio seconds/s
+43% | 367/848 | 02:08<<02:48 |  2.85 audio seconds/s
+47% | 395/848 | 02:20<<02:40 |  2.82 audio seconds/s
+50% | 422/848 | 02:30<<02:31 |  2.81 audio seconds/s
+53% | 449/848 | 02:39<<02:21 |  2.82 audio seconds/s
+56% | 472/848 | 02:48<<02:14 |  2.80 audio seconds/s
+59% | 501/848 | 02:57<<02:02 |  2.82 audio seconds/s
+62% | 529/848 | 03:06<<01:52 |  2.83 audio seconds/s
+66% | 558/848 | 03:17<<01:42 |  2.82 audio seconds/s
+69% | 585/848 | 03:27<<01:33 |  2.82 audio seconds/s
+72% | 614/848 | 03:38<<01:23 |  2.82 audio seconds/s
+76% | 642/848 | 03:48<<01:13 |  2.81 audio seconds/s
+79% | 672/848 | 03:59<<01:02 |  2.80 audio seconds/s
+82% | 696/848 | 04:08<<00:54 |  2.80 audio seconds/s
+85% | 725/848 | 04:19<<00:44 |  2.79 audio seconds/s
+89% | 751/848 | 04:31<<00:35 |  2.77 audio seconds/s
+92% | 780/848 | 04:40<<00:24 |  2.78 audio seconds/s
+95% | 807/848 | 04:51<<00:14 |  2.77 audio seconds/s
+99% | 836/848 | 05:04<<00:04 |  2.75 audio seconds/s
+100% | 848/848 | 05:09<<00:00 |  2.74 audio seconds/s
+Transcription speed: 2.74 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpgqhiuccr' directory.
+Operation finished in:  0:05:12.182
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Shorts creator studio\subtitle\исх_Shorts creator studio-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 22:50:56.594652
+sentence+karoake: локальная сборка предложений из word-level сегментов
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\f987ddfe495c220b99a73f547689686a.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Shorts creator studio\subtitle\стил__Shorts creator studio-FasterWhisper ✨-俄语.ass
+Сохранён word-level SRT: E:\Render\Shorts creator studio-слова.srt
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_225056.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 22:50:56.689806
+开始合成视频: E:/Render/Shorts creator studio.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Shorts creator studio.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Shorts creator studio.mp4"
+视频总时长: 847.9秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_Shorts creator studio.mp4
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-20 23:19:39.478070
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Shorts creator studio.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp7ij53wh2.wav
+视频时长: 847.9秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Shorts creator studio\subtitle\исх_Shorts creator studio-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:19:40.623221
+命中处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\f987ddfe495c220b99a73f547689686a.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Shorts creator studio\subtitle\стил__Shorts creator studio-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_231940.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:19:40.708973
+开始合成视频: E:/Render/Shorts creator studio.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Shorts creator studio.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Shorts creator studio.mp4"
+视频总时长: 847.9秒
+2026-04-20 23:19:45 - video_utils - ERROR - 视频合成失败， 
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-20 23:22:41.527827
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 01_6.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp7k6la82d.wav
+视频时长: 23.82秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmph5z59dji\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmph5z59dji\audio.wav
+79% | 19/24 | 00:06<<00:01 |  2.86 audio seconds/s
+100% | 24/24 | 00:06<<00:00 |  3.46 audio seconds/s
+Transcription speed: 3.43 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmph5z59dji' directory.
+Operation finished in:  0:00:08.718
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_6\subtitle\исх_Последовательность 01_6-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:22:51.774322
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\960383d9ce05c2e17b810d4d5c4f8250.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_6\subtitle\стил__Последовательность 01_6-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_232251.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:22:51.835323
+开始合成视频: E:/Render/Последовательность 01_6.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 01_6.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Последовательность 01_6.mp4"
+视频总时长: 23.82秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_Последовательность 01_6.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:23:51.385491
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 01_6.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpjg_dk9dh.wav
+视频时长: 23.82秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_6\subtitle\исх_Последовательность 01_6-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:23:51.533533
+命中处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\960383d9ce05c2e17b810d4d5c4f8250.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_6\subtitle\стил__Последовательность 01_6-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_232351.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:23:51.563273
+开始合成视频: E:/Render/Последовательность 01_6.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 01_6.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Последовательность 01_6.mp4"
+视频总时长: 23.82秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_Последовательность 01_6.mp4
+转换为音频执行命令: ffmpeg -i C:\Temp\tmpvpvg5_iy.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpdct5zbp_.wav
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmph98vcmt7\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmph98vcmt7\audio.wav
+9% |  55/608 | 00:06<<01:02 |  8.83 audio seconds/s
+14% |  84/608 | 00:27<<02:48 |  3.11 audio seconds/s
+19% | 115/608 | 00:33<<02:23 |  3.43 audio seconds/s
+23% | 140/608 | 00:38<<02:10 |  3.59 audio seconds/s
+29% | 175/608 | 00:44<<01:49 |  3.94 audio seconds/s
+33% | 202/608 | 00:50<<01:41 |  4.00 audio seconds/s
+37% | 225/608 | 00:54<<01:32 |  4.15 audio seconds/s
+41% | 250/608 | 00:56<<01:21 |  4.40 audio seconds/s
+46% | 278/608 | 01:00<<01:11 |  4.62 audio seconds/s
+49% | 299/608 | 01:31<<01:34 |  3.26 audio seconds/s
+Latest version info: v1.3.3
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1504.520 -t 40.960 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.034:end=3.580,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.760:end=4.280,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=4.520:end=5.020,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=6.184:end=10.040,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=10.160:end=18.440,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=19.700:end=20.880,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=21.080:end=23.481,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=24.947:end=26.413,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=26.820:end=30.608,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=30.960:end=32.320,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=33.027:end=34.073,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=34.540:end=38.412,setpts=PTS-STARTPTS[vp11];[0:v]trim=start=38.761:end=40.960,setpts=PTS-STARTPTS[vp12];[0:a]atrim=start=0.034:end=3.580,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.760:end=4.280,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=4.520:end=5.020,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=6.184:end=10.040,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=10.160:end=18.440,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=19.700:end=20.880,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=21.080:end=23.481,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=24.947:end=26.413,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=26.820:end=30.608,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=30.960:end=32.320,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=33.027:end=34.073,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=34.540:end=38.412,asetpts=PTS-STARTPTS[ap11];[0:a]atrim=start=38.761:end=40.960,asetpts=PTS-STARTPTS[ap12];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11][vp12][ap12]concat=n=13:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1517.000 -t 40.840 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=5.960,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=7.220:end=8.400,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.600:end=11.001,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.467:end=13.933,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.340:end=18.128,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=18.480:end=19.840,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=20.547:end=21.593,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=22.060:end=25.932,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=26.281:end=29.920,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=30.524:end=36.256,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=36.460:end=38.583,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=39.140:end=40.840,setpts=PTS-STARTPTS[vp11];[0:a]atrim=start=0.020:end=5.960,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=7.220:end=8.400,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.600:end=11.001,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.467:end=13.933,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.340:end=18.128,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=18.480:end=19.840,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=20.547:end=21.593,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=22.060:end=25.932,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=26.281:end=29.920,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=30.524:end=36.256,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=36.460:end=38.583,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=39.140:end=40.840,asetpts=PTS-STARTPTS[ap11];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11]concat=n=12:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_002_Разоблачение личности_1517-1557с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1705.760 -t 24.760 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=6.180,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.960:end=12.905,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=14.520:end=22.760,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=23.440:end=24.760,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=6.180,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.960:end=12.905,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=14.520:end=22.760,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=23.440:end=24.760,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1419.100 -t 18.520 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.000:end=3.780,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.940:end=5.232,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.221:end=10.040,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.340:end=11.100,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=11.340:end=13.160,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=13.731:end=15.460,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=15.574:end=17.000,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=17.220:end=18.520,setpts=PTS-STARTPTS[vp7];[0:a]atrim=start=0.000:end=3.780,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.940:end=5.232,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.221:end=10.040,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.340:end=11.100,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=11.340:end=13.160,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=13.731:end=15.460,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=15.574:end=17.000,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=17.220:end=18.520,asetpts=PTS-STARTPTS[ap7];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7]concat=n=8:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1484.240 -t 38.880 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=6.040,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.540:end=7.720,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.760:end=10.540,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=11.708:end=12.972,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.740:end=15.520,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.540:end=17.739,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=18.326:end=19.574,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=20.314:end=23.860,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=24.040:end=24.560,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=24.800:end=25.300,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=26.464:end=30.320,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=30.440:end=38.880,setpts=PTS-STARTPTS[vp11];[0:a]atrim=start=0.020:end=6.040,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.540:end=7.720,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.760:end=10.540,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=11.708:end=12.972,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.740:end=15.520,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.540:end=17.739,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=18.326:end=19.574,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=20.314:end=23.860,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=24.040:end=24.560,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=24.800:end=25.300,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=26.464:end=30.320,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=30.440:end=38.880,asetpts=PTS-STARTPTS[ap11];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11]concat=n=12:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1531.320 -t 41.400 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=3.808,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.160:end=5.520,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.227:end=7.273,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=7.740:end=11.612,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=11.961:end=15.600,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.204:end=21.936,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=22.140:end=24.263,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=24.820:end=26.344,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=27.240:end=30.440,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=30.660:end=33.301,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=34.260:end=35.000,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=35.820:end=39.040,setpts=PTS-STARTPTS[vp11];[0:v]trim=start=39.160:end=41.400,setpts=PTS-STARTPTS[vp12];[0:a]atrim=start=0.020:end=3.808,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.160:end=5.520,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.227:end=7.273,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=7.740:end=11.612,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=11.961:end=15.600,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.204:end=21.936,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=22.140:end=24.263,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=24.820:end=26.344,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=27.240:end=30.440,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=30.660:end=33.301,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=34.260:end=35.000,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=35.820:end=39.040,asetpts=PTS-STARTPTS[ap11];[0:a]atrim=start=39.160:end=41.400,asetpts=PTS-STARTPTS[ap12];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11][vp12][ap12]concat=n=13:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2789.520 -t 16.640 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=6.137,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.720:end=10.920,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=11.804:end=14.200,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=14.380:end=16.640,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=6.137,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.720:end=10.920,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=11.804:end=14.200,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=14.380:end=16.640,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2801.860 -t 15.920 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=1.860,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=2.040:end=4.140,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.144:end=8.612,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=9.240:end=11.640,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=12.040:end=15.920,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.020:end=1.860,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=2.040:end=4.140,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.144:end=8.612,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=9.240:end=11.640,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=12.040:end=15.920,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2376.360 -t 22.640 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=0.720,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.332:end=4.848,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=7.752:end=10.460,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=11.381:end=12.752,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.640:end=14.620,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=14.820:end=16.864,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=18.800:end=19.780,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=20.240:end=20.820,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=20.940:end=21.660,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=22.020:end=22.640,setpts=PTS-STARTPTS[vp9];[0:a]atrim=start=0.020:end=0.720,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.332:end=4.848,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=7.752:end=10.460,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=11.381:end=12.752,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.640:end=14.620,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=14.820:end=16.864,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=18.800:end=19.780,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=20.240:end=20.820,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=20.940:end=21.660,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=22.020:end=22.640,asetpts=PTS-STARTPTS[ap9];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9]concat=n=10:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_009_Погоня за беглецом_2376-2399с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1616.660 -t 16.620 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.034:end=4.371,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.360:end=7.180,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.519:end=10.580,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=14.299:end=16.620,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.034:end=4.371,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.360:end=7.180,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.519:end=10.580,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=14.299:end=16.620,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_010_Размышления о работе с проблемными людьми_1616-1633с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 847.960 -t 23.980 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_011_Открытие Ярихона_847-871с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1720.260 -t 17.900 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=8.260,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=8.940:end=10.100,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=10.400:end=11.580,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.520:end=13.140,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.260:end=15.740,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.188:end=17.900,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.020:end=8.260,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=8.940:end=10.100,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=10.400:end=11.580,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.520:end=13.140,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.260:end=15.740,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.188:end=17.900,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_012_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2903.780 -t 23.220 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.000:end=5.540,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.860:end=10.144,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=12.420:end=23.220,setpts=PTS-STARTPTS[vp2];[0:a]atrim=start=0.000:end=5.540,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.860:end=10.144,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=12.420:end=23.220,asetpts=PTS-STARTPTS[ap2];[vp0][ap0][vp1][ap1][vp2][ap2]concat=n=3:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_013_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1690.360 -t 27.100 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=1.700,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=2.320:end=3.080,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=3.720:end=7.680,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=8.584:end=10.480,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=12.040:end=14.680,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=14.883:end=21.580,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=22.360:end=27.100,setpts=PTS-STARTPTS[vp6];[0:a]atrim=start=0.020:end=1.700,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=2.320:end=3.080,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=3.720:end=7.680,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=8.584:end=10.480,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=12.040:end=14.680,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=14.883:end=21.580,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=22.360:end=27.100,asetpts=PTS-STARTPTS[ap6];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6]concat=n=7:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_014_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 47.920 -t 18.660 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.026:end=1.520,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.800:end=5.400,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.580:end=9.220,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.260:end=14.318,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=16.912:end=18.660,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.026:end=1.520,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.800:end=5.400,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.580:end=9.220,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.260:end=14.318,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=16.912:end=18.660,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_015_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1630.920 -t 17.620 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.039:end=7.128,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=7.740:end=11.620,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=13.659:end=17.620,setpts=PTS-STARTPTS[vp2];[0:a]atrim=start=0.039:end=7.128,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=7.740:end=11.620,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=13.659:end=17.620,asetpts=PTS-STARTPTS[ap2];[vp0][ap0][vp1][ap1][vp2][ap2]concat=n=3:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_016_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2435.780 -t 17.500 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.024:end=0.836,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.160:end=2.840,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=3.161:end=6.334,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=6.840:end=12.429,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=12.800:end=15.120,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=15.860:end=17.500,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.024:end=0.836,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.160:end=2.840,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=3.161:end=6.334,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=6.840:end=12.429,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=12.800:end=15.120,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=15.860:end=17.500,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_017_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2889.840 -t 19.640 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.031:end=3.910,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.031:end=7.289,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.540:end=10.360,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.540:end=13.440,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.920:end=19.640,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.031:end=3.910,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.031:end=7.289,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.540:end=10.360,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.540:end=13.440,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.920:end=19.640,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_018_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1379.820 -t 18.000 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=2.940,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.600:end=5.800,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.140:end=7.140,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=7.320:end=8.260,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=9.320:end=9.940,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=10.280:end=15.600,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=16.020:end=18.000,setpts=PTS-STARTPTS[vp6];[0:a]atrim=start=0.020:end=2.940,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.600:end=5.800,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.140:end=7.140,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=7.320:end=8.260,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=9.320:end=9.940,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=10.280:end=15.600,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=16.020:end=18.000,asetpts=PTS-STARTPTS[ap6];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6]concat=n=7:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_019_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1988.880 -t 21.060 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.047:end=4.248,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.140:end=7.480,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=7.740:end=9.280,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.187:end=12.940,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.200:end=15.860,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.615:end=21.060,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.047:end=4.248,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.140:end=7.480,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=7.740:end=9.280,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.187:end=12.940,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.200:end=15.860,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.615:end=21.060,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_020_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2916.180 -t 15.700 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=10.656,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=10.780:end=12.074,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=14.700:end=15.700,setpts=PTS-STARTPTS[vp2];[0:a]atrim=start=0.020:end=10.656,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=10.780:end=12.074,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=14.700:end=15.700,asetpts=PTS-STARTPTS[ap2];[vp0][ap0][vp1][ap1][vp2][ap2]concat=n=3:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_021_А пока что спасибо всем за просмотр, комментируйте, ставьте лайки, подп…_2916-2931с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2055.100 -t 15.840 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.119:end=2.649,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.420:end=6.899,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.260:end=10.742,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.020:end=13.900,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.044:end=15.840,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.119:end=2.649,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.420:end=6.899,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.260:end=10.742,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.020:end=13.900,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.044:end=15.840,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 115.640 -t 31.600 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_023_Начало приключений_115-147с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 147.620 -t 17.920 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_024_Поиск Ерехонки_147-165с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 871.040 -t 27.580 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_025_Вопросы о Ярихоне_871-898с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 899.020 -t 32.940 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_026_Нерадостная перспектива_899-931с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2276.680 -t 69.820 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_027_Не успеваю_2276-2346с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2410.760 -t 19.280 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_028_Облажался_2410-2430с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 953.940 -t 26.220 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_029_Повтор вопроса о плаще_953-980с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2924.260 -t 45.040 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_030_Заключительное общение_2924-2969с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:45:54.858406
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp0__z2b2h.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpz2atzrep\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpz2atzrep\audio.wav
+82% | 28/34 | 00:09<<00:01 |  3.00 audio seconds/s
+100% | 34/34 | 00:12<<00:00 |  2.73 audio seconds/s
+Transcription speed: 2.67 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpz2atzrep' directory.
+Operation finished in:  0:00:15.071
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_001_О 'Конноре. Вы хотите узнать_811466b1\subtitle\исх_шорт_001_О 'Конноре. Вы хотите узнать_811466b1-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:46:11.421863
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\192c6b9ca334a9b165517a47a7ea4ebf.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_001_О 'Конноре. Вы хотите узнать_811466b1\subtitle\стил__шорт_001_О 'Конноре. Вы хотите узнать_811466b1-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234611.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:46:11.437861
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4"
+视频总时长: 34.05秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:46:17.484043
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_002_Разоблачение личности_1517-1557с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp57r4k7zc.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmptbhd8oll\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmptbhd8oll\audio.wav
+79% | 27/34 | 00:08<<00:02 |  3.32 audio seconds/s
+100% | 34/34 | 00:11<<00:00 |  2.96 audio seconds/s
+Transcription speed: 2.91 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmptbhd8oll' directory.
+Operation finished in:  0:00:13.891
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_002_Разоблачение личности_1517-1557с\subtitle\исх_шорт_002_Разоблачение личности_1517-1557с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:46:32.784440
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\9f43955a3a60bdeb9408f5af8a1faa1a.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_002_Разоблачение личности_1517-1557с\subtitle\стил__шорт_002_Разоблачение личности_1517-1557с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234632.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:46:32.796438
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_002_Разоблачение личности_1517-1557с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_002_Разоблачение личности_1517-1557с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_002_Разоблачение личности_1517-1557с.mp4"
+视频总时长: 34.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_002_Разоблачение личности_1517-1557с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:46:38.711780
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp8syy8z0p.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpije0jlpa\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpije0jlpa\audio.wav
+95% | 21/22 | 00:08<<00:00 |  2.42 audio seconds/s
+100% | 22/22 | 00:08<<00:00 |  2.45 audio seconds/s
+Transcription speed: 2.41 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpije0jlpa' directory.
+Operation finished in:  0:00:11.057
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_003_вроде бы никто не живет, но о_cbc909ce\subtitle\исх_шорт_003_вроде бы никто не живет, но о_cbc909ce-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:46:51.161642
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\872fcacdd894728a2424be8d738af908.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_003_вроде бы никто не живет, но о_cbc909ce\subtitle\стил__шорт_003_вроде бы никто не живет, но о_cbc909ce-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234651.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:46:51.171642
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4"
+视频总时长: 21.68秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:46:54.918533
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpsasb3rez.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp749vhepd\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp749vhepd\audio.wav
+100% | 16/16 | 00:06<<00:00 |  2.39 audio seconds/s
+Transcription speed: 2.27 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp749vhepd' directory.
+Operation finished in:  0:00:09.043
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_004_тебя всё знаю, понял, нет Я т_633886eb\subtitle\исх_шорт_004_тебя всё знаю, понял, нет Я т_633886eb-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:47:05.307991
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\df567c4ab4c9b1b37aaf801b3c4b3dd1.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_004_тебя всё знаю, понял, нет Я т_633886eb\subtitle\стил__шорт_004_тебя всё знаю, понял, нет Я т_633886eb-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234705.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:47:05.320994
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4"
+视频总时长: 15.94秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:47:08.204457
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp7c_vbkk9.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmprpih5cvm\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmprpih5cvm\audio.wav
+84% | 26/31 | 00:10<<00:02 |  2.44 audio seconds/s
+100% | 31/31 | 00:13<<00:00 |  2.37 audio seconds/s
+Transcription speed: 2.35 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmprpih5cvm' directory.
+Operation finished in:  0:00:15.314
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_005_Калорийность вашего обеда поч_aff96580\subtitle\исх_шорт_005_Калорийность вашего обеда поч_aff96580-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:47:24.917005
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\e9d6b359541065243950fabce5b314c9.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_005_Калорийность вашего обеда поч_aff96580\subtitle\стил__шорт_005_Калорийность вашего обеда поч_aff96580-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234724.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:47:24.930005
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4"
+视频总时长: 31.36秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:47:30.247305
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpuc41i5c8.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpgkym9aa7\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpgkym9aa7\audio.wav
+83% | 29/35 | 00:09<<00:02 |  2.90 audio seconds/s
+100% | 35/35 | 00:13<<00:00 |  2.64 audio seconds/s
+Transcription speed: 2.6 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpgkym9aa7' directory.
+Operation finished in:  0:00:15.492
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_006_Нет, надо о чем-то отвеченном_14dcd28d\subtitle\исх_шорт_006_Нет, надо о чем-то отвеченном_14dcd28d-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:47:47.094511
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\e96f0f7074101aaf9c94d85c4859145e.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_006_Нет, надо о чем-то отвеченном_14dcd28d\subtitle\стил__шорт_006_Нет, надо о чем-то отвеченном_14dcd28d-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234747.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:47:47.103511
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4"
+视频总时长: 35.18秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:47:53.104048
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpa4wxbg7n.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpwd9py5ot\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpwd9py5ot\audio.wav
+100% | 15/15 | 00:06<<00:00 |  2.42 audio seconds/s
+Transcription speed: 2.3 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpwd9py5ot' directory.
+Operation finished in:  0:00:08.461
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_007_И че, вы свободны Прятаться т_388f51f7\subtitle\исх_шорт_007_И че, вы свободны Прятаться т_388f51f7-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:48:02.991908
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\6dbc9fae17f297e6a2d1b79b109f6681.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_007_И че, вы свободны Прятаться т_388f51f7\subtitle\стил__шорт_007_И че, вы свободны Прятаться т_388f51f7-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234802.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:48:03.003908
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4"
+视频总时长: 14.97秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:48:05.686124
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpius_2v1h.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpm0t39a2u\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpm0t39a2u\audio.wav
+93% | 13/14 | 00:06<<00:00 |  1.98 audio seconds/s
+100% | 14/14 | 00:06<<00:00 |  2.04 audio seconds/s
+Transcription speed: 1.99 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpm0t39a2u' directory.
+Operation finished in:  0:00:08.838
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_008_люди нас найдут, нам конец. А_5aad3e2e\subtitle\исх_шорт_008_люди нас найдут, нам конец. А_5aad3e2e-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:48:15.952647
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\c6a0b5564b58c27f8bb3ce25d1e7b47a.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_008_люди нас найдут, нам конец. А_5aad3e2e\subtitle\стил__шорт_008_люди нас найдут, нам конец. А_5aad3e2e-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234815.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:48:15.972647
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4"
+视频总时长: 13.68秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:48:18.471388
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_009_Погоня за беглецом_2376-2399с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp6sqy49ca.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpbpdbsw4i\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpbpdbsw4i\audio.wav
+100% | 12/12 | 00:04<<00:00 |  2.98 audio seconds/s
+Transcription speed: 2.83 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpbpdbsw4i' directory.
+Operation finished in:  0:00:06.323
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_009_Погоня за беглецом_2376-2399с\subtitle\исх_шорт_009_Погоня за беглецом_2376-2399с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:48:26.218223
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\d73a8967c3dff47fb6d4a12dc681dbd5.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_009_Погоня за беглецом_2376-2399с\subtitle\стил__шорт_009_Погоня за беглецом_2376-2399с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234826.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:48:26.230223
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_009_Погоня за беглецом_2376-2399с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_009_Погоня за беглецом_2376-2399с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_009_Погоня за беглецом_2376-2399с.mp4"
+视频总时长: 12.24秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_009_Погоня за беглецом_2376-2399с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:48:28.549076
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_010_Размышления о работе с проблемными людьми_1616-1633с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmptiny2cew.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpyompv_3d\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpyompv_3d\audio.wav
+91% | 10/11 | 00:04<<00:00 |  2.36 audio seconds/s
+100% | 11/11 | 00:04<<00:00 |  2.43 audio seconds/s
+Transcription speed: 2.31 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpyompv_3d' directory.
+Operation finished in:  0:00:06.478
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_010_Размышления о работе с пробле_26eb8b84\subtitle\исх_шорт_010_Размышления о работе с пробле_26eb8b84-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:48:36.398638
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\ce0cb2cec4c68b09478489dc9dcd268a.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_010_Размышления о работе с пробле_26eb8b84\subtitle\стил__шорт_010_Размышления о работе с пробле_26eb8b84-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234836.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:48:36.409638
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_010_Размышления о работе с проблемными людьми_1616-1633с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_010_Размышления о работе с проблемными людьми_1616-1633с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_010_Размышления о работе с проблемными людьми_1616-1633с.mp4"
+视频总时长: 10.53秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_010_Размышления о работе с проблемными людьми_1616-1633с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:48:38.516468
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_011_Открытие Ярихона_847-871с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpmoj6nwmf.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpmxa07tua\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpmxa07tua\audio.wav
+100% | 24/24 | 00:03<<00:00 |  6.81 audio seconds/s
+Transcription speed: 6.27 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpmxa07tua' directory.
+Operation finished in:  0:00:05.861
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_011_Открытие Ярихона_847-871с\subtitle\исх_шорт_011_Открытие Ярихона_847-871с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:48:45.711013
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\7b52eecf0da1089f8266b27e3dae799e.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_011_Открытие Ярихона_847-871с\subtitle\стил__шорт_011_Открытие Ярихона_847-871с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234845.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:48:45.718373
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_011_Открытие Ярихона_847-871с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_011_Открытие Ярихона_847-871с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_011_Открытие Ярихона_847-871с.mp4"
+视频总时长: 23.98秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_011_Открытие Ярихона_847-871с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:48:49.700022
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_012_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp0gomktzv.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpandb5k62\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpandb5k62\audio.wav
+93% | 14/15 | 00:06<<00:00 |  2.14 audio seconds/s
+100% | 15/15 | 00:06<<00:00 |  2.20 audio seconds/s
+Transcription speed: 2.26 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpandb5k62' directory.
+Operation finished in:  0:00:08.815
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_012_А если бы мы не спасли андрои_fb1e5bfb\subtitle\исх_шорт_012_А если бы мы не спасли андрои_fb1e5bfb-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:48:59.861023
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\36d46902c753775382d92cd30abd9406.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_012_А если бы мы не спасли андрои_fb1e5bfb\subtitle\стил__шорт_012_А если бы мы не спасли андрои_fb1e5bfb-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234859.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:48:59.873024
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_012_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_012_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_012_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4"
+视频总时长: 15.42秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_012_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:49:02.596292
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_013_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp_6h09kuj.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpjs0j4zmh\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpjs0j4zmh\audio.wav
+100% | 20/20 | 00:42<<00:00 |  0.47 audio seconds/s
+Transcription speed: 0.46 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpjs0j4zmh' directory.
+Operation finished in:  0:00:44.390
+Faster Whisper 返回值: 3221226505
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_013_Нас, конечно, быстро повяжут,_c4d78d94\subtitle\исх_шорт_013_Нас, конечно, быстро повяжут,_c4d78d94-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:49:48.185656
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\06d16c913e520c815d65fbe731a4fa45.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_013_Нас, конечно, быстро повяжут,_c4d78d94\subtitle\стил__шорт_013_Нас, конечно, быстро повяжут,_c4d78d94-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234948.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:49:48.193655
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_013_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_013_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_013_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4"
+视频总时长: 19.63秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_013_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:49:51.747758
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_014_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpprse5v25.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmplrgkg33r\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmplrgkg33r\audio.wav
+100% | 22/22 | 00:04<<00:00 |  5.31 audio seconds/s
+Transcription speed: 5.03 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmplrgkg33r' directory.
+Operation finished in:  0:00:06.432
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_014_Что мы знаем об этом парне Не_335c3899\subtitle\исх_шорт_014_Что мы знаем об этом парне Не_335c3899-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:49:59.602730
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\80506f4d900e1ebd52825b2e34a25428.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_014_Что мы знаем об этом парне Не_335c3899\subtitle\стил__шорт_014_Что мы знаем об этом парне Не_335c3899-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_234959.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:49:59.615625
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_014_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_014_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_014_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4"
+视频总时长: 22.38秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_014_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:50:03.324219
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_015_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpbhqmfaua.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp6bmh_ll6\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp6bmh_ll6\audio.wav
+93% | 14/15 | 00:04<<00:00 |  2.94 audio seconds/s
+100% | 15/15 | 00:05<<00:00 |  2.96 audio seconds/s
+Transcription speed: 2.86 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp6bmh_ll6' directory.
+Operation finished in:  0:00:07.035
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_015_Вот так вот. А раз ага... Лад_f45ffd5a\subtitle\исх_шорт_015_Вот так вот. А раз ага... Лад_f45ffd5a-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:50:11.679542
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\54a9da0feea4bac4e68215455ddba3b6.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_015_Вот так вот. А раз ага... Лад_f45ffd5a\subtitle\стил__шорт_015_Вот так вот. А раз ага... Лад_f45ffd5a-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235011.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:50:11.687547
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_015_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_015_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_015_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4"
+视频总时长: 14.55秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_015_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:50:14.307800
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_016_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp9r4_7pim.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpomh8730m\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpomh8730m\audio.wav
+100% | 15/15 | 00:04<<00:00 |  3.47 audio seconds/s
+Transcription speed: 3.24 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpomh8730m' directory.
+Operation finished in:  0:00:06.531
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_016_Ну, честно Работа с человеком_43e76383\subtitle\исх_шорт_016_Ну, честно Работа с человеком_43e76383-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:50:22.166905
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\69e46e889ab3d732e8768468203885b4.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_016_Ну, честно Работа с человеком_43e76383\subtitle\стил__шорт_016_Ну, честно Работа с человеком_43e76383-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235022.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:50:22.173896
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_016_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_016_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_016_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4"
+视频总时长: 14.93秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_016_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:50:24.883491
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_017_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpqhy2bgfu.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpi6p9s38n\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpi6p9s38n\audio.wav
+100% | 15/15 | 00:06<<00:00 |  2.17 audio seconds/s
+Transcription speed: 2.11 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpi6p9s38n' directory.
+Operation finished in:  0:00:09.189
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_017_нет, я хочу его догнать. Нель_94f81671\subtitle\исх_шорт_017_нет, я хочу его догнать. Нель_94f81671-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:50:35.394288
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\520b9ad8b4d9437ab364d3eec326523c.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_017_нет, я хочу его догнать. Нель_94f81671\subtitle\стил__шорт_017_нет, я хочу его догнать. Нель_94f81671-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235035.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:50:35.407287
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_017_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_017_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_017_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4"
+视频总时长: 15.22秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_017_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:50:38.080226
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_018_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp5wz8c1lg.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpffwfl1jj\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpffwfl1jj\audio.wav
+94% | 16/17 | 00:05<<00:00 |  2.71 audio seconds/s
+100% | 17/17 | 00:06<<00:00 |  2.74 audio seconds/s
+Transcription speed: 2.67 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpffwfl1jj' directory.
+Operation finished in:  0:00:08.183
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_018_Весело тут у вас, конечно, да_e1d6daa2\subtitle\исх_шорт_018_Весело тут у вас, конечно, да_e1d6daa2-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:50:47.676756
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\c62084e342e5308e2e656443e355b228.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_018_Весело тут у вас, конечно, да_e1d6daa2\subtitle\стил__шорт_018_Весело тут у вас, конечно, да_e1d6daa2-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235047.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:50:47.690756
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_018_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_018_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_018_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4"
+视频总时长: 16.58秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_018_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:50:50.674867
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_019_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpjt0wsj0v.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpm49klxhj\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpm49klxhj\audio.wav
+100% | 15/15 | 00:05<<00:00 |  2.56 audio seconds/s
+Transcription speed: 2.44 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpm49klxhj' directory.
+Operation finished in:  0:00:08.074
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_019_Думаю, наше знакомство прошло_434bf1cb\subtitle\исх_шорт_019_Думаю, наше знакомство прошло_434bf1cb-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:51:00.179804
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\e895e64a0b811627ea0432ebb620bff6.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_019_Думаю, наше знакомство прошло_434bf1cb\subtitle\стил__шорт_019_Думаю, наше знакомство прошло_434bf1cb-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235100.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:51:00.191807
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_019_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_019_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_019_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4"
+视频总时长: 14.98秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_019_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:51:02.861310
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_020_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmplf7t7s14.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpky16huyf\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpky16huyf\audio.wav
+100% | 17/17 | 00:05<<00:00 |  2.84 audio seconds/s
+Transcription speed: 2.7 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpky16huyf' directory.
+Operation finished in:  0:00:08.236
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_020_Изготовлено из переработанной_a44531bb\subtitle\исх_шорт_020_Изготовлено из переработанной_a44531bb-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:51:12.437748
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\51892c6fedd9e933687d47a2d32b1d1e.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_020_Изготовлено из переработанной_a44531bb\subtitle\стил__шорт_020_Изготовлено из переработанной_a44531bb-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235112.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:51:12.451768
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_020_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_020_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_020_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4"
+视频总时长: 16.95秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_020_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:51:15.555563
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_021_А пока что спасибо всем за просмотр, комментируйте, ставьте лайки, подп…_2916-2931с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpsn4fzpsm.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpin44d2et\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpin44d2et\audio.wav
+100% | 13/13 | 00:27<<00:00 |  0.47 audio seconds/s
+Transcription speed: 0.46 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpin44d2et' directory.
+Operation finished in:  0:00:30.164
+Faster Whisper 返回值: 3221226505
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_021_А пока что спасибо всем за пр_8ebba514\subtitle\исх_шорт_021_А пока что спасибо всем за пр_8ebba514-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:51:46.896559
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\9f666a18eac64c835885509fce293723.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_021_А пока что спасибо всем за пр_8ebba514\subtitle\стил__шорт_021_А пока что спасибо всем за пр_8ebba514-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235146.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:51:46.911280
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_021_А пока что спасибо всем за просмотр, комментируйте, ставьте лайки, подп…_2916-2931с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_021_А пока что спасибо всем за просмотр, комментируйте, ставьте лайки, подп…_2916-2931с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_021_А пока что спасибо всем за просмотр, комментируйте, ставьте лайки, подп…_2916-2931с.mp4"
+视频总时长: 12.93秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_021_А пока что спасибо всем за просмотр, комментируйте, ставьте лайки, подп…_2916-2931с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:51:49.489234
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmptnykyhmd.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpvxsrcwqv\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpvxsrcwqv\audio.wav
+100% | 12/12 | 00:04<<00:00 |  2.43 audio seconds/s
+Transcription speed: 2.33 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpvxsrcwqv' directory.
+Operation finished in:  0:00:07.354
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_022_2471 раз. То же самое написал_530a27ab\subtitle\исх_шорт_022_2471 раз. То же самое написал_530a27ab-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:51:58.242131
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\f4ea354f291ac5027f65e23a122fb802.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_022_2471 раз. То же самое написал_530a27ab\subtitle\стил__шорт_022_2471 раз. То же самое написал_530a27ab-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235158.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:51:58.251130
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4"
+视频总时长: 12.17秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:52:00.563035
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_023_Начало приключений_115-147с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp8t783ca8.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpgsj5dwcm\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpgsj5dwcm\audio.wav
+94% | 30/32 | 00:51<<00:03 |  0.58 audio seconds/s
+97% | 31/32 | 00:53<<00:01 |  0.58 audio seconds/s
+100% | 32/32 | 00:53<<00:00 |  0.60 audio seconds/s
+Transcription speed: 0.59 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpgsj5dwcm' directory.
+Operation finished in:  0:00:55.326
+Faster Whisper 返回值: 3221226505
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_023_Начало приключений_115-147с\subtitle\исх_шорт_023_Начало приключений_115-147с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:52:57.118647
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\6b14971bc890bc8568b3de107eb79c4b.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_023_Начало приключений_115-147с\subtitle\стил__шорт_023_Начало приключений_115-147с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235257.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:52:57.129646
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_023_Начало приключений_115-147с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_023_Начало приключений_115-147с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_023_Начало приключений_115-147с.mp4"
+视频总时长: 31.6秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_023_Начало приключений_115-147с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:53:02.136140
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_024_Поиск Ерехонки_147-165с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpj6l_0kgm.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpp1u2ereo\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpp1u2ereo\audio.wav
+100% | 18/18 | 00:03<<00:00 |  4.68 audio seconds/s
+Transcription speed: 4.33 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpp1u2ereo' directory.
+Operation finished in:  0:00:06.159
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_024_Поиск Ерехонки_147-165с\subtitle\исх_шорт_024_Поиск Ерехонки_147-165с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:53:09.677418
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\7e36a13db1ea6a77abec65d959cfcf93.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_024_Поиск Ерехонки_147-165с\subtitle\стил__шорт_024_Поиск Ерехонки_147-165с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235309.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:53:09.687384
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_024_Поиск Ерехонки_147-165с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_024_Поиск Ерехонки_147-165с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_024_Поиск Ерехонки_147-165с.mp4"
+视频总时长: 17.92秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_024_Поиск Ерехонки_147-165с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:53:12.801639
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_025_Вопросы о Ярихоне_871-898с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpbhyce1em.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpsahhmb0m\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpsahhmb0m\audio.wav
+96% | 27/28 | 00:02<<00:00 |  9.57 audio seconds/s
+100% | 28/28 | 00:03<<00:00 |  8.98 audio seconds/s
+Transcription speed: 8.82 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpsahhmb0m' directory.
+Operation finished in:  0:00:05.080
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_025_Вопросы о Ярихоне_871-898с\subtitle\исх_шорт_025_Вопросы о Ярихоне_871-898с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:53:19.247665
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\169ee1c4b5a340888325b29a9fa79469.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_025_Вопросы о Ярихоне_871-898с\subtitle\стил__шорт_025_Вопросы о Ярихоне_871-898с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235319.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:53:19.259663
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_025_Вопросы о Ярихоне_871-898с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_025_Вопросы о Ярихоне_871-898с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_025_Вопросы о Ярихоне_871-898с.mp4"
+视频总时长: 27.58秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_025_Вопросы о Ярихоне_871-898с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:53:23.763034
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_026_Нерадостная перспектива_899-931с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpplf9doy6.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpcccygg89\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpcccygg89\audio.wav
+82% | 27/33 | 00:03<<00:00 |  7.99 audio seconds/s
+97% | 32/33 | 00:05<<00:00 |  6.35 audio seconds/s
+100% | 33/33 | 00:05<<00:00 |  6.19 audio seconds/s
+Transcription speed: 6.17 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpcccygg89' directory.
+Operation finished in:  0:00:07.408
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_026_Нерадостная перспектива_899-931с\subtitle\исх_шорт_026_Нерадостная перспектива_899-931с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:53:32.616266
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\9e9a3bd940e1c572f80570bed8a17ac7.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_026_Нерадостная перспектива_899-931с\subtitle\стил__шорт_026_Нерадостная перспектива_899-931с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235332.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:53:32.630264
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_026_Нерадостная перспектива_899-931с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_026_Нерадостная перспектива_899-931с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_026_Нерадостная перспектива_899-931с.mp4"
+视频总时长: 32.94秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_026_Нерадостная перспектива_899-931с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:53:37.847169
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_027_Не успеваю_2276-2346с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp0oqwdncs.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp4kzagnpf\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp4kzagnpf\audio.wav
+43% | 30/70 | 00:02<<00:03 | 10.57 audio seconds/s
+77% | 54/70 | 00:05<<00:01 | 10.39 audio seconds/s
+100% | 70/70 | 00:06<<00:00 | 10.71 audio seconds/s
+Transcription speed: 10.19 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp4kzagnpf' directory.
+Operation finished in:  0:00:08.921
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_027_Не успеваю_2276-2346с\subtitle\исх_шорт_027_Не успеваю_2276-2346с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:53:48.188378
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\1c7dda14f7b9e3c79c7026a9b9e9a06e.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_027_Не успеваю_2276-2346с\subtitle\стил__шорт_027_Не успеваю_2276-2346с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235348.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:53:48.200378
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_027_Не успеваю_2276-2346с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_027_Не успеваю_2276-2346с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_027_Не успеваю_2276-2346с.mp4"
+视频总时长: 69.82秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_027_Не успеваю_2276-2346с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:53:58.889392
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_028_Облажался_2410-2430с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp9jwke7zi.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpl6qvjpld\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpl6qvjpld\audio.wav
+100% | 19/19 | 00:02<<00:00 |  8.17 audio seconds/s
+Transcription speed: 7.35 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpl6qvjpld' directory.
+Operation finished in:  0:00:04.624
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_028_Облажался_2410-2430с\subtitle\исх_шорт_028_Облажался_2410-2430с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:54:04.911063
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\ff8ddce4130bf7f5ec60c78b3d02a1e8.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_028_Облажался_2410-2430с\subtitle\стил__шорт_028_Облажался_2410-2430с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235404.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:54:04.923128
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_028_Облажался_2410-2430с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_028_Облажался_2410-2430с.mp4 -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_028_Облажался_2410-2430с.mp4
+视频总时长: 19.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_028_Облажался_2410-2430с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:54:08.148644
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_029_Повтор вопроса о плаще_953-980с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp61ytskb6.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmplqahbjco\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmplqahbjco\audio.wav
+96% | 25/26 | 00:03<<00:00 |  6.47 audio seconds/s
+100% | 26/26 | 00:04<<00:00 |  6.25 audio seconds/s
+Transcription speed: 6.29 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmplqahbjco' directory.
+Operation finished in:  0:00:06.119
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_029_Повтор вопроса о плаще_953-980с\subtitle\исх_шорт_029_Повтор вопроса о плаще_953-980с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:54:15.626732
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\f1bb8723c8dabb1e3da771e9b56d98a9.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_029_Повтор вопроса о плаще_953-980с\subtitle\стил__шорт_029_Повтор вопроса о плаще_953-980с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235415.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:54:15.633732
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_029_Повтор вопроса о плаще_953-980с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_029_Повтор вопроса о плаще_953-980с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_029_Повтор вопроса о плаще_953-980с.mp4"
+视频总时长: 26.22秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_029_Повтор вопроса о плаще_953-980с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 23:54:19.825371
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_030_Заключительное общение_2924-2969с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpw8ycbz1j.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpwlrwfs6_\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpwlrwfs6_\audio.wav
+16% |  7/45 | 00:19<<01:43 |  0.37 audio seconds/s
+100% | 45/45 | 00:20<<00:00 |  2.22 audio seconds/s
+Transcription speed: 2.22 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpwlrwfs6_' directory.
+Operation finished in:  0:00:22.341
+Faster Whisper 返回值: 3221226505
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_030_Заключительное общение_2924-2969с\subtitle\исх_шорт_030_Заключительное общение_2924-2969с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 23:54:43.429112
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\918e4bb8cf98040ebbc73a6b12aa7cdd.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_030_Заключительное общение_2924-2969с\subtitle\стил__шорт_030_Заключительное общение_2924-2969с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_235443.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 23:54:43.440112
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_030_Заключительное общение_2924-2969с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\шорт_030_Заключительное общение_2924-2969с.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_030_Заключительное общение_2924-2969с.mp4"
+视频总时长: 45.02秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_030_Заключительное общение_2924-2969с.mp4

@@ -8,6 +8,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from app.common.config import cfg
 from app.core.bk_asr import transcribe
 from app.core.entities import TranscribeTask, TranscribeModelEnum
+from app.core.task_factory import TaskFactory
 from app.core.utils.logger import setup_logger
 from app.core.utils.video_utils import video2audio
 from app.core.storage.cache_manager import ServiceUsageManager
@@ -36,12 +37,15 @@ class TranscriptThread(QThread):
             logger.info(f"\n===========转录任务开始===========")
             logger.info(f"时间：{datetime.datetime.now()}")
 
-            # Единый мастер-переключатель повторного прогона:
-            # если кэш обработанных субтитров отключён, не используем shortcut/ASR cache.
+            # Управляет только shortcut-ветками (reuse готового файла/скачанных субтитров).
+            # ВАЖНО: не отключаем ASR-кэш, иначе первый прогон с выключенным
+            # processed-cache не прогревает ASR cache и следующий запуск снова
+            # вынужден делать полное распознавание.
             allow_cache_shortcuts = bool(cfg.use_processed_subtitle_cache.value)
             if not allow_cache_shortcuts:
-                self.task.transcribe_config.use_asr_cache = False
-                logger.info("UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации")
+                logger.info(
+                    "UseProcessedSubtitleCache=OFF: отключаем только shortcut-ветки, ASR-кэш остаётся по настройке UseASRCache"
+                )
 
             # 检查是否已经存在字幕文件
             # if Path(self.task.output_path).exists():
@@ -71,11 +75,11 @@ class TranscriptThread(QThread):
             # 检查是否存在下载的字幕文件（对于视频url的任务，前面可能已下载字幕文件）
             if self.task.need_next_task:
                 subtitle_dir = Path(self.task.file_path).parent / "subtitle"
-                downloaded_subtitles = (
-                    list(subtitle_dir.glob("【下载字幕】*"))
-                    if subtitle_dir.exists()
-                    else []
-                )
+                downloaded_subtitles = []
+                if subtitle_dir.exists():
+                    downloaded_subtitles = list(
+                        subtitle_dir.glob(f"{TaskFactory.PREFIX_DOWNLOADED_SUBTITLE}*")
+                    ) or list(subtitle_dir.glob("【下载字幕】*"))
                 # В word-режиме нам нужны word-level таймштампы,
                 # поэтому нельзя переиспользовать уже скачанный SRT.
                 force_fresh_asr = bool(self.task.transcribe_config.need_word_time_stamp)

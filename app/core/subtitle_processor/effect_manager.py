@@ -440,6 +440,47 @@ class EffectManager:
         return "".join(out)
 
     @staticmethod
+    def _choose_word_ts_transform(
+        raw_pairs: List[tuple[float, float]],
+        seg_start: int,
+        seg_end: int,
+    ):
+        """Подбирает преобразование word timestamps (ms/sec, absolute/relative)."""
+        duration = max(1, seg_end - seg_start)
+        modes = {
+            "ms_abs": lambda x: x,
+            "sec_abs": lambda x: x * 1000.0,
+            "ms_rel": lambda x: seg_start + x,
+            "sec_rel": lambda x: seg_start + x * 1000.0,
+        }
+
+        def _score(transform) -> int:
+            score = 0
+            for s_raw, e_raw in raw_pairs[:40]:
+                s = transform(s_raw)
+                e = transform(e_raw)
+                if e <= s:
+                    continue
+                score += 1
+                # Попадание в окрестность сегмента
+                if s <= seg_end + duration and e >= seg_start - duration:
+                    score += 2
+                if seg_start - 200 <= s <= seg_end + 200:
+                    score += 1
+                if seg_start - 200 <= e <= seg_end + 200:
+                    score += 1
+            return score
+
+        best_name = "ms_abs"
+        best_score = -1
+        for name, fn in modes.items():
+            sc = _score(fn)
+            if sc > best_score:
+                best_score = sc
+                best_name = name
+        return modes[best_name]
+
+    @staticmethod
     def apply_ass_effect(
         text: str,
         effect_type: str,
@@ -510,19 +551,41 @@ class EffectManager:
 
         # Ключевая логика:
         # - если есть реальные word timestamps -> используем их
-        # - если word timestamps нет -> мягкий fallback без синтетического \k-каркаса
+        # - если word timestamps нет -> делаем синтетический \k-каркас,
+        #   чтобы пресет Karaoke визуально оставался "подсветкой по словам"
         if wants_karaoke and use_word_timestamps:
             wt = word_timestamps or []
             if wt:
                 seg_start = start_ms if segment_start_ms is None else segment_start_ms
                 seg_end = end_ms if segment_end_ms is None else segment_end_ms
+                raw_pairs: List[tuple[float, float]] = []
+                for item in wt:
+                    try:
+                        s_raw = float(item.get("start_time", 0))
+                        e_raw = float(item.get("end_time", s_raw))
+                        raw_pairs.append((s_raw, e_raw))
+                    except (TypeError, ValueError):
+                        continue
+
+                ts_transform = EffectManager._choose_word_ts_transform(
+                    raw_pairs,
+                    int(seg_start),
+                    int(seg_end),
+                )
+
                 tokens = []
                 for item in wt:
                     t = str(item.get("text", "")).strip()
                     if not t:
                         continue
-                    ws = int(item.get("start_time", seg_start))
-                    we = int(item.get("end_time", ws + 120))
+                    try:
+                        ws_raw = float(item.get("start_time", seg_start))
+                        we_raw = float(item.get("end_time", ws_raw))
+                    except (TypeError, ValueError):
+                        continue
+
+                    ws = int(ts_transform(ws_raw))
+                    we = int(ts_transform(we_raw))
                     ws = max(seg_start, ws)
                     we = min(seg_end, max(ws + 10, we))
                     k_cs = max(1, int((we - ws) / 10))
@@ -539,8 +602,10 @@ class EffectManager:
 
                         if i > 0:
                             prev = tokens[i - 1][0]
-                            if re.match(r"^[A-Za-z0-9']+$", prev) and re.match(
-                                r"^[A-Za-z0-9']+$", token
+                            # Для языков с пробелами (включая кириллицу) сохраняем пробел
+                            # между соседними словами, чтобы не склеивать текст.
+                            if re.match(r"^[\w']+$", prev, flags=re.UNICODE) and re.match(
+                                r"^[\w']+$", token, flags=re.UNICODE
                             ):
                                 joined.append(" ")
                         joined.append(f"{{\\k{k_cs}}}{token}")
@@ -554,23 +619,31 @@ class EffectManager:
                     processed_text = "".join(joined)
                     karaoke_active = True
             if not karaoke_active:
-                kdur = max(80, min(effect_duration_ms, duration))
-                processed_text = (
-                    f"{{\\1c&H00909090&\\t(0,{kdur},\\1c&H00FFFFFF&)}}"
-                    f"{processed_text}"
-                )
-                karaoke_active = True
+                # В режиме "настоящего" karaoke без валидных word timestamps
+                # НЕ включаем синтетическую подсветку, чтобы не было псевдо-эффекта.
+                karaoke_active = False
         elif wants_karaoke:
-            # Fallback для случаев без word-level таймштампов:
-            # без синтетических \k-тегов, только мягкая подсветка.
-            kdur = max(80, min(karaoke_window_ms, duration))
+            # Если word timestamps не включены на уровне данных,
+            # не имитируем karaoke искусственно.
+            karaoke_active = False
+
+        if karaoke_active:
+            # \2c — неактивный текст, \1c — активное слово.
+            # Цвета берём из пользовательских настроек UI.
+            inactive_color_ass = EffectManager._hex_to_ass_primary(
+                gradient_color_1 or "#B0B0B0",
+                fallback="&H00B0B0B0&",
+            )
+            active_color_ass = EffectManager._hex_to_ass_primary(
+                gradient_color_2 or "#FFFFFF",
+                fallback="&H00FFFFFF&",
+            )
             processed_text = (
-                f"{{\\1c&H00909090&\\t(0,{kdur},\\1c&H00FFFFFF&)}}"
+                f"{{\\2c{inactive_color_ass}\\1c{active_color_ass}}}"
                 f"{processed_text}"
             )
-            karaoke_active = True
 
-        if (speaker_color_mode or "off").lower() == "alternate":
+        if (not karaoke_active) and (speaker_color_mode or "off").lower() == "alternate":
             speaker_palette = ["#8FD3FF", "#FFD27A", "#B5F5B0", "#F6A9FF"]
             speaker_color = speaker_palette[index % len(speaker_palette)]
             processed_text = EffectManager._apply_gradient(
@@ -580,13 +653,16 @@ class EffectManager:
                 speaker_color,
             )
 
-        # Градиент применяем всегда; _apply_gradient умеет пропускать ASS-теги.
-        processed_text = EffectManager._apply_gradient(
-            processed_text,
-            gradient_mode,
-            gradient_color_1,
-            gradient_color_2,
-        )
+        # В karaoke-режиме градиент даёт частые \1c-override на каждый символ,
+        # что визуально "съедает" подсветку активного слова. Поэтому отключаем
+        # градиент на время karaoke, чтобы эффект был читаемым и контрастным.
+        if not karaoke_active:
+            processed_text = EffectManager._apply_gradient(
+                processed_text,
+                gradient_mode,
+                gradient_color_1,
+                gradient_color_2,
+            )
 
         if auto_contrast:
             processed_text = f"{{\\bord3\\shad1\\3c&H000000&\\blur1}}{processed_text}"

@@ -102,6 +102,26 @@ def check_cuda_available() -> bool:
         return False
 
 
+def _has_ffmpeg_encoder(encoder_name: str) -> bool:
+    """Проверяет, доступен ли кодек в ffmpeg -encoders."""
+    try:
+        result = subprocess.run(
+            ["ffmpeg", "-hide_banner", "-encoders"],
+            capture_output=True,
+            text=True,
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW
+                if hasattr(subprocess, "CREATE_NO_WINDOW")
+                else 0
+            ),
+        )
+        text = (result.stdout or "") + "\n" + (result.stderr or "")
+        return encoder_name.lower() in text.lower()
+    except Exception as e:
+        logger.warning(f"Не удалось проверить энкодер {encoder_name}: {e}")
+        return False
+
+
 def add_subtitles(
     input_file: str,
     subtitle_file: str,
@@ -123,6 +143,7 @@ def add_subtitles(
     resolution_mode: str = "source",
     resolution: str = "1080x1920",
     quality_profile: str = "high",
+    render_backend: str = "gpu",
     progress_callback: callable = None,
 ) -> None:
     assert Path(input_file).is_file(), "输入文件不存在"
@@ -245,8 +266,44 @@ def add_subtitles(
             vcodec = "libvpx-vp9"
             logger.info("WebM格式视频，使用libvpx-vp9编码器")
 
-        # 检查CUDA是否可用
-        use_cuda = check_cuda_available()
+        backend = str(render_backend or "gpu").strip().lower()
+        if backend not in {"cpu", "gpu"}:
+            backend = "gpu"
+
+        codec_args = [
+            "-vcodec",
+            vcodec,
+            "-preset",
+            enc_preset,
+            "-crf",
+            enc_crf,
+        ]
+
+        use_cuda = False
+        if Path(output).suffix.lower() != ".webm":
+            if backend == "gpu":
+                cuda_ok = check_cuda_available()
+                nvenc_ok = _has_ffmpeg_encoder("h264_nvenc")
+                if cuda_ok and nvenc_ok:
+                    use_cuda = True
+                    codec_args = [
+                        "-vcodec",
+                        "h264_nvenc",
+                        "-preset",
+                        "p5",
+                        "-cq",
+                        "19",
+                        "-b:v",
+                        "0",
+                    ]
+                    logger.info("Выбран GPU-рендер: используем h264_nvenc")
+                else:
+                    logger.warning(
+                        "GPU-рендер запрошен, но CUDA/NVENC недоступны. Используем CPU (libx264)."
+                    )
+            else:
+                logger.info("Выбран CPU-рендер: используем libx264")
+
         cmd = ["ffmpeg"]
         if use_cuda:
             logger.info("使用CUDA加速")
@@ -257,12 +314,7 @@ def add_subtitles(
                 input_file,
                 "-acodec",
                 "copy",
-                "-vcodec",
-                vcodec,
-                "-preset",
-                enc_preset,
-                "-crf",
-                enc_crf,
+                *codec_args,
                 "-vf",
                 vf,
                 "-pix_fmt",

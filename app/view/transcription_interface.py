@@ -4,6 +4,7 @@ import datetime
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from PyQt5.QtCore import *
@@ -27,6 +28,7 @@ from qfluentwidgets import (
     InfoBarPosition,
     PillPushButton,
     PrimaryPushButton,
+    ProgressBar,
     ProgressRing,
     PushButton,
     RoundMenu,
@@ -63,6 +65,7 @@ class VideoInfoCard(CardWidget):
         self.task = None
         self.video_info = None
         self.transcription_interface = parent
+        self._transcribe_started_at = None
 
     def setup_ui(self):
         self.setFixedHeight(150)
@@ -91,7 +94,7 @@ class VideoInfoCard(CardWidget):
     def setup_info_layout(self):
         self.info_layout = QVBoxLayout()
         self.info_layout.setContentsMargins(3, 8, 3, 8)
-        self.info_layout.setSpacing(10)
+        self.info_layout.setSpacing(8)
 
         self.video_title = BodyLabel("Перетащите аудио или видео файл", self)
         self.video_title.setFont(QFont("Microsoft YaHei", 14, QFont.Bold))
@@ -116,7 +119,28 @@ class VideoInfoCard(CardWidget):
         self.details_layout.addWidget(self.progress_ring)
         self.details_layout.addStretch(1)
         self.info_layout.addLayout(self.details_layout)
+
+        # Линейный прогресс + оценка оставшегося времени
+        self.transcribe_progress_bar = ProgressBar(self)
+        self.transcribe_progress_bar.setRange(0, 100)
+        self.transcribe_progress_bar.setValue(0)
+        self.transcribe_progress_bar.hide()
+
+        self.transcribe_progress_label = BodyLabel("", self)
+        self.transcribe_progress_label.hide()
+
+        self.info_layout.addWidget(self.transcribe_progress_bar)
+        self.info_layout.addWidget(self.transcribe_progress_label)
         self.layout.addLayout(self.info_layout)
+
+    @staticmethod
+    def _format_eta(seconds: float) -> str:
+        sec = max(0, int(seconds))
+        h, rem = divmod(sec, 3600)
+        m, s = divmod(rem, 60)
+        if h > 0:
+            return f"{h:d}:{m:02d}:{s:02d}"
+        return f"{m:02d}:{s:02d}"
 
     def create_pill_button(self, text, width):
         button = PillPushButton(text, self)
@@ -189,7 +213,12 @@ class VideoInfoCard(CardWidget):
             if need_language_settings and not self.show_language_settings():
                 return
         self.progress_ring.show()
-        self.progress_ring.setValue(100)
+        self.progress_ring.setValue(0)
+        self.transcribe_progress_bar.show()
+        self.transcribe_progress_bar.setValue(0)
+        self.transcribe_progress_label.setText("Подготовка распознавания...")
+        self.transcribe_progress_label.show()
+        self._transcribe_started_at = time.perf_counter()
         self.start_button.setDisabled(True)
         self.start_transcription()
 
@@ -232,14 +261,28 @@ class VideoInfoCard(CardWidget):
 
     def on_transcript_progress(self, value, message):
         """更新转录进度"""
+        value = max(0, min(100, int(value)))
         self.start_button.setText(message)
         self.progress_ring.setValue(value)
+        self.transcribe_progress_bar.setValue(value)
+
+        eta_text = ""
+        if self._transcribe_started_at and value > 0 and value < 100:
+            elapsed = max(0.0, time.perf_counter() - self._transcribe_started_at)
+            total_est = elapsed / (value / 100.0)
+            remain = max(0.0, total_est - elapsed)
+            eta_text = f" • осталось ~ {self._format_eta(remain)}"
+
+        self.transcribe_progress_label.setText(f"{value}%{eta_text} — {message}")
 
     def on_transcript_error(self, error):
         """处理转录错误"""
         self.start_button.setEnabled(True)
         self.start_button.setText("Повторить распознавание")
         self.start_button.setEnabled(True)
+        self._transcribe_started_at = None
+        self.transcribe_progress_bar.setValue(0)
+        self.transcribe_progress_label.setText("Распознавание завершилось с ошибкой")
         InfoBar.error(
             "Ошибка распознавания",
             self.tr(error),
@@ -251,6 +294,10 @@ class VideoInfoCard(CardWidget):
         """转录完成处理"""
         self.start_button.setEnabled(True)
         self.start_button.setText("Распознавание завершено")
+        self._transcribe_started_at = None
+        self.progress_ring.setValue(100)
+        self.transcribe_progress_bar.setValue(100)
+        self.transcribe_progress_label.setText("100% — распознавание завершено")
         self.finished.emit(task)
 
     def reset_ui(self):
@@ -258,6 +305,11 @@ class VideoInfoCard(CardWidget):
         self.start_button.setDisabled(False)
         self.start_button.setText("Начать распознавание")
         self.progress_ring.setValue(0)
+        self._transcribe_started_at = None
+        self.transcribe_progress_bar.hide()
+        self.transcribe_progress_bar.setValue(0)
+        self.transcribe_progress_label.hide()
+        self.transcribe_progress_label.setText("")
 
     def set_task(self, task):
         """设置任务并更新UI"""

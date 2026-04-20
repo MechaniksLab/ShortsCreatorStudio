@@ -752,6 +752,7 @@ class SynthesisConfig:
     resolution_mode: str = "source"  # source|fixed
     resolution: str = "1080x1920"
     quality_profile: str = "high"  # high|balanced|fast
+    render_backend: str = "gpu"  # gpu|cpu
 
 
 @dataclass

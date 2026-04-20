@@ -1117,6 +1117,22 @@ def render_shorts(
             raw = raw[:max_len].rstrip(" .")
         return raw
 
+    def _fit_filename_to_path_limit(parent: Path, filename: str, max_path_len: int = 240) -> str:
+        """Ограничивает имя файла, чтобы полный путь не превышал безопасную длину на Windows."""
+        ext = Path(filename).suffix
+        stem = Path(filename).stem
+        full = str(parent / filename)
+        if len(full) <= max_path_len and len(filename) <= 180:
+            return filename
+
+        max_stem_by_path = max(8, max_path_len - len(str(parent)) - 1 - len(ext))
+        max_stem_by_name = max(8, 180 - len(ext))
+        max_stem = max(8, min(max_stem_by_path, max_stem_by_name))
+        digest = hashlib.md5(stem.encode("utf-8", errors="ignore")).hexdigest()[:8]
+        head_len = max(4, max_stem - 9)
+        short_stem = stem[:head_len].rstrip(" ._") or "шорт"
+        return f"{short_stem}_{digest}{ext}"
+
     def _safe_int(v, default=0):
         try:
             return int(v)
@@ -1541,6 +1557,7 @@ def render_shorts(
         clip_end_ms = int(round(end_s * 1000.0))
         title_part = _safe_filename(c.title or c.excerpt or "short")
         out_name = f"шорт_{i:03d}_{title_part}_{int(start_s)}-{int(end_s)}с.mp4"
+        out_name = _fit_filename_to_path_limit(out_dir, out_name)
         out_path = out_dir / out_name
 
         def _normalize_candidate_ranges() -> List[Tuple[int, int]]:

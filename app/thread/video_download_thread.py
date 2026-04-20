@@ -8,6 +8,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 from app.config import APPDATA_PATH
 from app.core.entities import VideoInfo
+from app.core.task_factory import TaskFactory
 from app.core.utils.logger import setup_logger
 
 logger = setup_logger("video_download_thread")
@@ -121,7 +122,7 @@ class VideoDownloadThread(QThread):
         initial_ydl_opts = {
             "outtmpl": {
                 "default": "%(title)s.%(ext)s",
-                "subtitle": "【下载字幕】.%(ext)s",
+                "subtitle": f"{TaskFactory.PREFIX_DOWNLOADED_SUBTITLE}.%(ext)s",
                 "thumbnail": "thumbnail",
             },
             "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",  # 优先下载mp4格式
@@ -185,7 +186,11 @@ class VideoDownloadThread(QThread):
 
             # 获取字幕文件路径
             subtitle_file_path = None
-            for file in video_work_dir.glob("**/【下载字幕】*"):
+            subtitle_mask = f"**/{TaskFactory.PREFIX_DOWNLOADED_SUBTITLE}*"
+            files = list(video_work_dir.glob(subtitle_mask)) or list(
+                video_work_dir.glob("**/【下载字幕】*")
+            )
+            for file in files:
                 file_path = str(file)
                 if subtitle_language and subtitle_language not in file_path:
                     logger.info(
@@ -197,7 +202,7 @@ class VideoDownloadThread(QThread):
                         file_path = (
                             video_work_dir
                             / "subtitle"
-                            / f"【下载字幕】{subtitle_language}.vtt"
+                            / f"{TaskFactory.PREFIX_DOWNLOADED_SUBTITLE}{subtitle_language}.vtt"
                         )
                         if res := response.text:
                             with open(file_path, "w", encoding="utf-8") as f:

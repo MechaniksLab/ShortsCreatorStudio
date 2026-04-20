@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import json
 import os
+import re
 import time
 from pathlib import Path
 from typing import Dict
@@ -9,7 +10,7 @@ from typing import Dict
 from PyQt5.QtCore import QSettings, QThread, pyqtSignal
 
 from app.common.config import cfg
-from app.core.bk_asr.asr_data import ASRData
+from app.core.bk_asr.asr_data import ASRData, ASRDataSeg
 from app.core.entities import SubtitleConfig, SubtitleTask, TranslatorServiceEnum
 from app.core.subtitle_processor.split import SubtitleSplitter
 from app.core.subtitle_processor.summarization import SubtitleSummarizer
@@ -21,6 +22,7 @@ from app.core.utils.get_subtitle_style import get_subtitle_style
 from app.core.storage.cache_manager import ServiceUsageManager
 from app.core.storage.database import DatabaseManager
 from app.core.errors import AppError, ConfigError, map_exception
+from app.core.task_factory import TaskFactory
 from app.core.utils.io_utils import atomic_write_text
 from app.config import CACHE_PATH, WORK_PATH
 
@@ -49,10 +51,105 @@ class SubtitleThread(QThread):
     def set_custom_prompt_text(self, text: str):
         self.custom_prompt_text = text
 
+    @staticmethod
+    def _clone_asr_data(asr_data: ASRData) -> ASRData:
+        """Небольшой безопасный clone через JSON-представление."""
+        return ASRData.from_json(asr_data.to_json())
+
+    @staticmethod
+    def _count_units(text: str) -> int:
+        """Простой счётчик длины фразы: слова + CJK-символы."""
+        if not text:
+            return 0
+        cjk = len(re.findall(r"[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]", text))
+        non_cjk = re.sub(r"[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]", " ", text)
+        words = len(non_cjk.strip().split())
+        return cjk + words
+
+    @staticmethod
+    def _collect_word_timestamps(segments: list[ASRDataSeg]) -> list[dict]:
+        result: list[dict] = []
+        for seg in segments:
+            text = (seg.text or "").strip()
+            if not text:
+                continue
+            if seg.word_timestamps:
+                result.extend(seg.word_timestamps)
+            else:
+                result.append(
+                    {
+                        "text": text,
+                        "start_time": seg.start_time,
+                        "end_time": seg.end_time,
+                    }
+                )
+        return result
+
+    def _build_sentence_segments_from_word_level(
+        self,
+        asr_data: ASRData,
+        subtitle_config: SubtitleConfig,
+    ) -> ASRData:
+        """Собирает предложения из word-level сегментов без LLM/оптимизации."""
+        src = [s for s in asr_data.segments if (s.text or "").strip()]
+        if not src:
+            return asr_data
+
+        max_units = max(6, int(subtitle_config.max_word_count_english or 18))
+        max_gap_ms = 650
+        sentence_end_re = re.compile(r"[.!?…。！？]$")
+
+        groups: list[list[ASRDataSeg]] = []
+        current: list[ASRDataSeg] = []
+
+        for seg in src:
+            if not current:
+                current.append(seg)
+                continue
+
+            prev = current[-1]
+            gap = int(seg.start_time - prev.end_time)
+            current_text = " ".join((x.text or "").strip() for x in current).strip()
+            cur_units = self._count_units(current_text)
+
+            should_break = (
+                gap > max_gap_ms
+                or sentence_end_re.search((prev.text or "").strip()) is not None
+                or cur_units >= max_units
+            )
+
+            if should_break:
+                groups.append(current)
+                current = [seg]
+            else:
+                current.append(seg)
+
+        if current:
+            groups.append(current)
+
+        out_segments: list[ASRDataSeg] = []
+        for group in groups:
+            raw_text = " ".join((x.text or "").strip() for x in group).strip()
+            # Нормализация пробелов перед пунктуацией
+            text = re.sub(r"\s+([,.;:!?])", r"\1", raw_text)
+            text = re.sub(r"\s+([\]\)»])", r"\1", text)
+            text = re.sub(r"([\[\(«])\s+", r"\1", text)
+            out_segments.append(
+                ASRDataSeg(
+                    text=text,
+                    start_time=group[0].start_time,
+                    end_time=group[-1].end_time,
+                    word_timestamps=self._collect_word_timestamps(group),
+                )
+            )
+
+        return ASRData(out_segments)
+
     def _processed_cache_path(self, subtitle_path: str, subtitle_config: SubtitleConfig) -> Path:
         source_bytes = Path(subtitle_path).read_bytes()
         source_hash = hashlib.md5(source_bytes).hexdigest()
         process_profile = {
+            "cache_schema": 2,
             "source_hash": source_hash,
             "split": subtitle_config.need_split,
             "split_type": subtitle_config.split_type,
@@ -66,6 +163,10 @@ class SubtitleThread(QThread):
             "llm_model": subtitle_config.llm_model,
             "custom_prompt": subtitle_config.custom_prompt_text or "",
             "remove_punctuation": subtitle_config.need_remove_punctuation,
+            # Для karaoke/word_highlight критично наличие word_timestamps,
+            # поэтому учитываем эти режимы в ключе кэша.
+            "karaoke_mode": subtitle_config.subtitle_karaoke_mode,
+            "subtitle_effect": subtitle_config.subtitle_effect,
         }
         key = hashlib.md5(
             json.dumps(process_profile, ensure_ascii=False, sort_keys=True).encode("utf-8")
@@ -132,13 +233,14 @@ class SubtitleThread(QThread):
 
             # 字幕文件路径检查、对断句字幕路径进行定义
             subtitle_path = self.task.subtitle_path
-            output_name = (
-                Path(subtitle_path)
-                .stem.replace("【原始字幕】", "")
-                .replace("【下载字幕】", "")
+            output_name = TaskFactory._strip_known_subtitle_prefixes(
+                Path(subtitle_path).stem
             )
-            split_path = str(
-                Path(subtitle_path).parent / f"【断句字幕】{output_name}.srt"
+            split_path = TaskFactory._build_output_path(
+                parent=Path(subtitle_path).parent,
+                base_name=output_name,
+                ext=".srt",
+                prefix=TaskFactory.PREFIX_SPLIT_SUBTITLE,
             )
             assert subtitle_path is not None, self.tr("字幕文件路径为空")
 
@@ -189,8 +291,16 @@ class SubtitleThread(QThread):
             subtitle_config.subtitle_speaker_color_mode = (
                 cfg.subtitle_speaker_color_mode.value
             )
+            force_sentence_karaoke_timing = bool(
+                is_sentence_mode
+                and (
+                    subtitle_config.subtitle_karaoke_mode
+                    or subtitle_config.subtitle_effect == "word_highlight"
+                )
+            )
 
             asr_data = ASRData.from_subtitle_file(subtitle_path)
+            word_level_asr_for_export: ASRData | None = None
             processed_cache_path = self._processed_cache_path(subtitle_path, subtitle_config)
             reused_processed_cache = False
 
@@ -204,8 +314,14 @@ class SubtitleThread(QThread):
                 except Exception as e:
                     logger.warning(f"读取处理后字幕缓存失败，回退到正常流程: {str(e)}")
 
-            # 1. 分割成字词级时间戳（对于非断句字幕且开启分割选项）
-            if (not reused_processed_cache) and subtitle_config.need_split and not asr_data.is_word_timestamp():
+            # 1. 分割成字词级时间戳
+            # Для sentence+karaoke (или word_highlight) тоже форсируем word-level,
+            # иначе получится «псевдо-караоке» без ожидания реальных слов.
+            if (
+                (not reused_processed_cache)
+                and (subtitle_config.need_split or force_sentence_karaoke_timing)
+                and not asr_data.is_word_timestamp()
+            ):
                 asr_data.split_to_word_segments()
 
             # 获取API配置，会先检查可用性（优先使用设置的API，其次使用自带的公益API）
@@ -213,7 +329,11 @@ class SubtitleThread(QThread):
                 not reused_processed_cache
                 and (
                     subtitle_config.need_optimize
-                    or (subtitle_config.need_split and is_sentence_mode)
+                    or (
+                        subtitle_config.need_split
+                        and is_sentence_mode
+                        and not force_sentence_karaoke_timing
+                    )
                     or (
                         subtitle_config.need_translate
                         and subtitle_config.translator_service
@@ -230,26 +350,36 @@ class SubtitleThread(QThread):
                 subtitle_config = self._setup_api_config()
                 _stage_end("api_check")
 
-            # 2. 重新断句（仅在开启断句时，对字词级字幕执行）
-            if (not reused_processed_cache) and subtitle_config.need_split and asr_data.is_word_timestamp():
+            # 2. Формирование сегментов-предложений
+            # - для sentence+karaoke/word_highlight: из word-level локально (без LLM)
+            # - обычный sentence-режим: штатный LLM splitter
+            if (not reused_processed_cache) and (subtitle_config.need_split or force_sentence_karaoke_timing):
                 if is_sentence_mode:
                     _stage_start("split")
                     self.progress.emit(5, self.tr("字幕断句..."))
-                    logger.info("正在字幕断句...")
-                    splitter = SubtitleSplitter(
-                        thread_num=subtitle_config.thread_num,
-                        model=subtitle_config.llm_model,
-                        use_cache=subtitle_config.use_cache,
-                        openai_base_url=subtitle_config.base_url,
-                        openai_api_key=subtitle_config.api_key,
-                        temperature=0.3,
-                        timeout=60,
-                        retry_times=1,
-                        split_type=subtitle_config.split_type,
-                        max_word_count_cjk=subtitle_config.max_word_count_cjk,
-                        max_word_count_english=subtitle_config.max_word_count_english,
-                    )
-                    asr_data = splitter.split_subtitle(asr_data)
+                    if force_sentence_karaoke_timing:
+                        logger.info("sentence+karoake: локальная сборка предложений из word-level сегментов")
+                        word_level_asr_for_export = self._clone_asr_data(asr_data)
+                        asr_data = self._build_sentence_segments_from_word_level(
+                            asr_data,
+                            subtitle_config,
+                        )
+                    else:
+                        logger.info("正在字幕断句...")
+                        splitter = SubtitleSplitter(
+                            thread_num=subtitle_config.thread_num,
+                            model=subtitle_config.llm_model,
+                            use_cache=subtitle_config.use_cache,
+                            openai_base_url=subtitle_config.base_url,
+                            openai_api_key=subtitle_config.api_key,
+                            temperature=0.3,
+                            timeout=60,
+                            retry_times=1,
+                            split_type=subtitle_config.split_type,
+                            max_word_count_cjk=subtitle_config.max_word_count_cjk,
+                            max_word_count_english=subtitle_config.max_word_count_english,
+                        )
+                        asr_data = splitter.split_subtitle(asr_data)
                     asr_data.save(save_path=split_path)
                     self.update_all.emit(asr_data.to_json())
                     _stage_end("split")
@@ -413,6 +543,18 @@ class SubtitleThread(QThread):
                 asr_data.to_srt(
                     save_path=str(save_srt_path), layout=subtitle_config.subtitle_layout
                 )
+                # Дополнительно сохраняем word-level SRT для отладки karaoke-таймингов
+                # в режиме sentence+karaoke/word_highlight.
+                if word_level_asr_for_export is not None:
+                    save_word_srt_path = (
+                        Path(self.task.video_path).parent
+                        / f"{Path(self.task.video_path).stem}-слова.srt"
+                    )
+                    word_level_asr_for_export.to_srt(
+                        save_path=str(save_word_srt_path),
+                        layout="仅原文",
+                    )
+                    logger.info(f"Сохранён word-level SRT: {save_word_srt_path}")
                 # save_ass_path = (
                 #     Path(self.task.video_path).parent
                 #     / f"{Path(self.task.video_path).stem}.ass"
@@ -424,12 +566,32 @@ class SubtitleThread(QThread):
                 # )
             else:
                 # 删除断句文件（对于仅字幕任务）
-                split_path = str(
-                    Path(self.task.subtitle_path).parent
-                    / f"【智能断句】{Path(self.task.subtitle_path).stem}.srt"
+                subtitle_parent = Path(self.task.subtitle_path).parent
+                subtitle_stem = TaskFactory._strip_known_subtitle_prefixes(
+                    Path(self.task.subtitle_path).stem
                 )
-                if os.path.exists(split_path):
-                    os.remove(split_path)
+                split_path = TaskFactory._build_output_path(
+                    parent=subtitle_parent,
+                    base_name=subtitle_stem,
+                    ext=".srt",
+                    prefix=TaskFactory.PREFIX_SMART_SPLIT_SUBTITLE,
+                )
+                split_path_stage = TaskFactory._build_output_path(
+                    parent=subtitle_parent,
+                    base_name=subtitle_stem,
+                    ext=".srt",
+                    prefix=TaskFactory.PREFIX_SPLIT_SUBTITLE,
+                )
+
+                legacy_split_paths = [
+                    split_path,
+                    split_path_stage,
+                    str(subtitle_parent / f"【智能断句】{Path(self.task.subtitle_path).stem}.srt"),
+                    str(subtitle_parent / f"【断句字幕】{subtitle_stem}.srt"),
+                ]
+                for path in legacy_split_paths:
+                    if os.path.exists(path):
+                        os.remove(path)
 
             # 8. 诊断报告写入 work-dir
             report_name = f"subtitle_diagnostics_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json"

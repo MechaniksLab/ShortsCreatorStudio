@@ -415,6 +415,12 @@ class Config(QConfig):
         "high",
         OptionsValidator(["high", "balanced", "fast"]),
     )
+    batch_synthesis_render_backend = OptionsConfigItem(
+        "MainWindow",
+        "BatchSynthesisRenderBackend",
+        "gpu",
+        OptionsValidator(["cpu", "gpu"]),
+    )
 
     # ------------------- 更新配置 -------------------
     checkUpdateAtStartUp = ConfigItem(

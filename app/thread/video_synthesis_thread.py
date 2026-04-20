@@ -56,6 +56,9 @@ class VideoSynthesisThread(QThread):
                 quality_profile=str(
                     getattr(self.task.synthesis_config, "quality_profile", "high") or "high"
                 ),
+                render_backend=str(
+                    getattr(self.task.synthesis_config, "render_backend", "gpu") or "gpu"
+                ),
                 progress_callback=self.progress_callback,
             )
 

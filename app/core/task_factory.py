@@ -25,6 +25,19 @@ from app.core.entities import (
 class TaskFactory:
     """任务工厂类，用于创建各种类型的任务"""
 
+    # Короткие русские префиксы для выходных файлов
+    PREFIX_RAW_SUBTITLE = "исх"
+    PREFIX_DOWNLOADED_SUBTITLE = "загр"
+    PREFIX_STYLED_SUBTITLE = "стил"
+    PREFIX_SUBTITLE = "суб"
+    PREFIX_SPLIT_SUBTITLE = "разб"
+    PREFIX_SMART_SPLIT_SUBTITLE = "умразб"
+    PREFIX_RENDERED_VIDEO = "видео"
+
+    # Безопасные лимиты для Windows-путей
+    MAX_FILENAME_LEN = 180
+    MAX_PATH_LEN = 240
+
     @staticmethod
     def _safe_fs_name(name: str, max_len: int = 72) -> str:
         """Безопасное имя для Windows-путей: чистим спецсимволы и ограничиваем длину."""
@@ -44,6 +57,78 @@ class TaskFactory:
         digest = hashlib.md5(raw.encode("utf-8", errors="ignore")).hexdigest()[:8]
         head = raw[: max(16, max_len - 10)].rstrip(" .")
         return f"{head}_{digest}"
+
+    @staticmethod
+    def _strip_known_subtitle_prefixes(name: str) -> str:
+        """Удаляет служебные префиксы у имён субтитров (старые и новые)."""
+        value = (name or "").strip()
+        known_prefixes = (
+            "【原始字幕】",
+            "【下载字幕】",
+            "【样式字幕】",
+            "【字幕】",
+            "【断句字幕】",
+            "【智能断句】",
+            TaskFactory.PREFIX_RAW_SUBTITLE,
+            TaskFactory.PREFIX_DOWNLOADED_SUBTITLE,
+            TaskFactory.PREFIX_STYLED_SUBTITLE,
+            TaskFactory.PREFIX_SUBTITLE,
+            TaskFactory.PREFIX_SPLIT_SUBTITLE,
+            TaskFactory.PREFIX_SMART_SPLIT_SUBTITLE,
+            f"{TaskFactory.PREFIX_RAW_SUBTITLE}_",
+            f"{TaskFactory.PREFIX_DOWNLOADED_SUBTITLE}_",
+            f"{TaskFactory.PREFIX_STYLED_SUBTITLE}_",
+            f"{TaskFactory.PREFIX_SUBTITLE}_",
+            f"{TaskFactory.PREFIX_SPLIT_SUBTITLE}_",
+            f"{TaskFactory.PREFIX_SMART_SPLIT_SUBTITLE}_",
+        )
+        for p in known_prefixes:
+            if value.startswith(p):
+                value = value[len(p) :]
+        return value
+
+    @staticmethod
+    def _fit_filename_to_path_limit(parent: Path, filename: str) -> str:
+        """Ограничивает имя файла так, чтобы полный путь был безопасен для Windows."""
+        ext = Path(filename).suffix
+        stem = Path(filename).stem
+        parent_len = len(str(parent))
+        max_stem_by_filename = max(8, TaskFactory.MAX_FILENAME_LEN - len(ext))
+        max_stem_by_path = max(8, TaskFactory.MAX_PATH_LEN - parent_len - 1 - len(ext))
+        max_stem = max(8, min(max_stem_by_filename, max_stem_by_path))
+
+        if len(stem) <= max_stem and len(str(parent / filename)) <= TaskFactory.MAX_PATH_LEN:
+            return filename
+
+        digest = hashlib.md5(stem.encode("utf-8", errors="ignore")).hexdigest()[:8]
+        head_len = max(4, max_stem - 9)
+        short_stem = stem[:head_len].rstrip(" ._")
+        if not short_stem:
+            short_stem = "file"
+        return f"{short_stem}_{digest}{ext}"
+
+    @staticmethod
+    def _build_output_path(
+        parent: Path,
+        base_name: str,
+        ext: str,
+        prefix: str = "",
+        suffix: str = "",
+        base_max_len: int = 72,
+    ) -> str:
+        """Собирает безопасный output path с коротким префиксом и контролем длины."""
+        parent.mkdir(parents=True, exist_ok=True)
+        safe_base = TaskFactory._safe_fs_name(base_name, max_len=base_max_len)
+        safe_prefix = TaskFactory._safe_fs_name(prefix, max_len=16).replace(" ", "_") if prefix else ""
+        ext = ext if ext.startswith(".") else f".{ext}"
+
+        if safe_prefix:
+            filename = f"{safe_prefix}_{safe_base}{suffix}{ext}"
+        else:
+            filename = f"{safe_base}{suffix}{ext}"
+
+        filename = TaskFactory._fit_filename_to_path_limit(parent, filename)
+        return str(parent / filename)
 
     @staticmethod
     def get_subtitle_style(style_name: str) -> str:
@@ -82,20 +167,27 @@ class TaskFactory:
 
         # 获取文件名
         file_name = Path(file_path).stem
-        safe_file_name = TaskFactory._safe_fs_name(file_name, max_len=72)
+        safe_file_name = TaskFactory._safe_fs_name(file_name, max_len=48)
 
         # 构建输出路径
         if need_next_task:
-            output_path = str(
-                Path(cfg.work_dir.value)
-                / safe_file_name
-                / "subtitle"
-                / f"【原始字幕】{safe_file_name}-{cfg.transcribe_model.value.value}-{cfg.transcribe_language.value.value}.srt"
+            output_path = TaskFactory._build_output_path(
+                parent=Path(cfg.work_dir.value) / safe_file_name / "subtitle",
+                base_name=safe_file_name,
+                ext=".srt",
+                prefix=TaskFactory.PREFIX_RAW_SUBTITLE,
+                suffix=f"-{cfg.transcribe_model.value.value}-{cfg.transcribe_language.value.value}",
+                base_max_len=64,
             )
         else:
             if cfg.transcribe_model.value == TranscribeModelEnum.FASTER_WHISPER:
                 need_word_time_stamp = bool(cfg.faster_whisper_one_word.value)
-            output_path = str(Path(file_path).parent / f"{file_name}.srt")
+            output_path = TaskFactory._build_output_path(
+                parent=Path(file_path).parent,
+                base_name=file_name,
+                ext=".srt",
+                base_max_len=96,
+            )
 
         use_asr_cache = cfg.use_asr_cache.value
 
@@ -140,11 +232,7 @@ class TaskFactory:
         file_path: str, video_path: Optional[str] = None, need_next_task: bool = False
     ) -> SubtitleTask:
         """创建字幕任务"""
-        output_name = (
-            Path(file_path)
-            .stem.replace("【原始字幕】", "")
-            .replace(f"【下载字幕】", "")
-        )
+        output_name = TaskFactory._strip_known_subtitle_prefixes(Path(file_path).stem)
         output_name_safe = TaskFactory._safe_fs_name(output_name, max_len=72)
         # 只在需要翻译时添加翻译服务后缀
         suffix = (
@@ -152,12 +240,20 @@ class TaskFactory:
         )
 
         if need_next_task:
-            output_path = str(
-                Path(file_path).parent / f"【样式字幕】{output_name_safe}{suffix}.ass"
+            output_path = TaskFactory._build_output_path(
+                parent=Path(file_path).parent,
+                base_name=output_name_safe,
+                ext=".ass",
+                prefix=TaskFactory.PREFIX_STYLED_SUBTITLE,
+                suffix=suffix,
             )
         else:
-            output_path = str(
-                Path(file_path).parent / f"【字幕】{output_name_safe}{suffix}.srt"
+            output_path = TaskFactory._build_output_path(
+                parent=Path(file_path).parent,
+                base_name=output_name_safe,
+                ext=".srt",
+                prefix=TaskFactory.PREFIX_SUBTITLE,
+                suffix=suffix,
             )
 
         split_type_cfg = cfg.split_type.value
@@ -283,14 +379,13 @@ class TaskFactory:
         video_path: str, subtitle_path: str, need_next_task: bool = False
     ) -> SynthesisTask:
         """创建视频合成任务"""
-        if need_next_task:
-            output_path = str(
-                Path(video_path).parent / f"【卡卡】{Path(video_path).stem}.mp4"
-            )
-        else:
-            output_path = str(
-                Path(video_path).parent / f"【卡卡】{Path(video_path).stem}.mp4"
-            )
+        output_path = TaskFactory._build_output_path(
+            parent=Path(video_path).parent,
+            base_name=Path(video_path).stem,
+            ext=".mp4",
+            prefix=TaskFactory.PREFIX_RENDERED_VIDEO,
+            base_max_len=96,
+        )
 
         config = SynthesisConfig(
             need_video=cfg.need_video.value,
@@ -299,6 +394,7 @@ class TaskFactory:
             resolution_mode=str(cfg.batch_synthesis_resolution_mode.value or "source"),
             resolution=str(cfg.batch_synthesis_resolution.value or "1080x1920"),
             quality_profile=str(cfg.batch_synthesis_quality_profile.value or "high"),
+            render_backend=str(cfg.batch_synthesis_render_backend.value or "gpu"),
         )
 
         return SynthesisTask(

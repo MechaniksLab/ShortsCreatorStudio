@@ -17,6 +17,7 @@ from qfluentwidgets import (
     PrimaryPushButton,
     ProgressBar,
     PushButton,
+    ComboBox,
     ToolTipFilter,
     ToolTipPosition,
 )
@@ -107,6 +108,17 @@ class VideoSynthesisInterface(QWidget):
         self.video_layout.addWidget(self.video_input)
         self.video_layout.addWidget(self.video_button)
         self.config_layout.addLayout(self.video_layout)
+
+        # Выбор CPU/GPU для рендера
+        self.render_backend_layout = QHBoxLayout()
+        self.render_backend_layout.setSpacing(15)
+        self.render_backend_label = BodyLabel("Рендер", self)
+        self.render_backend_combo = ComboBox(self)
+        self.render_backend_combo.addItems(["GPU", "CPU"])
+        self.render_backend_layout.addWidget(self.render_backend_label)
+        self.render_backend_layout.addWidget(self.render_backend_combo)
+        self.render_backend_layout.addStretch(1)
+        self.config_layout.addLayout(self.render_backend_layout)
 
         self.main_layout.addWidget(self.config_card)
 
@@ -220,6 +232,8 @@ class VideoSynthesisInterface(QWidget):
         """设置初始值"""
         self.soft_subtitle_action.setChecked(cfg.soft_subtitle.value)
         self.need_video_action.setChecked(cfg.need_video.value)
+        backend = str(getattr(cfg, "batch_synthesis_render_backend").value or "gpu").strip().lower()
+        self.render_backend_combo.setCurrentText("CPU" if backend == "cpu" else "GPU")
 
     def on_soft_subtitle_changed(self, checked: bool):
         """处理软字幕选项变更"""
@@ -273,6 +287,11 @@ class VideoSynthesisInterface(QWidget):
         self.task = task
         self.update_info()
 
+        # синхронизируем UI с задачей
+        if task and task.synthesis_config:
+            b = str(getattr(task.synthesis_config, "render_backend", "gpu") or "gpu").strip().lower()
+            self.render_backend_combo.setCurrentText("CPU" if b == "cpu" else "GPU")
+
     def update_info(self):
         if self.task:
             self.video_input.setText(self.task.video_path)
@@ -283,6 +302,12 @@ class VideoSynthesisInterface(QWidget):
         self.progress_bar.resume()
         if need_create_task:
             self.task = self.create_task()
+
+        # протягиваем выбор backend из UI в config и в текущую задачу
+        selected_backend = "cpu" if self.render_backend_combo.currentText() == "CPU" else "gpu"
+        cfg.set(cfg.batch_synthesis_render_backend, selected_backend)
+        if self.task and self.task.synthesis_config:
+            self.task.synthesis_config.render_backend = selected_backend
 
         if self.task:
             self.video_synthesis_thread = VideoSynthesisThread(self.task)
