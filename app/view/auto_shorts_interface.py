@@ -437,9 +437,10 @@ class AutoShortsInterface(QWidget):
             stage_layout.addWidget(w)
         self.main_layout.addWidget(self.stage_card)
 
-        self.control_card = CardWidget(self)
-        self.control_card.setObjectName("shortsControlCard")
+        self.control_card = QWidget(self)
         control_layout = QVBoxLayout(self.control_card)
+        control_layout.setContentsMargins(0, 0, 0, 0)
+        control_layout.setSpacing(10)
 
         title_row = QHBoxLayout()
         title_row.addWidget(StrongBodyLabel("Пайплайн генерации (строго по этапам)"))
@@ -471,17 +472,23 @@ class AutoShortsInterface(QWidget):
         template_scope_hint_top.setWordWrap(True)
         control_layout.addWidget(template_scope_hint_top)
 
-        control_layout.addWidget(StrongBodyLabel("Этап 1: Whisper (распознавание речи)"))
+        stage1_card = CardWidget(self)
+        stage1_card.setObjectName("shortsStage1Card")
+        stage1_layout = QVBoxLayout(stage1_card)
+        stage1_layout.setContentsMargins(12, 12, 12, 12)
+        stage1_layout.setSpacing(8)
+
+        stage1_layout.addWidget(StrongBodyLabel("Этап 1: Whisper (распознавание речи)"))
         stage1_hint = BodyLabel("Применяется на этапе 1: параметры ниже влияют только на распознавание и диапазон анализа.")
         stage1_hint.setWordWrap(True)
-        control_layout.addWidget(stage1_hint)
+        stage1_layout.addWidget(stage1_hint)
 
-        control_layout.addWidget(BodyLabel("Диапазон анализа (всегда активен):"))
+        stage1_layout.addWidget(BodyLabel("Диапазон анализа (всегда активен):"))
         self.range_slider = TimeRangeSlider(self)
         self.range_slider.set_bounds(0, 1)
         self.range_slider.set_values(0, 1, emit_signal=False)
         self.range_slider.rangeChanged.connect(self._on_range_slider_changed)
-        control_layout.addWidget(self.range_slider)
+        stage1_layout.addWidget(self.range_slider)
 
         range_info_row = QHBoxLayout()
         self.range_start_label = BodyLabel("С: 00:00")
@@ -492,13 +499,13 @@ class AutoShortsInterface(QWidget):
         range_info_row.addWidget(self.range_end_label)
         range_info_row.addStretch(1)
         range_info_row.addWidget(self.range_span_label)
-        control_layout.addLayout(range_info_row)
+        stage1_layout.addLayout(range_info_row)
 
         hint = BodyLabel(
             "По умолчанию выбран весь ролик. Перемещайте левый и правый маркеры, чтобы ограничить промежуток анализа."
         )
         hint.setWordWrap(True)
-        control_layout.addWidget(hint)
+        stage1_layout.addWidget(hint)
 
         stage1_actions = QHBoxLayout()
         self.transcribe_btn = PrimaryPushButton("1) Запустить Whisper")
@@ -510,7 +517,7 @@ class AutoShortsInterface(QWidget):
         stage1_actions.addWidget(self.autonomous_checkbox)
         stage1_actions.addStretch(1)
         stage1_actions.addWidget(self.run_all_btn)
-        control_layout.addLayout(stage1_actions)
+        stage1_layout.addLayout(stage1_actions)
 
         self.stage1_progress_wrap = QWidget(self)
         stage1_progress_layout = QVBoxLayout(self.stage1_progress_wrap)
@@ -522,181 +529,212 @@ class AutoShortsInterface(QWidget):
         stage1_progress_layout.addWidget(self.stage1_progress_bar)
         stage1_progress_layout.addWidget(self.stage1_progress_label)
         self.stage1_progress_wrap.setVisible(False)
-        control_layout.addWidget(self.stage1_progress_wrap)
+        stage1_layout.addWidget(self.stage1_progress_wrap)
 
-        control_layout.addWidget(StrongBodyLabel("Этап 2: Отбор кандидатов (LLM/эвристика)"))
-        stage2_hint = BodyLabel("Применяется на этапе 2: фильтры ниже влияют на поиск, ранжирование и число кандидатов.")
-        stage2_hint.setWordWrap(True)
-        control_layout.addWidget(stage2_hint)
+        control_layout.addWidget(stage1_card)
+        control_layout.addSpacing(10)
+
+        stage2_card = CardWidget(self)
+        stage2_card.setObjectName("shortsStage2Card")
+        stage2_layout = QVBoxLayout(stage2_card)
+        stage2_layout.setContentsMargins(12, 12, 12, 12)
+        stage2_layout.setSpacing(8)
+
+        stage2_layout.addWidget(StrongBodyLabel("Этап 2: Отбор кандидатов (LLM/эвристика)"))
         self.llm_tokens_hint_label = BodyLabel("Оценка токенов LLM: появится после этапа 1 (Whisper)")
         self.llm_tokens_hint_label.setWordWrap(True)
-        control_layout.addWidget(self.llm_tokens_hint_label)
+        stage2_layout.addWidget(self.llm_tokens_hint_label)
+        stage2_layout.addSpacing(8)
 
         duration_row = QHBoxLayout()
-        duration_row.addWidget(BodyLabel("Мин. длительность шортса (сек):"))
+        min_duration_label = BodyLabel("Мин. длительность шортса (сек):")
+        min_duration_label.setToolTip("Минимальная длина одного шортса. Слишком малые значения чаще дают обрывки фраз.")
+        duration_row.addWidget(min_duration_label)
         self.min_duration = SpinBox(self)
         self.min_duration.setRange(8, 120)
         self.min_duration.setValue(22)
+        self.min_duration.setToolTip("Минимальная длина шортса в секундах")
         duration_row.addWidget(self.min_duration)
 
-        duration_row.addWidget(BodyLabel("Макс. длительность шортса (сек):"))
+        max_duration_label = BodyLabel("Макс. длительность шортса (сек):")
+        max_duration_label.setToolTip("Максимальная длина одного шортса. Большие значения дают меньше, но длиннее клипов.")
+        duration_row.addWidget(max_duration_label)
         self.max_duration = SpinBox(self)
         self.max_duration.setRange(20, 300)
         self.max_duration.setValue(110)
+        self.max_duration.setToolTip("Максимальная длина шортса в секундах")
         duration_row.addWidget(self.max_duration)
         duration_row.addStretch(1)
-        control_layout.addLayout(duration_row)
+        stage2_layout.addLayout(duration_row)
 
+        stage2_layout.addSpacing(6)
         tune_title = StrongBodyLabel("Тонкая настройка монтажа")
-        control_layout.addWidget(tune_title)
+        stage2_layout.addWidget(tune_title)
 
-        anti_repeat_title = BodyLabel("1) Повторы моментов")
-        control_layout.addWidget(anti_repeat_title)
-        anti_repeat_hint = BodyLabel(
-            "Анти-дубль отсекает кандидаты с похожим текстом/смыслом. "
-            "Чем выше значение — тем строже фильтр и меньше повторов в выдаче."
-        )
-        anti_repeat_hint.setWordWrap(True)
-        control_layout.addWidget(anti_repeat_hint)
+        anti_repeat_title = BodyLabel("1) Повторы и разнообразие")
+        anti_repeat_title.setToolTip("Группа фильтров, которые уменьшают повторы и повышают разнообразие найденных моментов")
+        stage2_layout.addWidget(anti_repeat_title)
 
         anti_repeat_row = QHBoxLayout()
-        anti_repeat_row.addWidget(BodyLabel("Анти-дубль (%):"))
+        repeat_similarity_label = BodyLabel("Анти-дубль (%):")
+        repeat_similarity_label.setToolTip(
+            "Порог схожести кандидатов.\n"
+            "Ниже — больше похожих моментов, выше — больше разнообразия."
+        )
+        anti_repeat_row.addWidget(repeat_similarity_label)
         self.repeat_similarity_spin = SpinBox(self)
         self.repeat_similarity_spin.setRange(40, 100)
         self.repeat_similarity_spin.setValue(int(cfg.get(cfg.auto_shorts_repeat_similarity_percent)))
+        self.repeat_similarity_spin.setToolTip(
+            "Порог схожести кандидатов.\n"
+            "Ниже — больше похожих моментов, выше — больше разнообразия."
+        )
         self.repeat_similarity_spin.valueChanged.connect(
             lambda v: cfg.set(cfg.auto_shorts_repeat_similarity_percent, int(v))
         )
         anti_repeat_row.addWidget(self.repeat_similarity_spin)
         anti_repeat_row.addStretch(1)
-        control_layout.addLayout(anti_repeat_row)
+        stage2_layout.addLayout(anti_repeat_row)
 
         candidates_limit_title = BodyLabel("1.1) Количество кандидатов")
-        control_layout.addWidget(candidates_limit_title)
-        candidates_limit_hint = BodyLabel(
-            "Ограничивает итоговое число найденных моментов: минимум и максимум на ролик. "
-            "По умолчанию подставляются рекомендации по длине исходного видео."
-        )
-        candidates_limit_hint.setWordWrap(True)
-        control_layout.addWidget(candidates_limit_hint)
+        candidates_limit_title.setToolTip("Ограничение числа найденных фрагментов после этапа отбора")
+        stage2_layout.addWidget(candidates_limit_title)
 
         candidates_limit_row = QHBoxLayout()
-        candidates_limit_row.addWidget(BodyLabel("Мин. кандидатов:"))
+        min_candidates_label = BodyLabel("Мин. кандидатов:")
+        min_candidates_label.setToolTip("Минимальное число кандидатов после отбора")
+        candidates_limit_row.addWidget(min_candidates_label)
         self.min_candidates_spin = SpinBox(self)
         self.min_candidates_spin.setRange(1, 300)
         self.min_candidates_spin.setValue(8)
+        self.min_candidates_spin.setToolTip("Минимальное число кандидатов после отбора")
         candidates_limit_row.addWidget(self.min_candidates_spin)
 
-        candidates_limit_row.addWidget(BodyLabel("Макс. кандидатов:"))
+        max_candidates_label = BodyLabel("Макс. кандидатов:")
+        max_candidates_label.setToolTip("Максимальное число кандидатов после отбора")
+        candidates_limit_row.addWidget(max_candidates_label)
         self.max_candidates_spin = SpinBox(self)
         self.max_candidates_spin.setRange(2, 500)
         self.max_candidates_spin.setValue(40)
+        self.max_candidates_spin.setToolTip("Максимальное число кандидатов после отбора")
         candidates_limit_row.addWidget(self.max_candidates_spin)
 
         self.recommend_candidates_btn = PushButton("Рекомендовать по длине")
         self.recommend_candidates_btn.clicked.connect(self._apply_recommended_candidate_limits)
         candidates_limit_row.addWidget(self.recommend_candidates_btn)
         candidates_limit_row.addStretch(1)
-        control_layout.addLayout(candidates_limit_row)
+        stage2_layout.addLayout(candidates_limit_row)
 
         filter_row = QHBoxLayout()
         self.auto_filter_weak_checkbox = CheckBox("Авто-фильтр слабых кандидатов")
         self.auto_filter_weak_checkbox.setChecked(True)
+        self.auto_filter_weak_checkbox.setToolTip(
+            "Автоматически убирает слабые моменты с низким качеством/хуком и длинными паузами"
+        )
         filter_row.addWidget(self.auto_filter_weak_checkbox)
         filter_row.addStretch(1)
-        control_layout.addLayout(filter_row)
+        stage2_layout.addLayout(filter_row)
 
         self.min_candidates_spin.valueChanged.connect(self._on_candidate_limits_changed)
         self.max_candidates_spin.valueChanged.connect(self._on_candidate_limits_changed)
 
-        anti_cut_title = BodyLabel("2) Границы фраз (чтобы не резало слова)")
-        control_layout.addWidget(anti_cut_title)
-        anti_cut_hint = BodyLabel(
-            "Эти параметры влияют на внутренние склейки по речи: "
-            "добавляют контекст до/после слова, объединяют короткие паузы и "
-            "задают минимальную долю речи, ниже которой берётся цельный фрагмент без агрессивных склеек."
-        )
-        anti_cut_hint.setWordWrap(True)
-        control_layout.addWidget(anti_cut_hint)
+        stage2_layout.addSpacing(8)
+        anti_cut_title = BodyLabel("2) Границы фраз и паузы (чтобы не резало слова)")
+        anti_cut_title.setToolTip("Параметры склейки речи и отступов, чтобы фразы не обрезались на стыках")
+        stage2_layout.addWidget(anti_cut_title)
 
         tune_row_1 = QHBoxLayout()
 
-        tune_row_1.addWidget(BodyLabel("Покрытие речи (%):"))
+        speech_coverage_label = BodyLabel("Покрытие речи (%):")
+        speech_coverage_label.setToolTip(
+            "Минимальная доля времени клипа, где есть речь.\n"
+            "Пример: 70% = минимум ~70% длительности занимают реплики, а не паузы/тишина."
+        )
+        tune_row_1.addWidget(speech_coverage_label)
         self.speech_min_coverage_spin = SpinBox(self)
         self.speech_min_coverage_spin.setRange(30, 100)
         self.speech_min_coverage_spin.setValue(int(cfg.get(cfg.auto_shorts_speech_min_coverage_percent)))
+        self.speech_min_coverage_spin.setToolTip(
+            "Минимальная доля речи в клипе.\n"
+            "Если речи меньше этого порога, алгоритм избегает агрессивной склейки и берёт более цельный фрагмент."
+        )
         self.speech_min_coverage_spin.valueChanged.connect(
             lambda v: cfg.set(cfg.auto_shorts_speech_min_coverage_percent, int(v))
         )
         tune_row_1.addWidget(self.speech_min_coverage_spin)
 
-        tune_row_1.addWidget(BodyLabel("Склейка пауз (мс):"))
+        speech_merge_label = BodyLabel("Склейка пауз (мс):")
+        speech_merge_label.setToolTip("Максимальная пауза между репликами для их склейки в один кусок")
+        tune_row_1.addWidget(speech_merge_label)
         self.speech_merge_gap_spin = SpinBox(self)
         self.speech_merge_gap_spin.setRange(60, 2000)
         self.speech_merge_gap_spin.setValue(int(cfg.get(cfg.auto_shorts_speech_merge_gap_ms)))
+        self.speech_merge_gap_spin.setToolTip("Максимальная пауза между репликами для их склейки в один кусок")
         self.speech_merge_gap_spin.valueChanged.connect(
             lambda v: cfg.set(cfg.auto_shorts_speech_merge_gap_ms, int(v))
         )
         tune_row_1.addWidget(self.speech_merge_gap_spin)
         tune_row_1.addStretch(1)
-        control_layout.addLayout(tune_row_1)
+        stage2_layout.addLayout(tune_row_1)
 
         tune_row_2 = QHBoxLayout()
-        tune_row_2.addWidget(BodyLabel("Перед словом (мс):"))
+        speech_pre_pad_label = BodyLabel("Перед словом (мс):")
+        speech_pre_pad_label.setToolTip("Сколько миллисекунд добавить перед началом речи")
+        tune_row_2.addWidget(speech_pre_pad_label)
         self.speech_pre_pad_spin = SpinBox(self)
         self.speech_pre_pad_spin.setRange(0, 1500)
         self.speech_pre_pad_spin.setValue(int(cfg.get(cfg.auto_shorts_speech_pre_pad_ms)))
+        self.speech_pre_pad_spin.setToolTip("Сколько миллисекунд добавить перед началом речи")
         self.speech_pre_pad_spin.valueChanged.connect(
             lambda v: cfg.set(cfg.auto_shorts_speech_pre_pad_ms, int(v))
         )
         tune_row_2.addWidget(self.speech_pre_pad_spin)
 
-        tune_row_2.addWidget(BodyLabel("После слова (мс):"))
+        speech_post_pad_label = BodyLabel("После слова (мс):")
+        speech_post_pad_label.setToolTip("Сколько миллисекунд добавить после окончания речи")
+        tune_row_2.addWidget(speech_post_pad_label)
         self.speech_post_pad_spin = SpinBox(self)
         self.speech_post_pad_spin.setRange(0, 2000)
         self.speech_post_pad_spin.setValue(int(cfg.get(cfg.auto_shorts_speech_post_pad_ms)))
+        self.speech_post_pad_spin.setToolTip("Сколько миллисекунд добавить после окончания речи")
         self.speech_post_pad_spin.valueChanged.connect(
             lambda v: cfg.set(cfg.auto_shorts_speech_post_pad_ms, int(v))
         )
         tune_row_2.addWidget(self.speech_post_pad_spin)
 
-        tune_row_2.addWidget(BodyLabel("До клипа (мс):"))
+        clip_head_pad_label = BodyLabel("До клипа (мс):")
+        clip_head_pad_label.setToolTip("Общий отступ в начале готового клипа")
+        tune_row_2.addWidget(clip_head_pad_label)
         self.clip_head_pad_spin = SpinBox(self)
         self.clip_head_pad_spin.setRange(0, 2000)
         self.clip_head_pad_spin.setValue(int(cfg.get(cfg.auto_shorts_clip_head_pad_ms)))
+        self.clip_head_pad_spin.setToolTip("Общий отступ в начале готового клипа")
         self.clip_head_pad_spin.valueChanged.connect(
             lambda v: cfg.set(cfg.auto_shorts_clip_head_pad_ms, int(v))
         )
         tune_row_2.addWidget(self.clip_head_pad_spin)
 
-        tune_row_2.addWidget(BodyLabel("После клипа (мс):"))
+        clip_tail_pad_label = BodyLabel("После клипа (мс):")
+        clip_tail_pad_label.setToolTip("Общий отступ в конце готового клипа")
+        tune_row_2.addWidget(clip_tail_pad_label)
         self.clip_tail_pad_spin = SpinBox(self)
         self.clip_tail_pad_spin.setRange(0, 3000)
         self.clip_tail_pad_spin.setValue(int(cfg.get(cfg.auto_shorts_clip_tail_pad_ms)))
+        self.clip_tail_pad_spin.setToolTip("Общий отступ в конце готового клипа")
         self.clip_tail_pad_spin.valueChanged.connect(
             lambda v: cfg.set(cfg.auto_shorts_clip_tail_pad_ms, int(v))
         )
         tune_row_2.addWidget(self.clip_tail_pad_spin)
         tune_row_2.addStretch(1)
-        control_layout.addLayout(tune_row_2)
+        stage2_layout.addLayout(tune_row_2)
 
-        clip_pad_hint = BodyLabel(
-            "3) Общий отступ клипа: добавляет контекст в начало/конец уже выбранного фрагмента. "
-            "Полезно, если начало или концовка звучат обрезанно."
-        )
-        clip_pad_hint.setWordWrap(True)
-        control_layout.addWidget(clip_pad_hint)
-
+        stage2_layout.addSpacing(8)
         stage2_actions = QHBoxLayout()
         self.select_candidates_btn = PrimaryPushButton("2) Отобрать кандидатов")
         self.select_candidates_btn.clicked.connect(self._start_candidate_selection)
         stage2_actions.addWidget(self.select_candidates_btn)
         stage2_actions.addStretch(1)
-        control_layout.addLayout(stage2_actions)
-
-        stage3_hint = BodyLabel("Этап 3: после отбора проверьте таблицу кандидатов ниже и отметьте нужные фрагменты.")
-        stage3_hint.setWordWrap(True)
-        control_layout.addWidget(stage3_hint)
+        stage2_layout.addLayout(stage2_actions)
 
         self.stage2_progress_wrap = QWidget(self)
         stage2_progress_layout = QVBoxLayout(self.stage2_progress_wrap)
@@ -708,7 +746,9 @@ class AutoShortsInterface(QWidget):
         stage2_progress_layout.addWidget(self.stage2_progress_bar)
         stage2_progress_layout.addWidget(self.stage2_progress_label)
         self.stage2_progress_wrap.setVisible(False)
-        control_layout.addWidget(self.stage2_progress_wrap)
+        stage2_layout.addWidget(self.stage2_progress_wrap)
+
+        control_layout.addWidget(stage2_card)
 
         self.main_layout.addWidget(self.control_card)
 
@@ -923,7 +963,11 @@ class AutoShortsInterface(QWidget):
         self._link_fx_control_pair(self.gm_temperature, self.gm_temperature_slider)
         self.main_layout.addWidget(self.template_card)
 
-        self.main_layout.addWidget(StrongBodyLabel("Этап 3: Проверка и ручной выбор кандидатов"))
+        self.stage3_card = CardWidget(self)
+        self.stage3_card.setObjectName("shortsStage3Card")
+        stage3_layout = QVBoxLayout(self.stage3_card)
+        stage3_layout.addWidget(StrongBodyLabel("Этап 3: Проверка и ручной выбор кандидатов"))
+
         self.table = QTableWidget(self)
         self.table.setColumnCount(10)
         self.table.setHorizontalHeaderLabels(
@@ -945,15 +989,18 @@ class AutoShortsInterface(QWidget):
         self.table.setAlternatingRowColors(False)
         self.table.verticalHeader().setDefaultSectionSize(64)
         self.table.setSortingEnabled(True)
-        self.main_layout.addWidget(self.table)
+        stage3_layout.addWidget(self.table)
+        self.main_layout.addWidget(self.stage3_card)
 
-        self.main_layout.addWidget(StrongBodyLabel("Этап 4: Рендер выбранных шортсов"))
+        self.stage4_card = CardWidget(self)
+        self.stage4_card.setObjectName("shortsStage4Card")
+        stage4_layout = QVBoxLayout(self.stage4_card)
+        stage4_layout.addWidget(StrongBodyLabel("Этап 4: Рендер выбранных шортсов"))
         stage4_hint = BodyLabel("Параметры рендера ниже применяются только на этапе 4.")
         stage4_hint.setWordWrap(True)
-        self.main_layout.addWidget(stage4_hint)
+        stage4_layout.addWidget(stage4_hint)
 
-        self.bottom_card = CardWidget(self)
-        self.bottom_card.setObjectName("shortsBottomCard")
+        self.bottom_card = QWidget(self)
         bottom_layout = QHBoxLayout(self.bottom_card)
         self.select_all_btn = PushButton("Выбрать все")
         self.select_all_btn.clicked.connect(self._select_all)
@@ -999,7 +1046,7 @@ class AutoShortsInterface(QWidget):
         bottom_layout.addStretch(1)
         bottom_layout.addWidget(self.stop_render_btn)
         bottom_layout.addWidget(self.render_btn)
-        self.main_layout.addWidget(self.bottom_card)
+        stage4_layout.addWidget(self.bottom_card)
 
         self.stage4_progress_wrap = QWidget(self)
         stage4_progress_layout = QVBoxLayout(self.stage4_progress_wrap)
@@ -1011,7 +1058,7 @@ class AutoShortsInterface(QWidget):
         stage4_progress_layout.addWidget(self.stage4_progress_bar)
         stage4_progress_layout.addWidget(self.stage4_progress_label)
         self.stage4_progress_wrap.setVisible(False)
-        self.main_layout.addWidget(self.stage4_progress_wrap)
+        stage4_layout.addWidget(self.stage4_progress_wrap)
 
         output_row = QHBoxLayout()
         self.output_hint_label = BodyLabel("Папка результата: пока нет")
@@ -1020,10 +1067,9 @@ class AutoShortsInterface(QWidget):
         self.open_output_folder_btn.clicked.connect(self._open_output_folder)
         output_row.addWidget(self.output_hint_label, 1)
         output_row.addWidget(self.open_output_folder_btn)
-        self.main_layout.addLayout(output_row)
+        stage4_layout.addLayout(output_row)
 
-        self.rendered_card = CardWidget(self)
-        self.rendered_card.setObjectName("shortsRenderedCard")
+        self.rendered_card = QWidget(self)
         rendered_layout = QVBoxLayout(self.rendered_card)
         rendered_layout.addWidget(StrongBodyLabel("Готовые шортсы"))
         self.rendered_list = QListWidget(self)
@@ -1039,7 +1085,8 @@ class AutoShortsInterface(QWidget):
         rendered_actions.addStretch(1)
         rendered_actions.addWidget(self.send_to_batch_btn)
         rendered_layout.addLayout(rendered_actions)
-        self.main_layout.addWidget(self.rendered_card)
+        stage4_layout.addWidget(self.rendered_card)
+        self.main_layout.addWidget(self.stage4_card)
 
         self.main_layout.addStretch(1)
 
@@ -1106,8 +1153,9 @@ class AutoShortsInterface(QWidget):
             QScrollArea > QWidget > QWidget {{ background: {p['window_bg']}; }}
             QLabel, BodyLabel, StrongBodyLabel {{ color: {p['text']}; }}
             CardWidget {{ border-radius: 10px; }}
-            CardWidget#shortsVideoCard, CardWidget#shortsStageCard, CardWidget#shortsControlCard,
-            CardWidget#shortsTemplateCard, CardWidget#shortsBottomCard, CardWidget#shortsRenderedCard {{
+            CardWidget#shortsVideoCard, CardWidget#shortsStageCard,
+            CardWidget#shortsTemplateCard, CardWidget#shortsStage1Card,
+            CardWidget#shortsStage2Card, CardWidget#shortsStage3Card, CardWidget#shortsStage4Card {{
                 background: {p['card_bg']};
                 border: 1px solid {p['border']};
             }}

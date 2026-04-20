@@ -57,7 +57,7 @@
     },
     "Update": {
         "CheckUpdateAtStartUp": true,
-        "LastKnownCommit": "790591cce80d35c339096799acd02e0319d9aea5",
+        "LastKnownCommit": "360391e14b35c707143d416fcd79c976aa314d88",
         "RepoBranch": "main",
         "RepoName": "ShortsCreatorStudio",
         "RepoOwner": "MechaniksLab"
