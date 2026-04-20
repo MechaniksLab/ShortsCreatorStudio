@@ -388,6 +388,9 @@ class AutoShortsCandidateThread(QThread):
         min_candidates: int = 8,
         max_candidates: int = 40,
         auto_filter_weak_candidates: bool = True,
+        auto_filter_profile: str = "balanced",
+        interest_threshold_percent: int = 52,
+        llm_search_intensity: int = 3,
     ):
         super().__init__()
         self.asr_payload = asr_payload or {}
@@ -397,6 +400,10 @@ class AutoShortsCandidateThread(QThread):
         self.min_candidates = max(1, int(min_candidates or 1))
         self.max_candidates = max(self.min_candidates, int(max_candidates or self.min_candidates))
         self.auto_filter_weak_candidates = bool(auto_filter_weak_candidates)
+        profile = str(auto_filter_profile or "balanced").strip().lower()
+        self.auto_filter_profile = profile if profile in {"soft", "balanced", "strict"} else "balanced"
+        self.interest_threshold_percent = max(30, min(95, int(interest_threshold_percent or 52)))
+        self.llm_search_intensity = max(1, min(5, int(llm_search_intensity or 3)))
 
     def run(self):
         try:
@@ -420,6 +427,9 @@ class AutoShortsCandidateThread(QThread):
                 min_candidates=self.min_candidates,
                 max_candidates=self.max_candidates,
                 auto_filter_weak_candidates=self.auto_filter_weak_candidates,
+                auto_filter_profile=self.auto_filter_profile,
+                interest_threshold_percent=self.interest_threshold_percent,
+                llm_search_intensity=self.llm_search_intensity,
             )
 
             candidates = processor.find_candidates(

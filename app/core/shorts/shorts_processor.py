@@ -69,6 +69,9 @@ class ShortsProcessor:
         min_candidates: int = 8,
         max_candidates: int = 40,
         auto_filter_weak_candidates: bool = True,
+        auto_filter_profile: str = "balanced",
+        interest_threshold_percent: int = 52,
+        llm_search_intensity: int = 3,
     ):
         self.min_duration_ms = int(min_duration_s * 1000)
         self.max_duration_ms = int(max_duration_s * 1000)
@@ -79,6 +82,10 @@ class ShortsProcessor:
         self.min_candidates = max(1, int(min_candidates or 1))
         self.max_candidates = max(self.min_candidates, int(max_candidates or self.min_candidates))
         self.auto_filter_weak_candidates = bool(auto_filter_weak_candidates)
+        profile = str(auto_filter_profile or "balanced").strip().lower()
+        self.auto_filter_profile = profile if profile in {"soft", "balanced", "strict"} else "balanced"
+        self.interest_threshold_percent = max(30, min(95, int(interest_threshold_percent or 52)))
+        self.llm_search_intensity = max(1, min(5, int(llm_search_intensity or 3)))
 
     def find_candidates(self, asr_data: ASRData, progress_cb: Optional[Callable] = None) -> List[ShortCandidate]:
         if progress_cb:
@@ -110,11 +117,37 @@ class ShortsProcessor:
         if progress_cb:
             progress_cb(55, f"Найдено кандидатов (эвристика): {len(candidates)}")
 
+        # Важно: сохраняем пул ДО precision-pass.
+        # Иначе при агрессивной фильтрации ниже по цепочке
+        # не получится добрать до min_candidates даже если изначально
+        # кандидатов было достаточно.
+        pre_precision_candidates = list(candidates)
+
         # Pass-2 (precision): локально ужесточаем качество до LLM rerank.
         candidates = self._precision_pass(candidates)
 
         reranked = self._try_llm_rerank(candidates)
         reranked = self._diversify_by_timeline(reranked)
+
+        interested_filtered = self._apply_interest_threshold(reranked)
+        min_safe_interest = max(3, int(self.min_candidates * 0.55))
+        if len(interested_filtered) >= min_safe_interest:
+            reranked = interested_filtered
+        elif interested_filtered:
+            # Если порог интереса оказался слишком строгим —
+            # делаем мягкий микс до min_candidates.
+            reserve = sorted(reranked, key=lambda x: x.quality_score, reverse=True)
+            used = {(c.start_ms, c.end_ms) for c in interested_filtered}
+            mixed = list(interested_filtered)
+            for c in reserve:
+                key = (c.start_ms, c.end_ms)
+                if key in used:
+                    continue
+                mixed.append(c)
+                used.add(key)
+                if len(mixed) >= self.min_candidates:
+                    break
+            reranked = mixed
 
         if self.auto_filter_weak_candidates:
             weak_filtered = self._auto_filter_weak_candidates(reranked)
@@ -138,7 +171,7 @@ class ShortsProcessor:
 
         if len(reranked) < self.min_candidates:
             # Добираем до минимального числа из общего пула, сохраняя порядок по score
-            reserve_pool = sorted(candidates, key=lambda x: x.score, reverse=True)
+            reserve_pool = sorted(pre_precision_candidates, key=lambda x: x.score, reverse=True)
             seen = {(c.start_ms, c.end_ms) for c in reranked}
             for c in reserve_pool:
                 key = (c.start_ms, c.end_ms)
@@ -211,22 +244,48 @@ class ShortsProcessor:
     def _auto_filter_weak_candidates(self, candidates: List[ShortCandidate]) -> List[ShortCandidate]:
         if not candidates:
             return []
+
+        if self.auto_filter_profile == "soft":
+            min_quality = 44.0
+            min_hook = 2.8
+            max_pause = 0.56
+            min_density = 0.62
+            min_quality_for_low_density = 58.0
+        elif self.auto_filter_profile == "strict":
+            min_quality = 54.0
+            min_hook = 3.8
+            max_pause = 0.44
+            min_density = 0.78
+            min_quality_for_low_density = 68.0
+        else:
+            min_quality = 48.0
+            min_hook = 3.2
+            max_pause = 0.48
+            min_density = 0.70
+            min_quality_for_low_density = 62.0
+
         out: List[ShortCandidate] = []
         for c in candidates:
             quality = float(getattr(c, "quality_score", 0.0) or 0.0)
             hook = float(getattr(c, "hook_score", 0.0) or 0.0)
             pause_ratio = float(getattr(c, "pause_ratio", 1.0) or 1.0)
             speech_density = float(getattr(c, "speech_density", 0.0) or 0.0)
-            if quality < 48:
+            if quality < min_quality:
                 continue
-            if hook < 3.2:
+            if hook < min_hook:
                 continue
-            if pause_ratio > 0.48:
+            if pause_ratio > max_pause:
                 continue
-            if speech_density < 0.7 and quality < 62:
+            if speech_density < min_density and quality < min_quality_for_low_density:
                 continue
             out.append(c)
         return out
+
+    def _apply_interest_threshold(self, candidates: List[ShortCandidate]) -> List[ShortCandidate]:
+        if not candidates:
+            return []
+        threshold = float(self.interest_threshold_percent)
+        return [c for c in candidates if float(getattr(c, "quality_score", 0.0) or 0.0) >= threshold]
 
     def _build_enterprise_llm_candidates(
         self,
@@ -237,7 +296,13 @@ class ShortsProcessor:
         if not segments:
             return []
 
-        packets = self._build_segment_packets(segments, packet_size=140, overlap=35)
+        intensity = int(self.llm_search_intensity)
+        packet_size_map = {1: 180, 2: 160, 3: 140, 4: 120, 5: 100}
+        overlap_map = {1: 42, 2: 38, 3: 35, 4: 30, 5: 26}
+        packet_size = packet_size_map.get(intensity, 140)
+        overlap = overlap_map.get(intensity, 35)
+
+        packets = self._build_segment_packets(segments, packet_size=packet_size, overlap=overlap)
         all_candidates: List[ShortCandidate] = []
 
         for i, (start_idx, end_idx, packet_segments) in enumerate(packets, 1):
@@ -245,6 +310,8 @@ class ShortsProcessor:
                 packet_candidates = self._llm_extract_candidates_from_packet(
                     packet_segments,
                     global_start_idx=start_idx,
+                    packet_index=i,
+                    total_packets=len(packets),
                 )
                 all_candidates.extend(packet_candidates)
             except Exception as e:
@@ -273,23 +340,49 @@ class ShortsProcessor:
             start += step
         return packets
 
-    def _llm_extract_candidates_from_packet(self, packet_segments: List, global_start_idx: int) -> List[ShortCandidate]:
+    def _llm_extract_candidates_from_packet(
+        self,
+        packet_segments: List,
+        global_start_idx: int,
+        packet_index: int = 1,
+        total_packets: int = 1,
+    ) -> List[ShortCandidate]:
         client = openai.OpenAI(base_url=self.llm_base_url, api_key=self.llm_api_key)
 
+        intensity = int(self.llm_search_intensity)
+        # Защита от переполнения контекста (особенно для локальных моделей в LM Studio).
+        max_rows_map = {1: 64, 2: 72, 3: 84, 4: 96, 5: 110}
+        max_text_chars_map = {1: 88, 2: 96, 3: 108, 4: 120, 5: 132}
+        max_prompt_chars_map = {1: 6200, 2: 7000, 3: 7800, 4: 8600, 5: 9400}
+        max_rows = max_rows_map.get(intensity, 84)
+        max_text_chars = max_text_chars_map.get(intensity, 108)
+        max_prompt_chars = max_prompt_chars_map.get(intensity, 7800)
+
         rows = []
+        prompt_chars_used = 0
         for local_idx, seg in enumerate(packet_segments):
+            if len(rows) >= max_rows:
+                break
             abs_idx = global_start_idx + local_idx
+            text = self._shorten((seg.text or "").strip(), max_text_chars)
+            row = {
+                "idx": abs_idx,
+                "text": text,
+            }
+            # Ограничиваем общий размер user-пейлоада в символах.
+            row_chars = len(json.dumps(row, ensure_ascii=False))
+            if rows and (prompt_chars_used + row_chars) > max_prompt_chars:
+                break
+            prompt_chars_used += row_chars
             rows.append(
-                {
-                    "idx": abs_idx,
-                    "start_ms": int(seg.start_time),
-                    "end_ms": int(seg.end_time),
-                    "text": (seg.text or "").strip(),
-                }
+                row
             )
 
         min_s = max(8, int(self.min_duration_ms / 1000))
         max_s = max(min_s + 5, int(self.max_duration_ms / 1000))
+        min_items = max(4, min(18, 4 + intensity * 2))
+        max_items = max(min_items + 2, min(28, 10 + intensity * 4))
+        max_output_tokens = max(220, min(640, 200 + max_items * 16))
 
         system = (
             "Ты enterprise-редактор YouTube Shorts. Найди лучшие моменты удержания. "
@@ -298,9 +391,14 @@ class ShortsProcessor:
             "{\"items\":[{\"start_idx\":int,\"end_idx\":int,\"score\":0-100,\"title\":str,\"reason\":str,"
             "\"hook\":0-10,\"emotion\":0-10,\"novelty\":0-10,\"shareability\":0-10}]}. "
             f"Длительность каждого фрагмента {min_s}-{max_s} секунд. "
+            f"Верни от {min_items} до {max_items} кандидатов на этот пакет. "
             "Не придумывай таймкоды, используй только переданные idx."
         )
-        user = f"Сегменты:\n{json.dumps(rows, ensure_ascii=False)}"
+        user = (
+            f"Пакет {packet_index}/{max(1, total_packets)}. "
+            "Нужны разнообразные, неповторяющиеся моменты по смыслу и таймингу.\n"
+            f"Сегменты:\n{json.dumps(rows, ensure_ascii=False)}"
+        )
 
         rsp = client.chat.completions.create(
             model=self.llm_model,
@@ -309,6 +407,7 @@ class ShortsProcessor:
                 {"role": "user", "content": user},
             ],
             temperature=0.15,
+            max_tokens=max_output_tokens,
             timeout=120,
         )
         content = rsp.choices[0].message.content or ""
@@ -706,14 +805,16 @@ class ShortsProcessor:
             return candidates
 
         try:
-            top = candidates[:40]
+            # Rerank делаем компактным, чтобы не выбивать контекст на локальных LLM.
+            rerank_top_map = {1: 24, 2: 30, 3: 36, 4: 42, 5: 50}
+            top = candidates[: rerank_top_map.get(int(self.llm_search_intensity), 44)]
             payload = [
                 {
                     "id": i,
                     "start_ms": c.start_ms,
                     "end_ms": c.end_ms,
                     "score": c.score,
-                    "excerpt": c.excerpt,
+                    "excerpt": self._shorten(c.excerpt, 130),
                 }
                 for i, c in enumerate(top)
             ]
@@ -731,6 +832,7 @@ class ShortsProcessor:
                     {"role": "user", "content": user},
                 ],
                 temperature=0.2,
+                max_tokens=260,
                 timeout=90,
             )
             content = rsp.choices[0].message.content or ""

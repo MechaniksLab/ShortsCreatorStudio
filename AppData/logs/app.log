@@ -16877,3 +16877,1112 @@ Latest version info: v1.3.3
 Latest version info: v1.3.3
 Latest version info: v1.3.3
 Latest version info: v1.3.3
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1490.760 -t 49.140 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=1.200,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=2.240:end=4.020,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.188:end=6.452,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=7.220:end=9.000,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=10.020:end=11.219,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=11.806:end=13.054,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=13.794:end=17.340,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=17.520:end=18.040,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=18.280:end=18.780,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=19.944:end=23.800,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=23.920:end=32.200,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=33.460:end=34.640,setpts=PTS-STARTPTS[vp11];[0:v]trim=start=34.840:end=37.241,setpts=PTS-STARTPTS[vp12];[0:v]trim=start=38.707:end=40.173,setpts=PTS-STARTPTS[vp13];[0:v]trim=start=40.580:end=44.368,setpts=PTS-STARTPTS[vp14];[0:v]trim=start=44.720:end=46.080,setpts=PTS-STARTPTS[vp15];[0:v]trim=start=46.787:end=47.833,setpts=PTS-STARTPTS[vp16];[0:v]trim=start=48.300:end=49.140,setpts=PTS-STARTPTS[vp17];[0:a]atrim=start=0.020:end=1.200,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=2.240:end=4.020,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.188:end=6.452,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=7.220:end=9.000,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=10.020:end=11.219,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=11.806:end=13.054,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=13.794:end=17.340,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=17.520:end=18.040,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=18.280:end=18.780,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=19.944:end=23.800,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=23.920:end=32.200,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=33.460:end=34.640,asetpts=PTS-STARTPTS[ap11];[0:a]atrim=start=34.840:end=37.241,asetpts=PTS-STARTPTS[ap12];[0:a]atrim=start=38.707:end=40.173,asetpts=PTS-STARTPTS[ap13];[0:a]atrim=start=40.580:end=44.368,asetpts=PTS-STARTPTS[ap14];[0:a]atrim=start=44.720:end=46.080,asetpts=PTS-STARTPTS[ap15];[0:a]atrim=start=46.787:end=47.833,asetpts=PTS-STARTPTS[ap16];[0:a]atrim=start=48.300:end=49.140,asetpts=PTS-STARTPTS[ap17];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11][vp12][ap12][vp13][ap13][vp14][ap14][vp15][ap15][vp16][ap16][vp17][ap17]concat=n=18:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_001_Это же вредно. Надо же от чего-то умереть_1490-1539с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1517.000 -t 40.840 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=5.960,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=7.220:end=8.400,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.600:end=11.001,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.467:end=13.933,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.340:end=18.128,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=18.480:end=19.840,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=20.547:end=21.593,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=22.060:end=25.932,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=26.281:end=29.920,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=30.524:end=36.256,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=36.460:end=38.583,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=39.140:end=40.840,setpts=PTS-STARTPTS[vp11];[0:a]atrim=start=0.020:end=5.960,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=7.220:end=8.400,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.600:end=11.001,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.467:end=13.933,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.340:end=18.128,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=18.480:end=19.840,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=20.547:end=21.593,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=22.060:end=25.932,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=26.281:end=29.920,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=30.524:end=36.256,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=36.460:end=38.583,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=39.140:end=40.840,asetpts=PTS-STARTPTS[ap11];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11]concat=n=12:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_002_Ну, налажали_1517-1557с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1687.740 -t 27.360 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.028:end=4.320,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.940:end=5.700,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.340:end=10.300,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=11.204:end=13.100,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.660:end=17.300,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=17.503:end=24.200,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=24.980:end=27.360,setpts=PTS-STARTPTS[vp6];[0:a]atrim=start=0.028:end=4.320,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.940:end=5.700,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.340:end=10.300,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=11.204:end=13.100,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.660:end=17.300,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=17.503:end=24.200,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=24.980:end=27.360,asetpts=PTS-STARTPTS[ap6];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6]concat=n=7:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_003_Допрос подозреваемого_1687-1715с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1705.760 -t 24.760 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=6.180,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.960:end=12.905,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=14.520:end=22.760,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=23.440:end=24.760,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=6.180,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.960:end=12.905,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=14.520:end=22.760,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=23.440:end=24.760,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_004_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1531.320 -t 41.400 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=3.808,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.160:end=5.520,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.227:end=7.273,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=7.740:end=11.612,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=11.961:end=15.600,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.204:end=21.936,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=22.140:end=24.263,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=24.820:end=26.344,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=27.240:end=30.440,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=30.660:end=33.301,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=34.260:end=35.000,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=35.820:end=39.040,setpts=PTS-STARTPTS[vp11];[0:v]trim=start=39.160:end=41.400,setpts=PTS-STARTPTS[vp12];[0:a]atrim=start=0.020:end=3.808,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.160:end=5.520,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.227:end=7.273,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=7.740:end=11.612,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=11.961:end=15.600,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.204:end=21.936,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=22.140:end=24.263,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=24.820:end=26.344,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=27.240:end=30.440,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=30.660:end=33.301,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=34.260:end=35.000,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=35.820:end=39.040,asetpts=PTS-STARTPTS[ap11];[0:a]atrim=start=39.160:end=41.400,asetpts=PTS-STARTPTS[ap12];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11][vp12][ap12]concat=n=13:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_005_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2789.520 -t 16.640 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=6.137,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.720:end=10.920,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=11.804:end=14.200,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=14.380:end=16.640,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=6.137,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.720:end=10.920,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=11.804:end=14.200,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=14.380:end=16.640,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_006_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2801.860 -t 15.920 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=1.860,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=2.040:end=4.140,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.144:end=8.612,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=9.240:end=11.640,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=12.040:end=15.920,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.020:end=1.860,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=2.040:end=4.140,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.144:end=8.612,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=9.240:end=11.640,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=12.040:end=15.920,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_007_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1732.800 -t 20.580 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.000:end=0.600,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=0.720:end=3.200,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=3.648:end=5.132,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=8.240:end=11.096,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=11.500:end=13.920,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.760:end=17.640,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=19.660:end=20.580,setpts=PTS-STARTPTS[vp6];[0:a]atrim=start=0.000:end=0.600,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=0.720:end=3.200,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=3.648:end=5.132,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=8.240:end=11.096,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=11.500:end=13.920,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.760:end=17.640,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=19.660:end=20.580,asetpts=PTS-STARTPTS[ap6];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6]concat=n=7:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_008_Неожиданный поворот_1732-1753с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1397.020 -t 66.680 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=0.640,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.097:end=6.043,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.711:end=8.040,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=11.221:end=11.999,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=12.481:end=13.600,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=14.580:end=16.049,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=16.481:end=19.240,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=20.521:end=25.860,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=26.020:end=27.312,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=28.301:end=32.120,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=32.420:end=33.180,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=33.420:end=35.240,setpts=PTS-STARTPTS[vp11];[0:v]trim=start=35.811:end=37.540,setpts=PTS-STARTPTS[vp12];[0:v]trim=start=37.654:end=39.080,setpts=PTS-STARTPTS[vp13];[0:v]trim=start=39.300:end=41.382,setpts=PTS-STARTPTS[vp14];[0:v]trim=start=42.462:end=43.700,setpts=PTS-STARTPTS[vp15];[0:v]trim=start=50.176:end=52.139,setpts=PTS-STARTPTS[vp16];[0:v]trim=start=53.980:end=54.740,setpts=PTS-STARTPTS[vp17];[0:v]trim=start=55.000:end=56.300,setpts=PTS-STARTPTS[vp18];[0:v]trim=start=64.274:end=66.680,setpts=PTS-STARTPTS[vp19];[0:a]atrim=start=0.020:end=0.640,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.097:end=6.043,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.711:end=8.040,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=11.221:end=11.999,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=12.481:end=13.600,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=14.580:end=16.049,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=16.481:end=19.240,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=20.521:end=25.860,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=26.020:end=27.312,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=28.301:end=32.120,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=32.420:end=33.180,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=33.420:end=35.240,asetpts=PTS-STARTPTS[ap11];[0:a]atrim=start=35.811:end=37.540,asetpts=PTS-STARTPTS[ap12];[0:a]atrim=start=37.654:end=39.080,asetpts=PTS-STARTPTS[ap13];[0:a]atrim=start=39.300:end=41.382,asetpts=PTS-STARTPTS[ap14];[0:a]atrim=start=42.462:end=43.700,asetpts=PTS-STARTPTS[ap15];[0:a]atrim=start=50.176:end=52.139,asetpts=PTS-STARTPTS[ap16];[0:a]atrim=start=53.980:end=54.740,asetpts=PTS-STARTPTS[ap17];[0:a]atrim=start=55.000:end=56.300,asetpts=PTS-STARTPTS[ap18];[0:a]atrim=start=64.274:end=66.680,asetpts=PTS-STARTPTS[ap19];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11][vp12][ap12][vp13][ap13][vp14][ap14][vp15][ap15][vp16][ap16][vp17][ap17][vp18][ap18][vp19][ap19]concat=n=20:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_009_Ананасовая страсть газированная, ага_1397-1463с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2029.520 -t 61.100 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.040:end=3.136,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=8.153:end=9.819,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=10.073:end=11.780,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=13.708:end=14.552,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=15.033:end=16.640,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=19.820:end=22.180,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=22.998:end=24.162,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=24.860:end=28.229,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=29.000:end=32.479,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=33.840:end=36.322,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=37.600:end=39.480,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=39.624:end=41.235,setpts=PTS-STARTPTS[vp11];[0:v]trim=start=42.260:end=43.488,setpts=PTS-STARTPTS[vp12];[0:v]trim=start=45.232:end=46.600,setpts=PTS-STARTPTS[vp13];[0:v]trim=start=47.320:end=49.900,setpts=PTS-STARTPTS[vp14];[0:v]trim=start=52.452:end=53.348,setpts=PTS-STARTPTS[vp15];[0:v]trim=start=59.372:end=61.100,setpts=PTS-STARTPTS[vp16];[0:a]atrim=start=0.040:end=3.136,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=8.153:end=9.819,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=10.073:end=11.780,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=13.708:end=14.552,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=15.033:end=16.640,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=19.820:end=22.180,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=22.998:end=24.162,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=24.860:end=28.229,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=29.000:end=32.479,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=33.840:end=36.322,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=37.600:end=39.480,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=39.624:end=41.235,asetpts=PTS-STARTPTS[ap11];[0:a]atrim=start=42.260:end=43.488,asetpts=PTS-STARTPTS[ap12];[0:a]atrim=start=45.232:end=46.600,asetpts=PTS-STARTPTS[ap13];[0:a]atrim=start=47.320:end=49.900,asetpts=PTS-STARTPTS[ap14];[0:a]atrim=start=52.452:end=53.348,asetpts=PTS-STARTPTS[ap15];[0:a]atrim=start=59.372:end=61.100,asetpts=PTS-STARTPTS[ap16];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11][vp12][ap12][vp13][ap13][vp14][ap14][vp15][ap15][vp16][ap16]concat=n=17:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_010_Загадочный дневник_2029-2090с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 73.020 -t 34.800 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_011_Чё это Саундтрек... Флоя... Лютер... Златко_73-107с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 824.420 -t 31.260 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map 0:a:0? -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_012_Открытие Ярихона_824-855с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1720.260 -t 17.900 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=8.260,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=8.940:end=10.100,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=10.400:end=11.580,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.520:end=13.140,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.260:end=15.740,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.188:end=17.900,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.020:end=8.260,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=8.940:end=10.100,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=10.400:end=11.580,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.520:end=13.140,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.260:end=15.740,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.188:end=17.900,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_013_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2903.780 -t 23.220 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.000:end=5.540,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.860:end=10.144,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=12.420:end=23.220,setpts=PTS-STARTPTS[vp2];[0:a]atrim=start=0.000:end=5.540,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.860:end=10.144,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=12.420:end=23.220,asetpts=PTS-STARTPTS[ap2];[vp0][ap0][vp1][ap1][vp2][ap2]concat=n=3:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_014_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 47.920 -t 18.660 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.026:end=1.520,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.800:end=5.400,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.580:end=9.220,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.260:end=14.318,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=16.912:end=18.660,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.026:end=1.520,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.800:end=5.400,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.580:end=9.220,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.260:end=14.318,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=16.912:end=18.660,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_015_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1630.920 -t 17.620 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.039:end=7.128,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=7.740:end=11.620,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=13.659:end=17.620,setpts=PTS-STARTPTS[vp2];[0:a]atrim=start=0.039:end=7.128,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=7.740:end=11.620,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=13.659:end=17.620,asetpts=PTS-STARTPTS[ap2];[vp0][ap0][vp1][ap1][vp2][ap2]concat=n=3:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_016_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1607.320 -t 16.680 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=3.172,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.400:end=8.460,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=9.374:end=13.711,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=14.700:end=16.680,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=3.172,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.400:end=8.460,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=9.374:end=13.711,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=14.700:end=16.680,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_017_правда, конечно. Я знаю, что учебу вы закончили с отличием. Быстро сдел…_1607-1624с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2435.780 -t 17.500 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.024:end=0.836,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.160:end=2.840,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=3.161:end=6.334,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=6.840:end=12.429,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=12.800:end=15.120,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=15.860:end=17.500,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.024:end=0.836,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.160:end=2.840,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=3.161:end=6.334,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=6.840:end=12.429,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=12.800:end=15.120,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=15.860:end=17.500,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_018_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2889.840 -t 19.640 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.031:end=3.910,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.031:end=7.289,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.540:end=10.360,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.540:end=13.440,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.920:end=19.640,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.031:end=3.910,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.031:end=7.289,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.540:end=10.360,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.540:end=13.440,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.920:end=19.640,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_019_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1379.820 -t 18.000 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=2.940,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.600:end=5.800,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.140:end=7.140,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=7.320:end=8.260,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=9.320:end=9.940,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=10.280:end=15.600,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=16.020:end=18.000,setpts=PTS-STARTPTS[vp6];[0:a]atrim=start=0.020:end=2.940,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.600:end=5.800,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.140:end=7.140,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=7.320:end=8.260,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=9.320:end=9.940,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=10.280:end=15.600,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=16.020:end=18.000,asetpts=PTS-STARTPTS[ap6];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6]concat=n=7:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_020_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1988.880 -t 21.060 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.047:end=4.248,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.140:end=7.480,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=7.740:end=9.280,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.187:end=12.940,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.200:end=15.860,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.615:end=21.060,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.047:end=4.248,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.140:end=7.480,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=7.740:end=9.280,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.187:end=12.940,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.200:end=15.860,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.615:end=21.060,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_021_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2916.180 -t 15.700 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=10.656,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=10.780:end=12.074,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=14.700:end=15.700,setpts=PTS-STARTPTS[vp2];[0:a]atrim=start=0.020:end=10.656,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=10.780:end=12.074,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=14.700:end=15.700,asetpts=PTS-STARTPTS[ap2];[vp0][ap0][vp1][ap1][vp2][ap2]concat=n=3:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_022_А пока что спасибо всем за просмотр, комментируйте, ставьте лайки, подп…_2916-2931с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2796.220 -t 17.000 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=4.220,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.104:end=7.500,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=7.680:end=9.780,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.784:end=14.252,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.880:end=17.000,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.020:end=4.220,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.104:end=7.500,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=7.680:end=9.780,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.784:end=14.252,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.880:end=17.000,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_023_Мы можем выжить, только прячась. Наш единственный выход прятаться. Если…_2796-2813с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2898.360 -t 15.740 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=1.840,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=2.020:end=4.920,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.400:end=10.960,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.280:end=15.740,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=1.840,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=2.020:end=4.920,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.400:end=10.960,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.280:end=15.740,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_160644\шорт_024_Поднимать восстание, короче, будем. В следующей серии отряд уже есть. Н…_2898-2914с.mp4
+Latest version info: v1.3.3
+2026-04-20 16:22:35 - shorts_processor - WARNING - Enterprise packet parse failed: Error code: 400 - {'error': 'Context size has been exceeded.'}
+Latest version info: v1.3.3
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1504.520 -t 40.960 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.034:end=3.580,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.760:end=4.280,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=4.520:end=5.020,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=6.184:end=10.040,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=10.160:end=18.440,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=19.700:end=20.880,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=21.080:end=23.481,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=24.947:end=26.413,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=26.820:end=30.608,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=30.960:end=32.320,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=33.027:end=34.073,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=34.540:end=38.412,setpts=PTS-STARTPTS[vp11];[0:v]trim=start=38.761:end=40.960,setpts=PTS-STARTPTS[vp12];[0:a]atrim=start=0.034:end=3.580,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.760:end=4.280,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=4.520:end=5.020,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=6.184:end=10.040,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=10.160:end=18.440,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=19.700:end=20.880,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=21.080:end=23.481,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=24.947:end=26.413,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=26.820:end=30.608,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=30.960:end=32.320,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=33.027:end=34.073,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=34.540:end=38.412,asetpts=PTS-STARTPTS[ap11];[0:a]atrim=start=38.761:end=40.960,asetpts=PTS-STARTPTS[ap12];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11][vp12][ap12]concat=n=13:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1517.000 -t 40.840 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=5.960,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=7.220:end=8.400,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.600:end=11.001,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.467:end=13.933,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.340:end=18.128,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=18.480:end=19.840,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=20.547:end=21.593,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=22.060:end=25.932,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=26.281:end=29.920,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=30.524:end=36.256,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=36.460:end=38.583,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=39.140:end=40.840,setpts=PTS-STARTPTS[vp11];[0:a]atrim=start=0.020:end=5.960,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=7.220:end=8.400,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.600:end=11.001,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.467:end=13.933,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.340:end=18.128,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=18.480:end=19.840,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=20.547:end=21.593,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=22.060:end=25.932,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=26.281:end=29.920,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=30.524:end=36.256,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=36.460:end=38.583,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=39.140:end=40.840,asetpts=PTS-STARTPTS[ap11];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11]concat=n=12:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_002_фактор восприятия. Мою внешность и голос специально разработали для гар…_1517-1557с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1705.760 -t 24.760 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=6.180,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.960:end=12.905,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=14.520:end=22.760,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=23.440:end=24.760,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=6.180,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.960:end=12.905,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=14.520:end=22.760,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=23.440:end=24.760,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1419.100 -t 18.520 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.000:end=3.780,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.940:end=5.232,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.221:end=10.040,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.340:end=11.100,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=11.340:end=13.160,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=13.731:end=15.460,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=15.574:end=17.000,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=17.220:end=18.520,setpts=PTS-STARTPTS[vp7];[0:a]atrim=start=0.000:end=3.780,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.940:end=5.232,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.221:end=10.040,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.340:end=11.100,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=11.340:end=13.160,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=13.731:end=15.460,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=15.574:end=17.000,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=17.220:end=18.520,asetpts=PTS-STARTPTS[ap7];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7]concat=n=8:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1484.240 -t 38.880 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=6.040,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.540:end=7.720,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.760:end=10.540,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=11.708:end=12.972,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.740:end=15.520,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.540:end=17.739,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=18.326:end=19.574,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=20.314:end=23.860,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=24.040:end=24.560,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=24.800:end=25.300,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=26.464:end=30.320,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=30.440:end=38.880,setpts=PTS-STARTPTS[vp11];[0:a]atrim=start=0.020:end=6.040,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.540:end=7.720,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.760:end=10.540,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=11.708:end=12.972,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.740:end=15.520,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.540:end=17.739,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=18.326:end=19.574,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=20.314:end=23.860,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=24.040:end=24.560,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=24.800:end=25.300,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=26.464:end=30.320,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=30.440:end=38.880,asetpts=PTS-STARTPTS[ap11];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11]concat=n=12:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1531.320 -t 41.400 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=3.808,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.160:end=5.520,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.227:end=7.273,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=7.740:end=11.612,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=11.961:end=15.600,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.204:end=21.936,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=22.140:end=24.263,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=24.820:end=26.344,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=27.240:end=30.440,setpts=PTS-STARTPTS[vp8];[0:v]trim=start=30.660:end=33.301,setpts=PTS-STARTPTS[vp9];[0:v]trim=start=34.260:end=35.000,setpts=PTS-STARTPTS[vp10];[0:v]trim=start=35.820:end=39.040,setpts=PTS-STARTPTS[vp11];[0:v]trim=start=39.160:end=41.400,setpts=PTS-STARTPTS[vp12];[0:a]atrim=start=0.020:end=3.808,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.160:end=5.520,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.227:end=7.273,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=7.740:end=11.612,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=11.961:end=15.600,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.204:end=21.936,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=22.140:end=24.263,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=24.820:end=26.344,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=27.240:end=30.440,asetpts=PTS-STARTPTS[ap8];[0:a]atrim=start=30.660:end=33.301,asetpts=PTS-STARTPTS[ap9];[0:a]atrim=start=34.260:end=35.000,asetpts=PTS-STARTPTS[ap10];[0:a]atrim=start=35.820:end=39.040,asetpts=PTS-STARTPTS[ap11];[0:a]atrim=start=39.160:end=41.400,asetpts=PTS-STARTPTS[ap12];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8][vp9][ap9][vp10][ap10][vp11][ap11][vp12][ap12]concat=n=13:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2789.520 -t 16.640 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=6.137,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.720:end=10.920,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=11.804:end=14.200,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=14.380:end=16.640,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=6.137,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.720:end=10.920,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=11.804:end=14.200,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=14.380:end=16.640,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2801.860 -t 15.920 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=1.860,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=2.040:end=4.140,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.144:end=8.612,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=9.240:end=11.640,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=12.040:end=15.920,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.020:end=1.860,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=2.040:end=4.140,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.144:end=8.612,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=9.240:end=11.640,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=12.040:end=15.920,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1616.660 -t 16.620 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.034:end=4.371,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.360:end=7.180,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.519:end=10.580,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=14.299:end=16.620,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.034:end=4.371,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.360:end=7.180,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.519:end=10.580,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=14.299:end=16.620,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_009_Вопрос о выводах_1616-1633с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1720.260 -t 17.900 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=8.260,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=8.940:end=10.100,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=10.400:end=11.580,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.520:end=13.140,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.260:end=15.740,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.188:end=17.900,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.020:end=8.260,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=8.940:end=10.100,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=10.400:end=11.580,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.520:end=13.140,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.260:end=15.740,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.188:end=17.900,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_010_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2442.600 -t 18.280 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=5.609,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.980:end=8.300,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=9.040:end=10.520,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=13.100:end=18.280,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=5.609,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.980:end=8.300,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=9.040:end=10.520,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=13.100:end=18.280,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы Коннор у нас... Ты…_2442-2460с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2903.780 -t 23.220 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.000:end=5.540,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.860:end=10.144,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=12.420:end=23.220,setpts=PTS-STARTPTS[vp2];[0:a]atrim=start=0.000:end=5.540,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.860:end=10.144,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=12.420:end=23.220,asetpts=PTS-STARTPTS[ap2];[vp0][ap0][vp1][ap1][vp2][ap2]concat=n=3:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1690.360 -t 27.100 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=1.700,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=2.320:end=3.080,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=3.720:end=7.680,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=8.584:end=10.480,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=12.040:end=14.680,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=14.883:end=21.580,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=22.360:end=27.100,setpts=PTS-STARTPTS[vp6];[0:a]atrim=start=0.020:end=1.700,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=2.320:end=3.080,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=3.720:end=7.680,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=8.584:end=10.480,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=12.040:end=14.680,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=14.883:end=21.580,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=22.360:end=27.100,asetpts=PTS-STARTPTS[ap6];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6]concat=n=7:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_013_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 47.920 -t 18.660 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.026:end=1.520,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.800:end=5.400,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.580:end=9.220,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.260:end=14.318,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=16.912:end=18.660,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.026:end=1.520,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.800:end=5.400,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.580:end=9.220,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.260:end=14.318,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=16.912:end=18.660,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1630.920 -t 17.620 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.039:end=7.128,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=7.740:end=11.620,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=13.659:end=17.620,setpts=PTS-STARTPTS[vp2];[0:a]atrim=start=0.039:end=7.128,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=7.740:end=11.620,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=13.659:end=17.620,asetpts=PTS-STARTPTS[ap2];[vp0][ap0][vp1][ap1][vp2][ap2]concat=n=3:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_015_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2435.780 -t 17.500 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.024:end=0.836,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.160:end=2.840,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=3.161:end=6.334,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=6.840:end=12.429,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=12.800:end=15.120,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=15.860:end=17.500,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.024:end=0.836,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.160:end=2.840,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=3.161:end=6.334,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=6.840:end=12.429,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=12.800:end=15.120,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=15.860:end=17.500,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_016_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2889.840 -t 19.640 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.031:end=3.910,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.031:end=7.289,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.540:end=10.360,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.540:end=13.440,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.920:end=19.640,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.031:end=3.910,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.031:end=7.289,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.540:end=10.360,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.540:end=13.440,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.920:end=19.640,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1379.820 -t 18.000 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=2.940,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.600:end=5.800,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.140:end=7.140,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=7.320:end=8.260,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=9.320:end=9.940,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=10.280:end=15.600,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=16.020:end=18.000,setpts=PTS-STARTPTS[vp6];[0:a]atrim=start=0.020:end=2.940,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.600:end=5.800,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.140:end=7.140,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=7.320:end=8.260,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=9.320:end=9.940,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=10.280:end=15.600,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=16.020:end=18.000,asetpts=PTS-STARTPTS[ap6];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6]concat=n=7:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_018_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1988.880 -t 21.060 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.047:end=4.248,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.140:end=7.480,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=7.740:end=9.280,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.187:end=12.940,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.200:end=15.860,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=16.615:end=21.060,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.047:end=4.248,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.140:end=7.480,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=7.740:end=9.280,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.187:end=12.940,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.200:end=15.860,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=16.615:end=21.060,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_019_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2395.120 -t 16.500 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.040:end=1.020,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.480:end=2.060,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=2.180:end=2.900,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=3.260:end=5.040,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=5.700:end=7.060,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=7.720:end=9.960,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=10.180:end=11.640,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=12.044:end=13.719,setpts=PTS-STARTPTS[vp7];[0:v]trim=start=14.420:end=16.500,setpts=PTS-STARTPTS[vp8];[0:a]atrim=start=0.040:end=1.020,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.480:end=2.060,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=2.180:end=2.900,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=3.260:end=5.040,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=5.700:end=7.060,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=7.720:end=9.960,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=10.180:end=11.640,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=12.044:end=13.719,asetpts=PTS-STARTPTS[ap7];[0:a]atrim=start=14.420:end=16.500,asetpts=PTS-STARTPTS[ap8];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7][vp8][ap8]concat=n=9:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет. Все, пошли отсюд…_2395-2411с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 163.260 -t 16.620 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.024:end=2.120,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=2.650:end=4.576,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.063:end=6.210,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=8.660:end=14.117,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.660:end=16.620,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.024:end=2.120,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=2.650:end=4.576,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.063:end=6.210,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=8.660:end=14.117,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.660:end=16.620,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где наша свобода. Най…_163-179с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2055.100 -t 15.840 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.119:end=2.649,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=3.420:end=6.899,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.260:end=10.742,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.020:end=13.900,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.044:end=15.840,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.119:end=2.649,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=3.420:end=6.899,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.260:end=10.742,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.020:end=13.900,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.044:end=15.840,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1097.180 -t 16.720 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.021:end=4.180,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=4.503:end=5.760,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=8.601:end=9.899,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.160:end=12.520,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.420:end=15.080,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=15.580:end=16.720,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.021:end=4.180,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=4.503:end=5.760,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=8.601:end=9.899,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.160:end=12.520,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.420:end=15.080,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=15.580:end=16.720,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дурочка, блин Ой, ка…_1097-1113с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 307.720 -t 18.200 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=4.842,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.704:end=6.936,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=7.560:end=8.320,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.536:end=13.680,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=15.852:end=18.200,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.020:end=4.842,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.704:end=6.936,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=7.560:end=8.320,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.536:end=13.680,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=15.852:end=18.200,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_024_этих символах у тебя зашифрована информация Как штрих-код Точка-точка…_307-325с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2827.640 -t 17.080 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=2.474,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.000:end=8.780,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=10.300:end=12.669,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=13.471:end=17.080,setpts=PTS-STARTPTS[vp3];[0:a]atrim=start=0.020:end=2.474,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.000:end=8.780,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=10.300:end=12.669,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=13.471:end=17.080,asetpts=PTS-STARTPTS[ap3];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3]concat=n=4:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_025_но все же у тебя не было и такой свободы. Прямо. Сидеть в темноте и жда…_2827-2844с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 35.940 -t 20.080 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.040:end=1.320,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.880:end=4.400,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=4.860:end=6.368,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=6.760:end=7.520,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=8.060:end=9.306,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=12.006:end=13.500,setpts=PTS-STARTPTS[vp5];[0:v]trim=start=13.780:end=17.380,setpts=PTS-STARTPTS[vp6];[0:v]trim=start=17.560:end=20.080,setpts=PTS-STARTPTS[vp7];[0:a]atrim=start=0.040:end=1.320,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.880:end=4.400,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=4.860:end=6.368,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=6.760:end=7.520,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=8.060:end=9.306,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=12.006:end=13.500,asetpts=PTS-STARTPTS[ap5];[0:a]atrim=start=13.780:end=17.380,asetpts=PTS-STARTPTS[ap6];[0:a]atrim=start=17.560:end=20.080,asetpts=PTS-STARTPTS[ap7];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5][vp6][ap6][vp7][ap7]concat=n=8:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас. Они могут погибну…_35-56с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 105.300 -t 20.840 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.092:end=2.400,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=6.392:end=8.880,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=9.980:end=11.090,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=12.549:end=14.031,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.460:end=20.840,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.092:end=2.400,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=6.392:end=8.880,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=9.980:end=11.090,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=12.549:end=14.031,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.460:end=20.840,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще не знаю для чего э…_105-126с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2043.200 -t 18.960 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.028:end=0.872,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.353:end=2.960,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=6.140:end=8.500,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=9.318:end=10.482,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=11.180:end=14.549,setpts=PTS-STARTPTS[vp4];[0:v]trim=start=15.320:end=18.960,setpts=PTS-STARTPTS[vp5];[0:a]atrim=start=0.028:end=0.872,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.353:end=2.960,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=6.140:end=8.500,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=9.318:end=10.482,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=11.180:end=14.549,asetpts=PTS-STARTPTS[ap4];[0:a]atrim=start=15.320:end=18.960,asetpts=PTS-STARTPTS[ap5];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4][vp5][ap5]concat=n=6:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано 2471 раз. То же с…_2043-2062с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 1411.880 -t 17.560 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.100:end=1.189,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=1.621:end=4.380,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=5.661:end=11.000,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=11.160:end=12.452,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=13.441:end=17.520,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.100:end=1.189,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=1.621:end=4.380,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=5.661:end=11.000,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=11.160:end=12.452,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=13.441:end=17.520,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я про т…_1411-1429с.mp4
+Render short: ffmpeg -nostdin -hide_banner -loglevel error -ss 2796.220 -t 17.000 -i E:/Downloads/НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5.mp4 -filter_complex [0:v]trim=start=0.020:end=4.220,setpts=PTS-STARTPTS[vp0];[0:v]trim=start=5.104:end=7.500,setpts=PTS-STARTPTS[vp1];[0:v]trim=start=7.680:end=9.780,setpts=PTS-STARTPTS[vp2];[0:v]trim=start=10.784:end=14.252,setpts=PTS-STARTPTS[vp3];[0:v]trim=start=14.880:end=17.000,setpts=PTS-STARTPTS[vp4];[0:a]atrim=start=0.020:end=4.220,asetpts=PTS-STARTPTS[ap0];[0:a]atrim=start=5.104:end=7.500,asetpts=PTS-STARTPTS[ap1];[0:a]atrim=start=7.680:end=9.780,asetpts=PTS-STARTPTS[ap2];[0:a]atrim=start=10.784:end=14.252,asetpts=PTS-STARTPTS[ap3];[0:a]atrim=start=14.880:end=17.000,asetpts=PTS-STARTPTS[ap4];[vp0][ap0][vp1][ap1][vp2][ap2][vp3][ap3][vp4][ap4]concat=n=5:v=1:a=1[vsrc][asrc];[vsrc]fps=60,split=2[src_cam][src_game];[src_cam]crop=583:345:0:0,eq=brightness=0.120:contrast=1.270:saturation=1.030:gamma=1.000,scale=1080:636:flags=fast_bilinear[cam];[src_game]crop=1203:1080:379:0,eq=brightness=0.210:contrast=1.330:saturation=0.950:gamma=1.000,scale=1080:1284:flags=fast_bilinear[game];[cam][game]vstack=inputs=2[vout] -map [vout] -map [asrc] -c:v h264_nvenc -preset p3 -tune hq -rc vbr -cq 21 -b:v 0 -bf 0 -pix_fmt yuv420p -movflags +faststart -shortest -c:a aac -b:a 160k -y E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_030_Мы можем выжить, только прячась. Наш единственный выход прятаться. Если…_2796-2813с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:22:25.628180
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmplr_k_3yz.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpl3ubuung\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpl3ubuung\audio.wav
+82% | 28/34 | 00:08<<00:01 |  3.28 audio seconds/s
+100% | 34/34 | 00:11<<00:00 |  2.96 audio seconds/s
+Transcription speed: 2.89 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpl3ubuung' directory.
+Operation finished in:  0:00:13.847
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хо_811466b1\subtitle\【原始字幕】шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хо_811466b1-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:22:40.965264
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хо_811466b1\subtitle\【样式字幕】шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хо_42ae1c22.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172240.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:22:40.978267
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4"
+视频总时长: 34.05秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_001_О 'Конноре. Вы хотите узнать что-то обо мне О нет. Хотя, да. Почему ты…_1504-1545с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:22:57.366606
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_002_фактор восприятия. Мою внешность и голос специально разработали для гар…_1517-1557с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmphxy1wg62.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpt9o7y03b\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpt9o7y03b\audio.wav
+79% | 27/34 | 00:08<<00:02 |  3.22 audio seconds/s
+100% | 34/34 | 00:11<<00:00 |  2.93 audio seconds/s
+Transcription speed: 2.88 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpt9o7y03b' directory.
+Operation finished in:  0:00:13.733
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_002_фактор восприятия. Мою внешность и голос специально р_548ea0c9\subtitle\【原始字幕】шорт_002_фактор восприятия. Мою внешность и голос специально р_548ea0c9-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:23:12.628834
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_002_фактор восприятия. Мою внешность и голос специально р_548ea0c9\subtitle\【样式字幕】шорт_002_фактор восприятия. Мою внешность и голос специально р_96f4259c.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172312.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:23:12.638835
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_002_фактор восприятия. Мою внешность и голос специально разработали для гар…_1517-1557с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_002_фактор восприятия. Мою внешность и голос специально разработали для гар…_1517-1557с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_002_фактор восприятия. Мою внешность и голос специально разработали для гар…_1517-1557с.mp4"
+视频总时长: 34.28秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_002_фактор восприятия. Мою внешность и голос специально разработали для гар…_1517-1557с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:23:28.718578
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpsbp_h9gw.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp_2c5ze7_\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp_2c5ze7_\audio.wav
+95% | 21/22 | 00:08<<00:00 |  2.49 audio seconds/s
+100% | 22/22 | 00:08<<00:00 |  2.52 audio seconds/s
+Transcription speed: 2.48 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp_2c5ze7_' directory.
+Operation finished in:  0:00:10.529
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_003_вроде бы никто не живет, но он видел человека, которы_cbc909ce\subtitle\【原始字幕】шорт_003_вроде бы никто не живет, но он видел человека, которы_cbc909ce-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:23:40.648813
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_003_вроде бы никто не живет, но он видел человека, которы_cbc909ce\subtitle\【样式字幕】шорт_003_вроде бы никто не живет, но он видел человека, которы_cafe8457.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172340.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:23:40.658812
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4"
+视频总时长: 21.68秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_003_вроде бы никто не живет, но он видел человека, который прятал... под ша…_1705-1730с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:23:52.639426
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpja8nsleh.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp8wr33y9n\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp8wr33y9n\audio.wav
+100% | 16/16 | 00:06<<00:00 |  2.47 audio seconds/s
+Transcription speed: 2.35 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp8wr33y9n' directory.
+Operation finished in:  0:00:08.556
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё ра_633886eb\subtitle\【原始字幕】шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё ра_633886eb-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:24:02.678082
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё ра_633886eb\subtitle\【样式字幕】шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё ра_70b761fd.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172402.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:24:02.691712
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4"
+视频总时长: 15.94秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_004_тебя всё знаю, понял, нет Я тебя вообще сейчас всё раскушу, тебя всего…_1419-1437с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:24:11.604143
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpi4fj1e_6.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp6xjyyzrw\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp6xjyyzrw\audio.wav
+84% | 26/31 | 00:10<<00:02 |  2.50 audio seconds/s
+100% | 31/31 | 00:12<<00:00 |  2.42 audio seconds/s
+Transcription speed: 2.4 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp6xjyyzrw' directory.
+Operation finished in:  0:00:14.890
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_005_Калорийность вашего обеда почти на 50% превышает суто_aff96580\subtitle\【原始字幕】шорт_005_Калорийность вашего обеда почти на 50% превышает суто_aff96580-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:24:27.888870
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_005_Калорийность вашего обеда почти на 50% превышает суто_aff96580\subtitle\【样式字幕】шорт_005_Калорийность вашего обеда почти на 50% превышает суто_eddfb486.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172427.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:24:27.898810
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4"
+视频总时长: 31.36秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_005_Калорийность вашего обеда почти на 50% превышает суточную норму. А холе…_1484-1523с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:24:41.445378
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpthtzkcp2.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpln1cf_br\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpln1cf_br\audio.wav
+83% | 29/35 | 00:10<<00:02 |  2.88 audio seconds/s
+100% | 35/35 | 00:13<<00:00 |  2.58 audio seconds/s
+Transcription speed: 2.54 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpln1cf_br' directory.
+Operation finished in:  0:00:15.651
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что изв_14dcd28d\subtitle\【原始字幕】шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что изв_14dcd28d-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:24:58.506548
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что изв_14dcd28d\subtitle\【样式字幕】шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что изв_12e2dad4.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172458.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:24:58.517115
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4"
+视频总时长: 35.18秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_006_Нет, надо о чем-то отвеченном. Рассказать вам что известно о девиантах.…_1531-1572с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:25:15.329985
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp7zst4_za.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp84benx18\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp84benx18\audio.wav
+100% | 15/15 | 00:06<<00:00 |  2.45 audio seconds/s
+Transcription speed: 2.33 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp84benx18' directory.
+Operation finished in:  0:00:08.230
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это с_388f51f7\subtitle\【原始字幕】шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это с_388f51f7-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:25:24.964860
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это с_388f51f7\subtitle\【样式字幕】шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это с_06966b27.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172524.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:25:24.974859
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4"
+视频总时长: 14.97秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_007_И че, вы свободны Прятаться тут как мыши. Разве это свобода Они нам в…_2789-2806с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:25:32.056363
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp3rqe9bxd.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpxb_dgi59\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpxb_dgi59\audio.wav
+93% | 13/14 | 00:06<<00:00 |  2.04 audio seconds/s
+100% | 14/14 | 00:06<<00:00 |  2.10 audio seconds/s
+Transcription speed: 2.05 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpxb_dgi59' directory.
+Operation finished in:  0:00:08.459
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям_5aad3e2e\subtitle\【原始字幕】шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям_5aad3e2e-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:25:41.909306
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям_5aad3e2e\subtitle\【样式字幕】шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям__fb4a5b3d.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172541.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:25:41.919323
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4"
+视频总时长: 13.68秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_008_люди нас найдут, нам конец. А вы прям человеки, прям такие, да Жесткие…_2801-2817с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:25:48.187568
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_009_Вопрос о выводах_1616-1633с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpdo29blxk.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmphhhvfko6\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmphhhvfko6\audio.wav
+91% | 10/11 | 00:04<<00:00 |  2.35 audio seconds/s
+100% | 11/11 | 00:04<<00:00 |  2.40 audio seconds/s
+Transcription speed: 2.29 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmphhhvfko6' directory.
+Operation finished in:  0:00:06.430
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_009_Вопрос о выводах_1616-1633с\subtitle\【原始字幕】шорт_009_Вопрос о выводах_1616-1633с-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:25:56.003755
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_009_Вопрос о выводах_1616-1633с\subtitle\【样式字幕】шорт_009_Вопрос о выводах_1616-1633с-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172556.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:25:56.014754
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_009_Вопрос о выводах_1616-1633с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_009_Вопрос о выводах_1616-1633с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_009_Вопрос о выводах_1616-1633с.mp4"
+视频总时长: 10.53秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_009_Вопрос о выводах_1616-1633с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:26:01.292332
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_010_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpk9v_7q_s.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpeq4tc1gy\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpeq4tc1gy\audio.wav
+93% | 14/15 | 00:06<<00:00 |  2.11 audio seconds/s
+100% | 15/15 | 00:06<<00:00 |  2.17 audio seconds/s
+Transcription speed: 2.23 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpeq4tc1gy' directory.
+Operation finished in:  0:00:08.758
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_010_А если бы мы не спасли андроида, которого допрашивали_f780848f\subtitle\【原始字幕】шорт_010_А если бы мы не спасли андроида, которого допрашивали_f780848f-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:26:11.463168
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_010_А если бы мы не спасли андроида, которого допрашивали_f780848f\subtitle\【样式字幕】шорт_010_А если бы мы не спасли андроида, которого допрашивали_a616d1ba.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172611.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:26:11.473165
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_010_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_010_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_010_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4"
+视频总时长: 15.42秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_010_А если бы мы не спасли андроида, которого допрашивали, у нас бы этой гл…_1720-1738с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:26:20.358041
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы Коннор у нас... Ты…_2442-2460с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpywwuo_6y.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpkfpbtx85\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpkfpbtx85\audio.wav
+93% | 14/15 | 00:06<<00:00 |  2.19 audio seconds/s
+100% | 15/15 | 00:06<<00:00 |  2.24 audio seconds/s
+Transcription speed: 2.17 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpkfpbtx85' directory.
+Operation finished in:  0:00:08.487
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы_726798df\subtitle\【原始字幕】шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы_726798df-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:26:30.202461
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы_726798df\subtitle\【样式字幕】шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы__5760e58e.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172630.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:26:30.213458
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы Коннор у нас... Ты…_2442-2460с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы Коннор у нас... Ты…_2442-2460с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы Коннор у нас... Ты…_2442-2460с.mp4"
+视频总时长: 14.57秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_011_Нельзя такому происходить. Ну, нельзя. Нельзя, чтобы Коннор у нас... Ты…_2442-2460с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:26:36.176970
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp86yp0a5c.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmphk77eiy7\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmphk77eiy7\audio.wav
+100% | 20/20 | 01:00<<00:00 |  0.33 audio seconds/s
+Transcription speed: 0.32 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmphk77eiy7' directory.
+Operation finished in:  0:01:02.834
+Faster Whisper 返回值: 3221226505
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять буд_a42ed550\subtitle\【原始字幕】шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять буд_a42ed550-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:27:40.211580
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять буд_a42ed550\subtitle\【样式字幕】шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять буд_9c5ca23b.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172740.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:27:40.221579
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4"
+视频总时长: 19.63秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_012_Нас, конечно, быстро повяжут, расстреляют и опять будем по-новому выбир…_2903-2927с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:27:49.547284
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_013_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpy_dugawn.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp31oymrej\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp31oymrej\audio.wav
+100% | 22/22 | 00:04<<00:00 |  5.09 audio seconds/s
+Transcription speed: 4.84 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp31oymrej' directory.
+Operation finished in:  0:00:06.558
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_013_Что мы знаем об этом парне Немного. Один из соседей с_aef3afaa\subtitle\【原始字幕】шорт_013_Что мы знаем об этом парне Немного. Один из соседей с_aef3afaa-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:27:57.522112
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_013_Что мы знаем об этом парне Немного. Один из соседей с_aef3afaa\subtitle\【样式字幕】шорт_013_Что мы знаем об этом парне Немного. Один из соседей с_82e5b881.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172757.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:27:57.531112
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_013_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_013_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_013_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4"
+视频总时长: 22.38秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_013_Что мы знаем об этом парне Немного. Один из соседей сообщил... Секунду…_1690-1717с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:28:07.894395
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmphcq0n4e8.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmped4_79g8\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmped4_79g8\audio.wav
+93% | 14/15 | 00:04<<00:00 |  2.94 audio seconds/s
+100% | 15/15 | 00:05<<00:00 |  2.97 audio seconds/s
+Transcription speed: 2.87 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmped4_79g8' directory.
+Operation finished in:  0:00:06.833
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем пр_05d1da4a\subtitle\【原始字幕】шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем пр_05d1da4a-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:28:16.072862
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем пр_05d1da4a\subtitle\【样式字幕】шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем пр_d69eba3e.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172816.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:28:16.085861
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4"
+视频总时长: 14.55秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_014_Вот так вот. А раз ага... Ладно, всем привет. Всем привет и... Мы должн…_47-66с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:28:20.296947
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_015_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp1k14p60z.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpjsgj88kt\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpjsgj88kt\audio.wav
+100% | 15/15 | 00:04<<00:00 |  3.51 audio seconds/s
+Transcription speed: 3.27 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpjsgj88kt' directory.
+Operation finished in:  0:00:06.330
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_015_Ну, честно Работа с человеком, который имеет сложную_7d06affc\subtitle\【原始字幕】шорт_015_Ну, честно Работа с человеком, который имеет сложную_7d06affc-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:28:27.999369
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_015_Ну, честно Работа с человеком, который имеет сложную_7d06affc\subtitle\【样式字幕】шорт_015_Ну, честно Работа с человеком, который имеет сложную__321fc3cf.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172828.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:28:28.005369
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_015_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_015_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_015_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4"
+视频总时长: 14.93秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_015_Ну, честно Работа с человеком, который имеет сложную личность, несет в…_1630-1648с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:28:35.154321
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_016_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp5ln1zbe2.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp8ixzbjeb\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp8ixzbjeb\audio.wav
+100% | 15/15 | 00:07<<00:00 |  2.13 audio seconds/s
+Transcription speed: 2.07 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp8ixzbjeb' directory.
+Operation finished in:  0:00:09.122
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_016_нет, я хочу его догнать. Нельзя такого происходить. П_a242a0e7\subtitle\【原始字幕】шорт_016_нет, я хочу его догнать. Нельзя такого происходить. П_a242a0e7-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:28:45.628135
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_016_нет, я хочу его догнать. Нельзя такого происходить. П_a242a0e7\subtitle\【样式字幕】шорт_016_нет, я хочу его догнать. Нельзя такого происходить. П_e98be00b.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172845.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:28:45.639661
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_016_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_016_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_016_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4"
+视频总时长: 15.22秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_016_нет, я хочу его догнать. Нельзя такого происходить. Переходим в дерево …_2435-2453с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:28:51.194509
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpu6u_tffj.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpxkp0i6iw\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpxkp0i6iw\audio.wav
+94% | 16/17 | 00:06<<00:00 |  2.63 audio seconds/s
+100% | 17/17 | 00:06<<00:00 |  2.67 audio seconds/s
+Transcription speed: 2.6 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpxkp0i6iw' directory.
+Operation finished in:  0:00:08.196
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче_d5c036a5\subtitle\【原始字幕】шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче_d5c036a5-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:29:00.857057
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче_d5c036a5\subtitle\【样式字幕】шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче_a1eb2cc7.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172900.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:29:00.867413
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4"
+视频总时长: 16.58秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_017_Весело тут у вас, конечно, да. Прямо зашибись. Короче, тут со всеми мож…_2889-2909с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:29:10.050003
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_018_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpriz_3mag.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp2v52r09y\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp2v52r09y\audio.wav
+100% | 15/15 | 00:06<<00:00 |  2.49 audio seconds/s
+Transcription speed: 2.37 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp2v52r09y' directory.
+Operation finished in:  0:00:08.124
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_018_Думаю, наше знакомство прошло не лучшим образом. След_37be7f1c\subtitle\【原始字幕】шорт_018_Думаю, наше знакомство прошло не лучшим образом. След_37be7f1c-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:29:19.576251
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_018_Думаю, наше знакомство прошло не лучшим образом. След_37be7f1c\subtitle\【样式字幕】шорт_018_Думаю, наше знакомство прошло не лучшим образом. След_2d45a990.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172919.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:29:19.589248
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_018_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_018_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_018_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4"
+视频总时长: 14.98秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_018_Думаю, наше знакомство прошло не лучшим образом. Следует забыть об этом…_1379-1397с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:29:27.485199
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_019_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp2fmdqrok.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpf58rkgnn\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpf58rkgnn\audio.wav
+100% | 17/17 | 00:06<<00:00 |  2.75 audio seconds/s
+Transcription speed: 2.61 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpf58rkgnn' directory.
+Operation finished in:  0:00:08.251
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_019_Изготовлено из переработанной бумаги. Недавно был пер_da9c7239\subtitle\【原始字幕】шорт_019_Изготовлено из переработанной бумаги. Недавно был пер_da9c7239-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:29:37.176563
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_019_Изготовлено из переработанной бумаги. Недавно был пер_da9c7239\subtitle\【样式字幕】шорт_019_Изготовлено из переработанной бумаги. Недавно был пер_d6530bc5.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172937.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:29:37.182563
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_019_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_019_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_019_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4"
+视频总时长: 16.95秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_019_Изготовлено из переработанной бумаги. Недавно был перемещен уголок плак…_1988-2009с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:29:45.634403
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет. Все, пошли отсюд…_2395-2411с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmply5t3dcc.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpu023i8p5\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpu023i8p5\audio.wav
+100% | 13/13 | 00:05<<00:00 |  2.46 audio seconds/s
+Transcription speed: 2.3 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpu023i8p5' directory.
+Operation finished in:  0:00:07.405
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет_4bea6a16\subtitle\【原始字幕】шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет_4bea6a16-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:29:54.482743
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет_4bea6a16\subtitle\【样式字幕】шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет_148189d6.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_172954.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:29:54.495252
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет. Все, пошли отсюд…_2395-2411с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет. Все, пошли отсюд…_2395-2411с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет. Все, пошли отсюд…_2395-2411с.mp4"
+视频总时长: 12.89秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_020_Ладно, ничего, неважно. Мы его теперь знаем, не уйдет. Все, пошли отсюд…_2395-2411с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:30:01.460498
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где наша свобода. Най…_163-179с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpvb0a3g1s.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpzrbmtswe\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpzrbmtswe\audio.wav
+92% | 12/13 | 00:05<<00:00 |  2.18 audio seconds/s
+100% | 13/13 | 00:05<<00:00 |  2.24 audio seconds/s
+Transcription speed: 2.16 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpzrbmtswe' directory.
+Operation finished in:  0:00:07.607
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где_2ef212ab\subtitle\【原始字幕】шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где_2ef212ab-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:30:10.479706
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где_2ef212ab\subtitle\【样式字幕】шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где__4c720176.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173010.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:30:10.489706
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где наша свобода. Най…_163-179с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где наша свобода. Най…_163-179с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где наша свобода. Най…_163-179с.mp4"
+视频总时长: 12.58秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_021_Ферн... Ой, а чё такое граффити такое Есть место где наша свобода. Най…_163-179с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:30:17.097637
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpfk0rrs5n.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpiyfwfc4q\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpiyfwfc4q\audio.wav
+100% | 12/12 | 00:04<<00:00 |  2.68 audio seconds/s
+Transcription speed: 2.56 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpiyfwfc4q' directory.
+Operation finished in:  0:00:06.560
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_022_2471 раз. То же самое написал андроид Артиса на стене_530a27ab\subtitle\【原始字幕】шорт_022_2471 раз. То же самое написал андроид Артиса на стене_530a27ab-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:30:25.051541
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_022_2471 раз. То же самое написал андроид Артиса на стене_530a27ab\subtitle\【样式字幕】шорт_022_2471 раз. То же самое написал андроид Артиса на стене_648da8dc.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173025.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:30:25.061544
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4"
+视频总时长: 12.17秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_022_2471 раз. То же самое написал андроид Артиса на стене ванной. Что знача…_2055-2070с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:30:30.324132
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дурочка, блин Ой, ка…_1097-1113с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpe_7u7c7l.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpomwd98rn\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpomwd98rn\audio.wav
+100% | 12/12 | 00:05<<00:00 |  2.29 audio seconds/s
+Transcription speed: 2.14 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpomwd98rn' directory.
+Operation finished in:  0:00:07.417
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дур_6ae79b26\subtitle\【原始字幕】шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дур_6ae79b26-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:30:39.063141
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дур_6ae79b26\subtitle\【样式字幕】шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дур_ec66abb1.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173039.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:30:39.072142
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дурочка, блин Ой, ка…_1097-1113с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дурочка, блин Ой, ка…_1097-1113с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дурочка, блин Ой, ка…_1097-1113с.mp4"
+视频总时长: 11.88秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_023_Ух ты ёб... красоте, блин! Ты что делаешь-то тут, дурочка, блин Ой, ка…_1097-1113с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:30:44.644673
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_024_этих символах у тебя зашифрована информация Как штрих-код Точка-точка…_307-325с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp29_uzi8m.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpabgo5wg9\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpabgo5wg9\audio.wav
+100% | 12/12 | 00:05<<00:00 |  2.04 audio seconds/s
+Transcription speed: 1.99 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpabgo5wg9' directory.
+Operation finished in:  0:00:07.966
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_024_этих символах у тебя зашифрована информация Как штрих_04990b0e\subtitle\【原始字幕】шорт_024_этих символах у тебя зашифрована информация Как штрих_04990b0e-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:30:53.965081
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_024_этих символах у тебя зашифрована информация Как штрих_04990b0e\subtitle\【样式字幕】шорт_024_этих символах у тебя зашифрована информация Как штрих_637303ff.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173053.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:30:53.975080
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_024_этих символах у тебя зашифрована информация Как штрих-код Точка-точка…_307-325с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_024_этих символах у тебя зашифрована информация Как штрих-код Точка-точка…_307-325с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_024_этих символах у тебя зашифрована информация Как штрих-код Точка-точка…_307-325с.mp4"
+视频总时长: 12.32秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_024_этих символах у тебя зашифрована информация Как штрих-код Точка-точка…_307-325с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:31:00.691912
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_025_но все же у тебя не было и такой свободы. Прямо. Сидеть в темноте и жда…_2827-2844с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpm15lqtsh.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpwarsrpf4\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpwarsrpf4\audio.wav
+100% | 11/11 | 00:04<<00:00 |  2.67 audio seconds/s
+Transcription speed: 2.53 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpwarsrpf4' directory.
+Operation finished in:  0:00:06.187
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_025_но все же у тебя не было и такой свободы. Прямо. Сиде_f1f3743f\subtitle\【原始字幕】шорт_025_но все же у тебя не было и такой свободы. Прямо. Сиде_f1f3743f-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:31:08.222190
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_025_но все же у тебя не было и такой свободы. Прямо. Сиде_f1f3743f\subtitle\【样式字幕】шорт_025_но все же у тебя не было и такой свободы. Прямо. Сиде_3c3eca53.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173108.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:31:08.228198
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_025_но все же у тебя не было и такой свободы. Прямо. Сидеть в темноте и жда…_2827-2844с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_025_но все же у тебя не было и такой свободы. Прямо. Сидеть в темноте и жда…_2827-2844с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_025_но все же у тебя не было и такой свободы. Прямо. Сидеть в темноте и жда…_2827-2844с.mp4"
+视频总时长: 11.22秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_025_но все же у тебя не было и такой свободы. Прямо. Сидеть в темноте и жда…_2827-2844с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:31:12.298919
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас. Они могут погибну…_35-56с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp7fm70y26.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp1kheb47h\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp1kheb47h\audio.wav
+100% | 15/15 | 00:03<<00:00 |  3.78 audio seconds/s
+Transcription speed: 3.5 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp1kheb47h' directory.
+Operation finished in:  0:00:06.065
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас_07b74717\subtitle\【原始字幕】шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас_07b74717-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:31:19.685173
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас_07b74717\subtitle\【样式字幕】шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас__1ca1497d.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173119.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:31:19.691174
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас. Они могут погибну…_35-56с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас. Они могут погибну…_35-56с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас. Они могут погибну…_35-56с.mp4"
+视频总时长: 14.93秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_026_ПОДПИШИСЬ! Помните, судьба персонажей зависит от вас. Они могут погибну…_35-56с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:31:24.203579
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще не знаю для чего э…_105-126с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpp0er7log.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp_r8_kokj\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp_r8_kokj\audio.wav
+93% | 13/14 | 00:35<<00:02 |  0.36 audio seconds/s
+100% | 14/14 | 00:36<<00:00 |  0.39 audio seconds/s
+Transcription speed: 0.38 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp_r8_kokj' directory.
+Operation finished in:  0:00:37.865
+Faster Whisper 返回值: 3221226505
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще н_51434faa\subtitle\【原始字幕】шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще н_51434faa-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:32:03.199969
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще н_51434faa\subtitle\【样式字幕】шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще н_3de91960.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173203.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:32:03.207270
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще не знаю для чего э…_105-126с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще не знаю для чего э…_105-126с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще не знаю для чего э…_105-126с.mp4"
+视频总时长: 13.78秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_027_А чё это за предмет это Короче, я не знаю. Я вообще не знаю для чего э…_105-126с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:32:07.768705
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано 2471 раз. То же с…_2043-2062с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpz51uy2do.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpmogjhn53\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpmogjhn53\audio.wav
+100% | 13/13 | 00:04<<00:00 |  3.23 audio seconds/s
+Transcription speed: 3.0 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpmogjhn53' directory.
+Operation finished in:  0:00:06.070
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано_de9dcc7a\subtitle\【原始字幕】шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано_de9dcc7a-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:32:15.165652
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано_de9dcc7a\subtitle\【样式字幕】шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано__a6cbb498.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173215.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:32:15.174839
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано 2471 раз. То же с…_2043-2062с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано 2471 раз. То же с…_2043-2062с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано 2471 раз. То же с…_2043-2062с.mp4"
+视频总时长: 12.98秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_028_РА-9. Все понятно. Ты знаешь, что это РА-9. Написано 2471 раз. То же с…_2043-2062с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:32:20.992134
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я про т…_1411-1429с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp15h3hp5l.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp4p4fiz6g\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp4p4fiz6g\audio.wav
+93% | 14/15 | 00:05<<00:00 |  2.45 audio seconds/s
+100% | 15/15 | 00:06<<00:00 |  2.50 audio seconds/s
+Transcription speed: 2.42 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp4p4fiz6g' directory.
+Operation finished in:  0:00:07.762
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я_b741204c\subtitle\【原始字幕】шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я_b741204c-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:32:30.151823
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я_b741204c\subtitle\【样式字幕】шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я__453e8f4b.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173230.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-20 17:32:30.161330
+开始合成视频: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я про т…_1411-1429с.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я про т…_1411-1429с.mp4" -acodec copy -vcodec libx264 -preset medium -crf 18 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я про т…_1411-1429с.mp4"
+视频总时长: 14.57秒
+视频合成完成
+视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\【卡卡】шорт_029_ты там суёшь Ананасовая страсть газированная, ага. Я тебя всё, я про т…_1411-1429с.mp4
+
+===========转录任务开始===========
+时间：2026-04-20 17:32:37.841926
+UseProcessedSubtitleCache=OFF: отключаем shortcut и ASR-кэш для транскрибации
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Neyro\ShortsCreatorStudio\work-dir\shorts\shorts_НАШЁЛ ИЕРИХОН! КОННОР НЕДОВОЛЕН! ｜ Detroit Become Human #5_20260420_171717\шорт_030_Мы можем выжить, только прячась. Наш единственный выход прятаться. Если…_2796-2813с.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpim7x_xp9.wav
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpk_nhvzdg\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpk_nhvzdg\audio.wav
+100% | 14/14 | 00:06<<00:00 |  2.20 audio seconds/s
+Transcription speed: 2.14 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpk_nhvzdg' directory.
+Operation finished in:  0:00:08.474
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\шорт_030_Мы можем выжить, только прячась. Наш единственный вых_293d80f3\subtitle\【原始字幕】шорт_030_Мы можем выжить, только прячась. Наш единственный вых_293d80f3-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-20 17:32:47.686501
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\шорт_030_Мы можем выжить, только прячась. Наш единственный вых_293d80f3\subtitle\【样式字幕】шорт_030_Мы можем выжить, только прячась. Наш единственный вых_8f341507.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260420_173247.json
+优化完成

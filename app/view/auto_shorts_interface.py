@@ -635,6 +635,67 @@ class AutoShortsInterface(QWidget):
         filter_row.addStretch(1)
         stage2_layout.addLayout(filter_row)
 
+        filter_profile_row = QHBoxLayout()
+        filter_profile_label = BodyLabel("Профиль авто-фильтра:")
+        filter_profile_label.setToolTip(
+            "Мягкий — больше кандидатов, но больше слабых.\n"
+            "Сбалансированный — стандартный режим.\n"
+            "Строгий — максимум качества, но кандидатов будет меньше."
+        )
+        filter_profile_row.addWidget(filter_profile_label)
+        self.auto_filter_profile_combo = ComboBox(self)
+        self.auto_filter_profile_combo.addItems(["Мягкий", "Сбалансированный", "Строгий"])
+        self.auto_filter_profile_combo.setCurrentText("Сбалансированный")
+        self.auto_filter_profile_combo.setToolTip(
+            "Профиль строгости авто-фильтра слабых кандидатов"
+        )
+        filter_profile_row.addWidget(self.auto_filter_profile_combo)
+        filter_profile_row.addStretch(1)
+        stage2_layout.addLayout(filter_profile_row)
+
+        llm_density_title = BodyLabel("1.2) Плотность отбора LLM")
+        llm_density_title.setToolTip("Настройки, которые увеличивают/уменьшают число кандидатов без ослабления анти-дубля")
+        stage2_layout.addWidget(llm_density_title)
+
+        llm_density_row = QHBoxLayout()
+        llm_intensity_label = BodyLabel("Интенсивность LLM-поиска:")
+        llm_intensity_label.setToolTip(
+            "1 — экономный режим (крупные пакеты, меньше вариантов).\n"
+            "5 — плотный режим (больше пакетов и вариантов на пакет)."
+        )
+        llm_density_row.addWidget(llm_intensity_label)
+        self.llm_search_intensity_spin = SpinBox(self)
+        self.llm_search_intensity_spin.setRange(1, 5)
+        self.llm_search_intensity_spin.setValue(3)
+        self.llm_search_intensity_spin.setToolTip(
+            "Управляет количеством анализируемых пакетов и целевым числом кандидатов от LLM"
+        )
+        self.llm_search_intensity_spin.valueChanged.connect(lambda _v: self._update_llm_token_estimate())
+        llm_density_row.addWidget(self.llm_search_intensity_spin)
+
+        interest_label = BodyLabel("Порог интереса (quality %):")
+        interest_label.setToolTip(
+            "Минимальный quality_score кандидата после ранжирования.\n"
+            "Ниже значение — больше кандидатов, выше — строже качество."
+        )
+        llm_density_row.addWidget(interest_label)
+        self.interest_threshold_spin = SpinBox(self)
+        self.interest_threshold_spin.setRange(30, 95)
+        self.interest_threshold_spin.setValue(52)
+        self.interest_threshold_spin.setToolTip(
+            "Порог интереса для финального списка кандидатов"
+        )
+        llm_density_row.addWidget(self.interest_threshold_spin)
+        llm_density_row.addStretch(1)
+        stage2_layout.addLayout(llm_density_row)
+
+        llm_density_hint = BodyLabel(
+            "Рекомендуемо для длинных роликов (40–120 мин): интенсивность 4–5, "
+            "порог интереса 45–58, профиль фильтра «Сбалансированный» или «Мягкий»."
+        )
+        llm_density_hint.setWordWrap(True)
+        stage2_layout.addWidget(llm_density_hint)
+
         self.min_candidates_spin.valueChanged.connect(self._on_candidate_limits_changed)
         self.max_candidates_spin.valueChanged.connect(self._on_candidate_limits_changed)
 
@@ -1451,6 +1512,9 @@ class AutoShortsInterface(QWidget):
             min_candidates=self.min_candidates_spin.value(),
             max_candidates=self.max_candidates_spin.value(),
             auto_filter_weak_candidates=bool(self.auto_filter_weak_checkbox.isChecked()),
+            auto_filter_profile=self._auto_filter_profile_value(),
+            interest_threshold_percent=self.interest_threshold_spin.value(),
+            llm_search_intensity=self.llm_search_intensity_spin.value(),
         )
         self.candidate_thread.progress.connect(self._on_progress)
         self.candidate_thread.finished.connect(self._on_candidate_selection_finished)
@@ -1701,6 +1765,10 @@ class AutoShortsInterface(QWidget):
                 "max_duration_s": int(self.max_duration.value()),
                 "min_candidates": int(self.min_candidates_spin.value()),
                 "max_candidates": int(self.max_candidates_spin.value()),
+                "auto_filter_weak_enabled": bool(self.auto_filter_weak_checkbox.isChecked()),
+                "auto_filter_profile": self._auto_filter_profile_value(),
+                "interest_threshold_percent": int(self.interest_threshold_spin.value()),
+                "llm_search_intensity": int(self.llm_search_intensity_spin.value()),
             },
         }
 
@@ -1956,6 +2024,18 @@ class AutoShortsInterface(QWidget):
                     self.max_candidates_spin.setValue(
                         int(ui_settings.get("max_candidates", self.max_candidates_spin.value()))
                     )
+                    self.auto_filter_weak_checkbox.setChecked(
+                        bool(ui_settings.get("auto_filter_weak_enabled", self.auto_filter_weak_checkbox.isChecked()))
+                    )
+                    self._set_auto_filter_profile_value(
+                        str(ui_settings.get("auto_filter_profile", self._auto_filter_profile_value()) or "balanced")
+                    )
+                    self.interest_threshold_spin.setValue(
+                        int(ui_settings.get("interest_threshold_percent", self.interest_threshold_spin.value()))
+                    )
+                    self.llm_search_intensity_spin.setValue(
+                        int(ui_settings.get("llm_search_intensity", self.llm_search_intensity_spin.value()))
+                    )
 
                     loaded_start = int(ui_settings.get("range_start_s", self.selected_start_s))
                     loaded_end = int(ui_settings.get("range_end_s", self.selected_end_s))
@@ -1985,10 +2065,12 @@ class AutoShortsInterface(QWidget):
             self.llm_tokens_hint_label.setText("Оценка токенов LLM: не удалось извлечь сегменты из Whisper")
             return
 
-        # В реальном пайплайне запросы в LLM идут пакетами по 140 сегментов (overlap 35),
-        # поэтому показываем оценку "на 1 пакет" и "в сумме".
-        packet_size = 140
-        overlap = 35
+        # В реальном пайплайне размер пакетов зависит от "Интенсивности LLM-поиска".
+        intensity = int(self.llm_search_intensity_spin.value()) if hasattr(self, "llm_search_intensity_spin") else 3
+        packet_size_map = {1: 180, 2: 160, 3: 140, 4: 120, 5: 100}
+        overlap_map = {1: 42, 2: 38, 3: 35, 4: 30, 5: 26}
+        packet_size = packet_size_map.get(intensity, 140)
+        overlap = overlap_map.get(intensity, 35)
         packets = self._estimate_packet_count(len(segments), packet_size=packet_size, overlap=overlap)
 
         sample_rows = []
@@ -2022,9 +2104,8 @@ class AutoShortsInterface(QWidget):
         # Используем более реалистичный коэффициент 1.6 символа/токен.
         per_packet_input_tokens = max(128, int((len(system_payload) + len(user_payload)) / 1.6))
 
-        # max_candidates на UI относится ко всему этапу, а не к одному packet-запросу.
-        # На один пакет ограничиваем ожидаемое число item, чтобы не завышать context.
-        target_candidates = max(1, min(24, int(self.max_candidates_spin.value())))
+        # На один пакет число кандидатов зависит от интенсивности LLM.
+        target_candidates = max(1, min(28, 10 + intensity * 4))
         per_packet_output_tokens = 180 + target_candidates * 75
         per_packet_total = per_packet_input_tokens + per_packet_output_tokens
 
@@ -2040,6 +2121,23 @@ class AutoShortsInterface(QWidget):
             f"Суммарно за этап: вход ~{total_input_tokens}, выход ~{total_output_tokens}, всего ~{total_tokens}. "
             f"Рекомендуемый context в LM Studio: от {recommended_ctx} (на один запрос)."
         )
+
+    def _auto_filter_profile_value(self) -> str:
+        text = (self.auto_filter_profile_combo.currentText() or "Сбалансированный").strip().lower()
+        if "мяг" in text:
+            return "soft"
+        if "строг" in text:
+            return "strict"
+        return "balanced"
+
+    def _set_auto_filter_profile_value(self, profile: str):
+        p = str(profile or "balanced").strip().lower()
+        if p == "soft":
+            self.auto_filter_profile_combo.setCurrentText("Мягкий")
+        elif p == "strict":
+            self.auto_filter_profile_combo.setCurrentText("Строгий")
+        else:
+            self.auto_filter_profile_combo.setCurrentText("Сбалансированный")
 
     @staticmethod
     def _collect_asr_text(asr_json: Dict) -> str:
