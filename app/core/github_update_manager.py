@@ -24,27 +24,24 @@ class GitHubUpdateManager:
         self.updater_root.mkdir(parents=True, exist_ok=True)
         self.state_file = self.updater_root / "update_state.json"
 
+    def _read_state(self) -> Dict:
+        try:
+            if not self.state_file.exists():
+                return {}
+            raw = self.state_file.read_text(encoding="utf-8")
+            data = json.loads(raw) if raw else {}
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
     def _get_known_sha(self) -> str:
         """Берём baseline SHA из cfg, при необходимости из резервного state-файла."""
         cfg_sha = str(cfg.update_last_known_commit.value or "").strip()
-        state_sha = ""
-        try:
-            if self.state_file.exists():
-                raw = self.state_file.read_text(encoding="utf-8")
-                data = json.loads(raw) if raw else {}
-                if isinstance(data, dict):
-                    state_sha = str(data.get("last_known_commit") or "").strip()
-        except Exception:
-            state_sha = ""
+        state_sha = str(self._read_state().get("last_known_commit") or "").strip()
 
-        # Если есть state_sha — считаем его более надёжным источником:
-        # он пишется прямо в процессе обновления и переживает сбои записи qconfig.
+        # Если есть state_sha — считаем его более надёжным источником.
+        # ВАЖНО: здесь ничего не записываем в cfg, чтобы check_update не менял settings.
         if state_sha:
-            if state_sha != cfg_sha:
-                try:
-                    cfg.set(cfg.update_last_known_commit, state_sha)
-                except Exception:
-                    pass
             return state_sha
 
         return cfg_sha
@@ -62,7 +59,10 @@ class GitHubUpdateManager:
             self.state_file.parent.mkdir(parents=True, exist_ok=True)
             self.state_file.write_text(
                 json.dumps(
-                    {"last_known_commit": clean},
+                    {
+                        "last_known_commit": clean,
+                        "applied_via_updater": True,
+                    },
                     ensure_ascii=False,
                     indent=2,
                 ),
@@ -224,13 +224,34 @@ class GitHubUpdateManager:
         latest = self.fetch_latest_commit()
         latest_sha = latest.get("sha", "")
         saved_sha = self._get_known_sha()
+        state = self._read_state()
+        state_sha = str(state.get("last_known_commit") or "").strip()
+        state_applied = bool(state.get("applied_via_updater"))
         git_head_sha = self._get_git_head_sha()
         has_git_repo = bool(git_head_sha) or (self.app_root / ".git").exists()
         git_clean = self._is_git_tracked_worktree_clean() if has_git_repo else False
 
-        # Если уже зафиксирован именно тот же коммит, который сейчас в master,
-        # то обновления нет (избегаем зацикливания после успешного апдейта).
-        if latest_sha and saved_sha and latest_sha == saved_sha and (not has_git_repo or not git_clean):
+        # Пользовательское окружение без git: обычная логика baseline.
+        if latest_sha and saved_sha and latest_sha == saved_sha and not has_git_repo:
+            return {
+                "has_update": False,
+                "latest": latest,
+                "known": saved_sha,
+                "baseline_initialized": False,
+                "commits_behind": 0,
+            }
+
+        # Git-окружение: suppress только если этот SHA действительно был зафиксирован
+        # именно успешным автообновлением (state.applied_via_updater=true).
+        if (
+            has_git_repo
+            and latest_sha
+            and saved_sha
+            and latest_sha == saved_sha
+            and state_applied
+            and state_sha == saved_sha
+            and not git_clean
+        ):
             return {
                 "has_update": False,
                 "latest": latest,
