@@ -97,13 +97,18 @@ class GitHubUpdateManager:
         """Текущая версия приложения для сравнения с master.
 
         Приоритет:
-        1) git HEAD (если мы в dev-рабочей копии),
-        2) сохранённый baseline (cfg/state) для обычных пользователей без git.
+        1) сохранённый baseline (cfg/state),
+        2) git HEAD (только как fallback для dev-сценария, когда baseline ещё не инициализирован).
+
+        Почему так:
+        - после применения автообновления мы фиксируем baseline в settings/state;
+        - git HEAD в рабочей копии не меняется (мы не делаем git pull/checkout),
+          поэтому если всегда брать git HEAD, будет бесконечное "нужно обновиться".
         """
-        git_head = self._get_git_head_sha()
-        if git_head:
-            return git_head
-        return self._get_known_sha()
+        known = self._get_known_sha()
+        if known:
+            return known
+        return self._get_git_head_sha()
 
     @staticmethod
     def _creation_flags() -> int:
