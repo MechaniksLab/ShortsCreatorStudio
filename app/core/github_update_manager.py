@@ -93,11 +93,21 @@ class GitHubUpdateManager:
             cfg.set(cfg.update_last_known_commit, latest_sha)
             return {"has_update": False, "latest": latest, "known": latest_sha, "baseline_initialized": True}
 
+        has_update = bool(latest_sha and known_sha and latest_sha != known_sha)
+        commits_behind = 0
+        if has_update:
+            compare = self._fetch_compare(owner=self._repo()[0], name=self._repo()[1], base_sha=known_sha, head_sha=latest_sha)
+            try:
+                commits_behind = int(compare.get("total_commits") or 0)
+            except Exception:
+                commits_behind = 0
+
         return {
-            "has_update": bool(latest_sha and known_sha and latest_sha != known_sha),
+            "has_update": has_update,
             "latest": latest,
             "known": known_sha,
             "baseline_initialized": False,
+            "commits_behind": commits_behind,
         }
 
     def apply_update_and_restart(self, progress_cb: Optional[Callable[[int, str], None]] = None) -> Dict:
@@ -118,16 +128,16 @@ class GitHubUpdateManager:
 
         owner, name, _ = self._repo()
 
-        # Быстрый путь: применяем только изменённые файлы между known_sha и latest sha
-        changed_files = self._fetch_changed_files(owner=owner, name=name, base_sha=known_sha, head_sha=sha)
-        if changed_files and len(changed_files) <= 80:
-            ok = self._apply_incremental_changes(owner=owner, name=name, sha=sha, files=changed_files, report=report)
-            if ok:
-                launcher = self._resolve_launcher()
-                script_path = self._spawn_restart_only_script(launcher=launcher)
-                cfg.set(cfg.update_last_known_commit, sha)
-                report(100, "Обновление применено, перезапуск...")
-                return {"ok": True, "sha": sha, "script": str(script_path), "mode": "incremental"}
+        # ВАЖНО: всегда применяем полный snapshot на latest SHA,
+        # чтобы за один апдейт подтягивались сразу ВСЕ изменения между known_sha и head.
+        if known_sha and known_sha != sha:
+            compare = self._fetch_compare(owner=owner, name=name, base_sha=known_sha, head_sha=sha)
+            try:
+                total_commits = int(compare.get("total_commits") or 0)
+            except Exception:
+                total_commits = 0
+            if total_commits > 0:
+                report(6, f"Найдено новых коммитов: {total_commits}. Подготавливаю обновление...")
 
         # fallback: полный снимок по SHA
         # Скачиваем по SHA коммита, чтобы не зависеть от названия ветки
@@ -182,9 +192,9 @@ class GitHubUpdateManager:
         report(100, "Обновление запущено")
         return {"ok": True, "sha": sha, "script": str(script_path), "mode": "full"}
 
-    def _fetch_changed_files(self, owner: str, name: str, base_sha: str, head_sha: str):
+    def _fetch_compare(self, owner: str, name: str, base_sha: str, head_sha: str) -> Dict:
         if not base_sha or not head_sha or base_sha == head_sha:
-            return []
+            return {}
 
         headers = {
             "Accept": "application/vnd.github+json",
@@ -193,9 +203,13 @@ class GitHubUpdateManager:
         url = f"https://api.github.com/repos/{owner}/{name}/compare/{base_sha}...{head_sha}"
         r = requests.get(url, timeout=20, headers=headers)
         if r.status_code in (404, 422):
-            return []
+            return {}
         r.raise_for_status()
         data = r.json() or {}
+        return data if isinstance(data, dict) else {}
+
+    def _fetch_changed_files(self, owner: str, name: str, base_sha: str, head_sha: str):
+        data = self._fetch_compare(owner=owner, name=name, base_sha=base_sha, head_sha=head_sha)
         files = data.get("files") or []
         return files if isinstance(files, list) else []
 
