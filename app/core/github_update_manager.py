@@ -170,6 +170,7 @@ class GitHubUpdateManager:
         latest = self.fetch_latest_commit()
         latest_sha = latest.get("sha", "")
         saved_sha = self._get_known_sha()
+        git_head_sha = self._get_git_head_sha()
 
         # Если уже зафиксирован именно тот же коммит, который сейчас в master,
         # то обновления нет (избегаем зацикливания после успешного апдейта).
@@ -182,9 +183,12 @@ class GitHubUpdateManager:
                 "commits_behind": 0,
             }
 
-        known_sha = saved_sha or self._get_git_head_sha()
+        # Для dev-сценария (есть .git) сравниваем с фактическим HEAD ветки разработчика,
+        # чтобы видеть, что master отличается.
+        # Для пользователей без git сравниваем с сохранённым baseline.
+        known_sha = git_head_sha or saved_sha
 
-        # Первый запуск: фиксируем baseline без навязчивого апдейта.
+        # Первый запуск без git и без baseline: инициализируем baseline без навязчивого апдейта.
         if not known_sha and latest_sha:
             self._set_known_sha(latest_sha)
             return {"has_update": False, "latest": latest, "known": latest_sha, "baseline_initialized": True}
