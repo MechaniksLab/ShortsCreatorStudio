@@ -271,8 +271,18 @@ class GitHubUpdateManager:
 
         # ВАЖНО: в check_update() больше не фиксируем latest_sha автоматически.
         # Фиксация происходит только после запуска обновления в apply_update_and_restart().
+        # Если локальный baseline неизвестен (часто у пользователей без .git и без
+        # ранее сохранённого LastKnownCommit), считаем что обновление доступно,
+        # чтобы можно было подтянуть полный актуальный snapshot master.
         if not known_sha and latest_sha:
-            return {"has_update": False, "latest": latest, "known": "", "baseline_initialized": False}
+            return {
+                "has_update": True,
+                "latest": latest,
+                "known": "",
+                "baseline_initialized": False,
+                "commits_behind": 0,
+                "unknown_local_revision": True,
+            }
 
         has_update = bool(latest_sha and known_sha and latest_sha != known_sha)
         commits_behind = 0
@@ -483,7 +493,8 @@ class GitHubUpdateManager:
     def _build_update_script(src_root: Path, dst_root: Path, launcher: str) -> str:
         src = str(src_root)
         dst = str(dst_root)
-        # /XD исключаем runtime и пользовательские данные.
+        # /MIR зеркалирует дерево: удаляет файлы, которых больше нет в master.
+        # /XD исключает пользовательские и runtime-каталоги.
         return (
             "@echo off\n"
             "chcp 65001 >nul\n"
@@ -491,7 +502,7 @@ class GitHubUpdateManager:
             f"set SRC={src}\n"
             f"set DST={dst}\n"
             "timeout /t 4 /nobreak >nul\n"
-            "robocopy \"%SRC%\" \"%DST%\" /E /R:2 /W:1 /XD \"%DST%\\runtime\" \"%DST%\\AppData\" \"%DST%\\work-dir\" >nul\n"
+            "robocopy \"%SRC%\" \"%DST%\" /MIR /R:2 /W:1 /XD \"%DST%\\runtime\" \"%DST%\\AppData\" \"%DST%\\work-dir\" >nul\n"
             f"start \"\" {launcher}\n"
             "endlocal\n"
         )
