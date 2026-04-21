@@ -93,55 +93,17 @@ class GitHubUpdateManager:
         except Exception:
             return ""
 
-    def _is_git_worktree_clean(self) -> bool:
-        """Проверка чистоты git-рабочей копии.
-        Нужна для dev-сценария: если дерево чистое — сравниваем с HEAD,
-        если после автообновления дерево стало изменённым — используем сохранённый baseline.
-        """
-        try:
-            git_dir = self.app_root / ".git"
-            if not git_dir.exists():
-                return False
-            p = subprocess.run(
-                ["git", "-C", str(self.app_root), "status", "--porcelain"],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                creationflags=(subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0),
-            )
-            if p.returncode != 0:
-                return False
-            return not str(p.stdout or "").strip()
-        except Exception:
-            return False
-
     def _get_effective_known_sha(self) -> str:
         """Текущая версия приложения для сравнения с master.
 
-        Приоритет:
-        1) сохранённый baseline (cfg/state),
-        2) git HEAD (только как fallback для dev-сценария, когда baseline ещё не инициализирован).
-
-        Почему так:
-        - после применения автообновления мы фиксируем baseline в settings/state;
-        - git HEAD в рабочей копии не меняется (мы не делаем git pull/checkout),
-          поэтому если всегда брать git HEAD, будет бесконечное "нужно обновиться".
+        Приоритет всегда за сохранённым baseline (cfg/state),
+        т.к. после автообновления именно он фиксирует применённый коммит.
+        git HEAD используется только как fallback, если baseline ещё не инициализирован.
         """
-        # DEV: если это git-репозиторий и рабочее дерево чистое,
-        # считаем "текущей версией" именно HEAD (так корректно видим отличия от master).
-        git_head = self._get_git_head_sha()
-        if git_head and self._is_git_worktree_clean():
-            return git_head
-
-        # PROD / либо DEV после автообновления (грязное дерево):
-        # используем сохранённый baseline, чтобы не зациклиться на одном коммите.
         known = self._get_known_sha()
         if known:
             return known
-
-        # fallback
-        return git_head
+        return self._get_git_head_sha()
 
     @staticmethod
     def _creation_flags() -> int:
@@ -207,7 +169,20 @@ class GitHubUpdateManager:
     def check_update(self) -> Dict:
         latest = self.fetch_latest_commit()
         latest_sha = latest.get("sha", "")
-        known_sha = self._get_effective_known_sha()
+        saved_sha = self._get_known_sha()
+
+        # Если уже зафиксирован именно тот же коммит, который сейчас в master,
+        # то обновления нет (избегаем зацикливания после успешного апдейта).
+        if latest_sha and saved_sha and latest_sha == saved_sha:
+            return {
+                "has_update": False,
+                "latest": latest,
+                "known": saved_sha,
+                "baseline_initialized": False,
+                "commits_behind": 0,
+            }
+
+        known_sha = saved_sha or self._get_git_head_sha()
 
         # Первый запуск: фиксируем baseline без навязчивого апдейта.
         if not known_sha and latest_sha:
