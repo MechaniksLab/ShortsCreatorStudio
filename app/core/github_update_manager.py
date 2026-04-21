@@ -121,6 +121,28 @@ class GitHubUpdateManager:
         except Exception:
             return ""
 
+    def _is_git_tracked_worktree_clean(self) -> bool:
+        """Проверяем чистоту только tracked-файлов (без untracked).
+        Это важно, чтобы случайные untracked не ломали логику проверки обновлений.
+        """
+        try:
+            git_dir = self.app_root / ".git"
+            if not git_dir.exists():
+                return False
+            p = subprocess.run(
+                ["git", "-C", str(self.app_root), "status", "--porcelain", "--untracked-files=no"],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                creationflags=(subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0),
+            )
+            if p.returncode != 0:
+                return False
+            return not str(p.stdout or "").strip()
+        except Exception:
+            return False
+
     def _get_effective_known_sha(self) -> str:
         """Текущая версия приложения для сравнения с master.
 
@@ -130,7 +152,7 @@ class GitHubUpdateManager:
         has_git_repo = (self.app_root / ".git").exists()
         if has_git_repo:
             git_head = self._get_git_head_sha()
-            if git_head:
+            if self._is_git_tracked_worktree_clean() and git_head:
                 return git_head
         known = self._get_known_sha()
         if known:
@@ -204,10 +226,11 @@ class GitHubUpdateManager:
         saved_sha = self._get_known_sha()
         git_head_sha = self._get_git_head_sha()
         has_git_repo = (self.app_root / ".git").exists()
+        git_clean = self._is_git_tracked_worktree_clean() if has_git_repo else False
 
         # Если уже зафиксирован именно тот же коммит, который сейчас в master,
         # то обновления нет (избегаем зацикливания после успешного апдейта).
-        if (not has_git_repo) and latest_sha and saved_sha and latest_sha == saved_sha:
+        if latest_sha and saved_sha and latest_sha == saved_sha and (not has_git_repo or not git_clean):
             return {
                 "has_update": False,
                 "latest": latest,
@@ -219,7 +242,13 @@ class GitHubUpdateManager:
         # Для dev-сценария (есть .git) сравниваем с фактическим HEAD ветки разработчика,
         # чтобы видеть, что master отличается.
         # Для пользователей без git сравниваем с сохранённым baseline.
-        known_sha = (git_head_sha or saved_sha) if has_git_repo else saved_sha
+        if has_git_repo:
+            # В чистом dev-дереве сравниваем с HEAD ветки (чтобы видеть отставание от master).
+            # После автообновления tracked-дерево обычно грязное -> берём зафиксированный SHA,
+            # чтобы не зациклиться на одном и том же коммите.
+            known_sha = (git_head_sha or saved_sha) if git_clean else (saved_sha or git_head_sha)
+        else:
+            known_sha = saved_sha
 
         # Инициализируем baseline ТОЛЬКО в пользовательском окружении без git.
         # В dev-репозитории baseline не фиксируем автоматически, чтобы не затирать
