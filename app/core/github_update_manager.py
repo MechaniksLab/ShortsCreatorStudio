@@ -244,25 +244,19 @@ class GitHubUpdateManager:
                 "commits_behind": 0,
             }
 
-        # Git-окружение: suppress только если этот SHA действительно был зафиксирован
-        # именно успешным автообновлением (state.applied_via_updater=true).
-        if (
-            has_git_repo
-            and latest_sha
-            and saved_sha
-            and latest_sha == saved_sha
-            and state_applied
-            and state_sha == saved_sha
-            and state_from_head
-            and state_from_head == git_head_sha
-        ):
-            return {
-                "has_update": False,
-                "latest": latest,
-                "known": saved_sha,
-                "baseline_initialized": False,
-                "commits_behind": 0,
-            }
+        # Git-окружение: если latest уже был зафиксирован апдейтером,
+        # не предлагаем его повторно, КРОМЕ случая, когда разработчик
+        # осознанно переключился на другой HEAD (чистое дерево и HEAD изменился).
+        if has_git_repo and latest_sha and saved_sha and latest_sha == saved_sha and state_applied and state_sha == saved_sha:
+            head_changed_since_apply = bool(state_from_head and git_head_sha and state_from_head != git_head_sha)
+            if not (git_clean and head_changed_since_apply):
+                return {
+                    "has_update": False,
+                    "latest": latest,
+                    "known": saved_sha,
+                    "baseline_initialized": False,
+                    "commits_behind": 0,
+                }
 
         # Для dev-сценария (есть .git) сравниваем с фактическим HEAD ветки разработчика,
         # чтобы видеть, что master отличается.
