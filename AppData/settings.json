@@ -96,7 +96,7 @@
         "AntiFlicker": true,
         "AutoContrast": false,
         "Effect": "zoom_in",
-        "EffectDuration": 300,
+        "EffectDuration": 290,
         "EffectIntensity": 130,
         "GradientColor1": "#ff5555",
         "GradientColor2": "#ff5252",
