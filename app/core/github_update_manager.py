@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import zipfile
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Dict, Optional
@@ -21,6 +22,51 @@ class GitHubUpdateManager:
         self.app_root = ROOT_PATH.parent
         self.updater_root = CACHE_PATH / "updater"
         self.updater_root.mkdir(parents=True, exist_ok=True)
+        self.state_file = self.updater_root / "update_state.json"
+
+    def _get_known_sha(self) -> str:
+        """Берём baseline SHA из cfg, при необходимости из резервного state-файла."""
+        known_sha = str(cfg.update_last_known_commit.value or "").strip()
+        if known_sha:
+            return known_sha
+        try:
+            if not self.state_file.exists():
+                return ""
+            raw = self.state_file.read_text(encoding="utf-8")
+            data = json.loads(raw) if raw else {}
+            if isinstance(data, dict):
+                restored = str(data.get("last_known_commit") or "").strip()
+                if restored:
+                    try:
+                        cfg.set(cfg.update_last_known_commit, restored)
+                    except Exception:
+                        pass
+                return restored
+        except Exception:
+            return ""
+        return ""
+
+    def _set_known_sha(self, sha: str):
+        """Надёжно сохраняем baseline SHA в cfg и резервный state-файл."""
+        clean = str(sha or "").strip()
+        if not clean:
+            return
+        try:
+            cfg.set(cfg.update_last_known_commit, clean)
+        except Exception:
+            pass
+        try:
+            self.state_file.parent.mkdir(parents=True, exist_ok=True)
+            self.state_file.write_text(
+                json.dumps(
+                    {"last_known_commit": clean},
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+        except Exception:
+            pass
 
     @staticmethod
     def _creation_flags() -> int:
@@ -86,11 +132,11 @@ class GitHubUpdateManager:
     def check_update(self) -> Dict:
         latest = self.fetch_latest_commit()
         latest_sha = latest.get("sha", "")
-        known_sha = str(cfg.update_last_known_commit.value or "").strip()
+        known_sha = self._get_known_sha()
 
         # Первый запуск: фиксируем baseline без навязчивого апдейта.
         if not known_sha and latest_sha:
-            cfg.set(cfg.update_last_known_commit, latest_sha)
+            self._set_known_sha(latest_sha)
             return {"has_update": False, "latest": latest, "known": latest_sha, "baseline_initialized": True}
 
         has_update = bool(latest_sha and known_sha and latest_sha != known_sha)
@@ -125,6 +171,7 @@ class GitHubUpdateManager:
             return {"ok": False, "error": "Не удалось получить SHA последнего коммита"}
 
         known_sha = str(cfg.update_last_known_commit.value or "").strip()
+        known_sha = self._get_known_sha()
 
         owner, name, _ = self._repo()
 
@@ -188,7 +235,7 @@ class GitHubUpdateManager:
             creationflags=self._creation_flags(),
         )
 
-        cfg.set(cfg.update_last_known_commit, sha)
+        self._set_known_sha(sha)
         report(100, "Обновление запущено")
         return {"ok": True, "sha": sha, "script": str(script_path), "mode": "full"}
 
