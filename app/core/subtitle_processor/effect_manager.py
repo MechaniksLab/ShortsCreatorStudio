@@ -628,20 +628,10 @@ class EffectManager:
             karaoke_active = False
 
         if karaoke_active:
-            # \2c — неактивный текст, \1c — активное слово.
-            # Цвета берём из пользовательских настроек UI.
-            inactive_color_ass = EffectManager._hex_to_ass_primary(
-                gradient_color_1 or "#B0B0B0",
-                fallback="&H00B0B0B0&",
-            )
-            active_color_ass = EffectManager._hex_to_ass_primary(
-                gradient_color_2 or "#FFFFFF",
-                fallback="&H00FFFFFF&",
-            )
-            processed_text = (
-                f"{{\\2c{inactive_color_ass}\\1c{active_color_ass}}}"
-                f"{processed_text}"
-            )
+            # Критично: НЕ подменяем \1c (основной цвет текста),
+            # чтобы цвет из стиля субтитра всегда оставался главным.
+            # Для «неактивных» слов задаём только \2c в нейтральный тон.
+            processed_text = f"{{\\2c&H00B0B0B0&}}{processed_text}"
 
         if (not karaoke_active) and (speaker_color_mode or "off").lower() == "alternate":
             speaker_palette = ["#8FD3FF", "#FFD27A", "#B5F5B0", "#F6A9FF"]

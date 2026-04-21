@@ -250,6 +250,10 @@ class Config(QConfig):
     subtitle_style_name = ConfigItem("SubtitleStyle", "StyleName", "default")
     subtitle_layout = ConfigItem("SubtitleStyle", "Layout", "译文在上")
     subtitle_preview_image = ConfigItem("SubtitleStyle", "PreviewImage", "")
+    subtitle_preview_custom_text = ConfigItem("SubtitleStyle", "PreviewCustomText", "")
+    subtitle_preview_live_duration_ms = RangeConfigItem(
+        "SubtitleStyle", "PreviewLiveDurationMs", 1000, RangeValidator(500, 15000)
+    )
     subtitle_effect = ConfigItem("SubtitleStyle", "Effect", "none")
     subtitle_effect_duration = RangeConfigItem(
         "SubtitleStyle", "EffectDuration", 300, RangeValidator(20, 10000)

@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import subprocess
@@ -31,7 +32,7 @@ from app.components.MySettingCard import (
     DoubleSpinBoxSettingCard,
     SpinBoxSettingCard,
 )
-from app.config import SUBTITLE_STYLE_PATH, ASSETS_PATH
+from app.config import SUBTITLE_STYLE_PATH, ASSETS_PATH, APPDATA_PATH
 from app.core.entities import SplitTypeEnum
 from app.core.subtitle_processor.effect_manager import EffectManager
 from app.core.utils.subtitle_preview import generate_preview, generate_preview_video
@@ -156,16 +157,16 @@ PREVIEW_TEXTS_SENTENCE = {
 
 PREVIEW_TEXTS_WORD = {
     "По словам — коротко": (
-        "Word by word karaoke preview",
-        "Слово за словом караоке",
+        "я иду домой после работы",
+        "я иду домой после работы",
     ),
     "По словам — ритм": (
-        "one two three four five",
-        "раз два три четыре пять",
+        "вчера неожиданно случилось невероятное приключение",
+        "вчера неожиданно случилось невероятное приключение",
     ),
     "По словам — акцент": (
-        "highlight every word clearly",
-        "подсветка каждого слова",
+        "старт пауза ускорение финиш аплодисменты",
+        "старт пауза ускорение финиш аплодисменты",
     ),
 }
 
@@ -179,6 +180,8 @@ DEFAULT_BG_PORTRAIT = {
     "width": 480,
     "height": 852,
 }
+
+CUSTOM_SUBTITLE_PRESETS_PATH = APPDATA_PATH / "subtitle_custom_presets.json"
 
 
 class PreviewThread(QThread):
@@ -361,6 +364,10 @@ class SubtitleStyleInterface(QWidget):
 
     def _initPreviewArea(self):
         """初始化右侧预览区域"""
+        self.previewScrollArea = ScrollArea()
+        self.previewScrollArea.setWidgetResizable(True)
+        self.previewScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
         self.previewCard = CardWidget()
         self.previewLayout = QVBoxLayout(self.previewCard)
         self.previewLayout.setSpacing(16)
@@ -416,12 +423,33 @@ class SubtitleStyleInterface(QWidget):
             "Открыть папку стилей в проводнике",
         )
 
+        self.customPresetComboBox = ComboBoxSettingCard(
+            FIF.BOOK_SHELF,
+            "Кастомный пресет",
+            "Сохранённые наборы ваших настроек стиля и эффектов",
+            texts=[],
+        )
+
+        self.saveCustomPresetButton = PushSettingCard(
+            "Сохранить текущий пресет",
+            FIF.SAVE,
+            "Сохранить текущий пресет",
+            "Сохранить все текущие настройки во внутренний пользовательский пресет",
+        )
+
         self.previewEffectButton = PushSettingCard(
             "Показать анимацию",
             FIF.PLAY,
             "Показать анимацию эффекта",
             "Сгенерировать короткое видео предпросмотра и открыть его",
         )
+
+        self.customPreviewTextLabel = BodyLabel("Свой текст предпросмотра")
+        self.customPreviewTextInput = LineEdit(self.previewBottomWidget)
+        self.customPreviewTextInput.setPlaceholderText(
+            "Введите свой текст (можно: оригинал || перевод)"
+        )
+        self.customPreviewTextInput.setClearButtonEnabled(True)
 
         self.wordTimestampHintLabel = BodyLabel(
             "⚠ Для режима «по словам» и точного karaoke нужны word timestamps из ASR.")
@@ -430,16 +458,23 @@ class SubtitleStyleInterface(QWidget):
             "color: #F5A524; font-size: 12px; padding: 2px 0;"
         )
 
+        # Live-блок размещаем выше — сразу под окном предпросмотра
+        self.previewBottomLayout.addWidget(self.timelineWidget)
         self.previewBottomLayout.addWidget(self.styleNameComboBox)
         self.previewBottomLayout.addWidget(self.newStyleButton)
         self.previewBottomLayout.addWidget(self.openStyleFolderButton)
+        self.previewBottomLayout.addWidget(self.customPresetComboBox)
+        self.previewBottomLayout.addWidget(self.saveCustomPresetButton)
         self.previewBottomLayout.addWidget(self.previewEffectButton)
+        self.previewBottomLayout.addWidget(self.customPreviewTextLabel)
+        self.previewBottomLayout.addWidget(self.customPreviewTextInput)
         self.previewBottomLayout.addWidget(self.wordTimestampHintLabel)
-        self.previewBottomLayout.addWidget(self.timelineWidget)
 
         self.previewLayout.addWidget(self.previewTopWidget)
         self.previewLayout.addWidget(self.previewBottomWidget)
         self.previewLayout.addStretch(1)
+
+        self.previewScrollArea.setWidget(self.previewCard)
 
     def _initSettingCards(self):
         """初始化所有设置卡片"""
@@ -833,6 +868,14 @@ class SubtitleStyleInterface(QWidget):
             parent=self.previewGroup,
         )
 
+        self.liveDurationCard = SpinBoxSettingCard(
+            FIF.STOP_WATCH,
+            "Длительность Live-предпросмотра (мс)",
+            "Диапазон времени для ползунка и режима Live",
+            minimum=500,
+            maximum=15000,
+        )
+
     def _initLayout(self):
         """初始化布局"""
         # 添加卡片到组
@@ -897,6 +940,7 @@ class SubtitleStyleInterface(QWidget):
 
         self.previewGroup.addSettingCard(self.previewTextCard)
         self.previewGroup.addSettingCard(self.orientationCard)
+        self.previewGroup.addSettingCard(self.liveDurationCard)
         self.previewGroup.addSettingCard(self.previewImageCard)
 
         # 添加组到布局
@@ -912,7 +956,7 @@ class SubtitleStyleInterface(QWidget):
 
         # 添加左右两侧到主布局
         self.hBoxLayout.addWidget(self.settingsScrollArea)
-        self.hBoxLayout.addWidget(self.previewCard)
+        self.hBoxLayout.addWidget(self.previewScrollArea, 1)
 
     def _initStyle(self):
         """初始化样式"""
@@ -987,6 +1031,13 @@ class SubtitleStyleInterface(QWidget):
         )
         self._refresh_effect_options_by_split_mode()
         self._refresh_preview_text_options()
+        self.liveDurationCard.spinBox.setValue(
+            int(cfg.get(cfg.subtitle_preview_live_duration_ms))
+        )
+        self._apply_live_duration_ms(int(cfg.get(cfg.subtitle_preview_live_duration_ms)))
+        self.customPreviewTextInput.setText(
+            str(cfg.get(cfg.subtitle_preview_custom_text) or "")
+        )
         self.maxWordCountCjkCard.spinBox.setValue(int(cfg.get(cfg.max_word_count_cjk)))
         self.maxWordCountEnglishCard.spinBox.setValue(
             int(cfg.get(cfg.max_word_count_english))
@@ -1061,6 +1112,8 @@ class SubtitleStyleInterface(QWidget):
         else:
             self.loadStyle(style_files[0])
             self.styleNameComboBox.comboBox.setCurrentText(style_files[0])
+
+        self._refresh_custom_preset_items()
 
     def connectSignals(self):
         """连接所有设置变更的信号到预览更新函数"""
@@ -1253,7 +1306,9 @@ class SubtitleStyleInterface(QWidget):
         # 预览设置
         self.previewTextCard.currentTextChanged.connect(self.onSettingChanged)
         self.orientationCard.currentTextChanged.connect(self.onOrientationChanged)
+        self.liveDurationCard.spinBox.valueChanged.connect(self.onLiveDurationChanged)
         self.previewImageCard.clicked.connect(self.selectPreviewImage)
+        self.customPreviewTextInput.textChanged.connect(self.onCustomPreviewTextChanged)
         self.previewEffectButton.clicked.connect(self.showEffectPreview)
         self.playPreviewButton.clicked.connect(self.toggleLivePreview)
         self.timelineSlider.valueChanged.connect(self.onTimelineChanged)
@@ -1262,6 +1317,8 @@ class SubtitleStyleInterface(QWidget):
         self.styleNameComboBox.currentTextChanged.connect(self.loadStyle)
         self.newStyleButton.clicked.connect(self.createNewStyle)
         self.openStyleFolderButton.clicked.connect(self.on_open_style_folder_clicked)
+        self.customPresetComboBox.currentTextChanged.connect(self.onCustomPresetChanged)
+        self.saveCustomPresetButton.clicked.connect(self.saveCurrentCustomPreset)
 
         # 连接字幕排布信号
         self.layoutCard.comboBox.currentTextChanged.connect(
@@ -1279,6 +1336,390 @@ class SubtitleStyleInterface(QWidget):
             subprocess.run(["open", SUBTITLE_STYLE_PATH])
         else:  # Linux
             subprocess.run(["xdg-open", SUBTITLE_STYLE_PATH])
+
+    def _read_custom_presets(self) -> dict:
+        try:
+            if not CUSTOM_SUBTITLE_PRESETS_PATH.exists():
+                return {}
+            raw = CUSTOM_SUBTITLE_PRESETS_PATH.read_text(encoding="utf-8")
+            data = json.loads(raw)
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
+    def _write_custom_presets(self, data: dict):
+        try:
+            CUSTOM_SUBTITLE_PRESETS_PATH.parent.mkdir(parents=True, exist_ok=True)
+            CUSTOM_SUBTITLE_PRESETS_PATH.write_text(
+                json.dumps(data, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception:
+            pass
+
+    def _collect_custom_preset_state(self) -> dict:
+        def _color_hex(c: QColor) -> str:
+            try:
+                return c.name(QColor.HexArgb)
+            except Exception:
+                return c.name()
+
+        return {
+            "style_name": self.styleNameComboBox.comboBox.currentText(),
+            "vertical_spacing": int(self.verticalSpacingCard.spinBox.value()),
+
+            "layout_label": self.layoutCard.comboBox.currentText(),
+            "effect_label": self.effectCard.comboBox.currentText(),
+            "effect_duration": int(self.effectDurationCard.spinBox.value()),
+            "effect_intensity": int(self.effectIntensityCard.spinBox.value()),
+            "rainbow_end_color": _color_hex(self.rainbowEndColorCard.colorPicker.color),
+            "preset_label": self.presetCard.comboBox.currentText(),
+            "motion_direction_label": self.motionDirectionCard.comboBox.currentText(),
+            "motion_amplitude": int(self.motionAmplitudeCard.spinBox.value()),
+            "motion_easing_label": self.motionEasingCard.comboBox.currentText(),
+            "motion_jitter": int(self.motionJitterCard.spinBox.value()),
+            "motion_blur": int(self.motionBlurCard.spinBox.value()),
+            "karaoke_mode_label": self.karaokeModeCard.comboBox.currentText(),
+            "karaoke_window_ms": int(self.karaokeWindowCard.spinBox.value()),
+            "need_split_label": self.needSplitCard.comboBox.currentText(),
+            "split_type_label": self.splitTypeCard.comboBox.currentText(),
+            "max_word_count_cjk": int(self.maxWordCountCjkCard.spinBox.value()),
+            "max_word_count_english": int(self.maxWordCountEnglishCard.spinBox.value()),
+            "remove_punctuation_label": self.removePunctuationCard.comboBox.currentText(),
+            "processed_cache_label": self.processedSubtitleCacheCard.comboBox.currentText(),
+            "auto_contrast_label": self.autoContrastCard.comboBox.currentText(),
+            "anti_flicker_label": self.antiFlickerCard.comboBox.currentText(),
+            "gradient_mode_label": self.gradientModeCard.comboBox.currentText(),
+            "gradient_color_1": _color_hex(self.gradientColor1Card.colorPicker.color),
+            "gradient_color_2": _color_hex(self.gradientColor2Card.colorPicker.color),
+            "speaker_color_mode_label": self.speakerColorModeCard.comboBox.currentText(),
+            "safe_area_label": self.safeAreaCard.comboBox.currentText(),
+            "safe_margin_x": int(self.safeMarginXCard.spinBox.value()),
+            "safe_margin_y": int(self.safeMarginYCard.spinBox.value()),
+
+            "main_font": self.mainFontCard.comboBox.currentText(),
+            "main_size": int(self.mainSizeCard.spinBox.value()),
+            "main_font_size": int(self.mainSizeCard.spinBox.value()),
+            "main_spacing": float(self.mainSpacingCard.spinBox.value()),
+            "main_color": _color_hex(self.mainColorCard.colorPicker.color),
+            "main_outline_color": _color_hex(self.mainOutlineColorCard.colorPicker.color),
+            "main_outline_size": float(self.mainOutlineSizeCard.spinBox.value()),
+            "main_shadow": float(self.mainShadowCard.spinBox.value()),
+            "main_shadow_color": _color_hex(self.mainShadowColorCard.colorPicker.color),
+            "main_blur": float(self.mainBlurCard.spinBox.value()),
+
+            "sub_font": self.subFontCard.comboBox.currentText(),
+            "sub_size": int(self.subSizeCard.spinBox.value()),
+            "sub_font_size": int(self.subSizeCard.spinBox.value()),
+            "sub_spacing": float(self.subSpacingCard.spinBox.value()),
+            "sub_color": _color_hex(self.subColorCard.colorPicker.color),
+            "sub_outline_color": _color_hex(self.subOutlineColorCard.colorPicker.color),
+            "sub_outline_size": float(self.subOutlineSizeCard.spinBox.value()),
+            "sub_shadow": float(self.subShadowCard.spinBox.value()),
+            "sub_shadow_color": _color_hex(self.subShadowColorCard.colorPicker.color),
+            "sub_blur": float(self.subBlurCard.spinBox.value()),
+
+            "preview_text_label": self.previewTextCard.comboBox.currentText(),
+            "preview_custom_text": self.customPreviewTextInput.text(),
+            "orientation_label": self.orientationCard.comboBox.currentText(),
+        }
+
+    def _apply_custom_preset_state(self, state: dict):
+        if not isinstance(state, dict):
+            return
+
+        def _qcolor(value: str, fallback: QColor) -> QColor:
+            try:
+                c = QColor(str(value or ""))
+                return c if c.isValid() else fallback
+            except Exception:
+                return fallback
+
+        def _as_int(value, fallback: int) -> int:
+            try:
+                return int(value)
+            except Exception:
+                return int(fallback)
+
+        def _as_float(value, fallback: float) -> float:
+            try:
+                return float(value)
+            except Exception:
+                return float(fallback)
+
+        self._loading_style = True
+        try:
+            style_name = str(state.get("style_name", "") or "").strip()
+            if style_name:
+                self.styleNameComboBox.comboBox.setCurrentText(style_name)
+
+            self.verticalSpacingCard.spinBox.setValue(
+                _as_int(state.get("vertical_spacing", self.verticalSpacingCard.spinBox.value()), self.verticalSpacingCard.spinBox.value())
+            )
+
+            self.layoutCard.comboBox.setCurrentText(
+                str(state.get("layout_label", self.layoutCard.comboBox.currentText()))
+            )
+            self.effectCard.comboBox.setCurrentText(
+                str(state.get("effect_label", self.effectCard.comboBox.currentText()))
+            )
+            self.effectDurationCard.spinBox.setValue(
+                _as_int(state.get("effect_duration", self.effectDurationCard.spinBox.value()), self.effectDurationCard.spinBox.value())
+            )
+            self.effectIntensityCard.spinBox.setValue(
+                _as_int(state.get("effect_intensity", self.effectIntensityCard.spinBox.value()), self.effectIntensityCard.spinBox.value())
+            )
+            self.rainbowEndColorCard.setColor(
+                _qcolor(
+                    str(state.get("rainbow_end_color", "")),
+                    self.rainbowEndColorCard.colorPicker.color,
+                )
+            )
+            self.presetCard.comboBox.setCurrentText(
+                str(state.get("preset_label", self.presetCard.comboBox.currentText()))
+            )
+            self.motionDirectionCard.comboBox.setCurrentText(
+                str(state.get("motion_direction_label", self.motionDirectionCard.comboBox.currentText()))
+            )
+            self.motionAmplitudeCard.spinBox.setValue(
+                _as_int(state.get("motion_amplitude", self.motionAmplitudeCard.spinBox.value()), self.motionAmplitudeCard.spinBox.value())
+            )
+            self.motionEasingCard.comboBox.setCurrentText(
+                str(state.get("motion_easing_label", self.motionEasingCard.comboBox.currentText()))
+            )
+            self.motionJitterCard.spinBox.setValue(
+                _as_int(state.get("motion_jitter", self.motionJitterCard.spinBox.value()), self.motionJitterCard.spinBox.value())
+            )
+            self.motionBlurCard.spinBox.setValue(
+                _as_int(state.get("motion_blur", self.motionBlurCard.spinBox.value()), self.motionBlurCard.spinBox.value())
+            )
+            self.karaokeModeCard.comboBox.setCurrentText(
+                str(state.get("karaoke_mode_label", self.karaokeModeCard.comboBox.currentText()))
+            )
+            self.karaokeWindowCard.spinBox.setValue(
+                _as_int(state.get("karaoke_window_ms", self.karaokeWindowCard.spinBox.value()), self.karaokeWindowCard.spinBox.value())
+            )
+            self.needSplitCard.comboBox.setCurrentText(
+                str(state.get("need_split_label", self.needSplitCard.comboBox.currentText()))
+            )
+            self.splitTypeCard.comboBox.setCurrentText(
+                str(state.get("split_type_label", self.splitTypeCard.comboBox.currentText()))
+            )
+            self.maxWordCountCjkCard.spinBox.setValue(
+                _as_int(state.get("max_word_count_cjk", self.maxWordCountCjkCard.spinBox.value()), self.maxWordCountCjkCard.spinBox.value())
+            )
+            self.maxWordCountEnglishCard.spinBox.setValue(
+                _as_int(state.get("max_word_count_english", self.maxWordCountEnglishCard.spinBox.value()), self.maxWordCountEnglishCard.spinBox.value())
+            )
+            self.removePunctuationCard.comboBox.setCurrentText(
+                str(state.get("remove_punctuation_label", self.removePunctuationCard.comboBox.currentText()))
+            )
+            self.processedSubtitleCacheCard.comboBox.setCurrentText(
+                str(state.get("processed_cache_label", self.processedSubtitleCacheCard.comboBox.currentText()))
+            )
+            self.autoContrastCard.comboBox.setCurrentText(
+                str(state.get("auto_contrast_label", self.autoContrastCard.comboBox.currentText()))
+            )
+            self.antiFlickerCard.comboBox.setCurrentText(
+                str(state.get("anti_flicker_label", self.antiFlickerCard.comboBox.currentText()))
+            )
+            self.gradientModeCard.comboBox.setCurrentText(
+                str(state.get("gradient_mode_label", self.gradientModeCard.comboBox.currentText()))
+            )
+            self.gradientColor1Card.setColor(
+                _qcolor(
+                    str(state.get("gradient_color_1", "")),
+                    self.gradientColor1Card.colorPicker.color,
+                )
+            )
+            self.gradientColor2Card.setColor(
+                _qcolor(
+                    str(state.get("gradient_color_2", "")),
+                    self.gradientColor2Card.colorPicker.color,
+                )
+            )
+            self.speakerColorModeCard.comboBox.setCurrentText(
+                str(state.get("speaker_color_mode_label", self.speakerColorModeCard.comboBox.currentText()))
+            )
+            self.safeAreaCard.comboBox.setCurrentText(
+                str(state.get("safe_area_label", self.safeAreaCard.comboBox.currentText()))
+            )
+            self.safeMarginXCard.spinBox.setValue(
+                _as_int(state.get("safe_margin_x", self.safeMarginXCard.spinBox.value()), self.safeMarginXCard.spinBox.value())
+            )
+            self.safeMarginYCard.spinBox.setValue(
+                _as_int(state.get("safe_margin_y", self.safeMarginYCard.spinBox.value()), self.safeMarginYCard.spinBox.value())
+            )
+
+            self.mainFontCard.comboBox.setCurrentText(
+                str(state.get("main_font", self.mainFontCard.comboBox.currentText()))
+            )
+            self.mainSizeCard.spinBox.setValue(
+                _as_int(
+                    state.get(
+                        "main_size",
+                        state.get("main_font_size", self.mainSizeCard.spinBox.value()),
+                    ),
+                    self.mainSizeCard.spinBox.value(),
+                )
+            )
+            self.mainSpacingCard.spinBox.setValue(
+                _as_float(state.get("main_spacing", self.mainSpacingCard.spinBox.value()), self.mainSpacingCard.spinBox.value())
+            )
+            self.mainColorCard.setColor(
+                _qcolor(str(state.get("main_color", "")), self.mainColorCard.colorPicker.color)
+            )
+            self.mainOutlineColorCard.setColor(
+                _qcolor(
+                    str(state.get("main_outline_color", "")),
+                    self.mainOutlineColorCard.colorPicker.color,
+                )
+            )
+            self.mainOutlineSizeCard.spinBox.setValue(
+                _as_float(state.get("main_outline_size", self.mainOutlineSizeCard.spinBox.value()), self.mainOutlineSizeCard.spinBox.value())
+            )
+            self.mainShadowCard.spinBox.setValue(
+                _as_float(state.get("main_shadow", self.mainShadowCard.spinBox.value()), self.mainShadowCard.spinBox.value())
+            )
+            self.mainShadowColorCard.setColor(
+                _qcolor(
+                    str(state.get("main_shadow_color", "")),
+                    self.mainShadowColorCard.colorPicker.color,
+                )
+            )
+            self.mainBlurCard.spinBox.setValue(
+                _as_float(state.get("main_blur", self.mainBlurCard.spinBox.value()), self.mainBlurCard.spinBox.value())
+            )
+
+            self.subFontCard.comboBox.setCurrentText(
+                str(state.get("sub_font", self.subFontCard.comboBox.currentText()))
+            )
+            self.subSizeCard.spinBox.setValue(
+                _as_int(
+                    state.get(
+                        "sub_size",
+                        state.get("sub_font_size", self.subSizeCard.spinBox.value()),
+                    ),
+                    self.subSizeCard.spinBox.value(),
+                )
+            )
+            self.subSpacingCard.spinBox.setValue(
+                _as_float(state.get("sub_spacing", self.subSpacingCard.spinBox.value()), self.subSpacingCard.spinBox.value())
+            )
+            self.subColorCard.setColor(
+                _qcolor(str(state.get("sub_color", "")), self.subColorCard.colorPicker.color)
+            )
+            self.subOutlineColorCard.setColor(
+                _qcolor(
+                    str(state.get("sub_outline_color", "")),
+                    self.subOutlineColorCard.colorPicker.color,
+                )
+            )
+            self.subOutlineSizeCard.spinBox.setValue(
+                _as_float(state.get("sub_outline_size", self.subOutlineSizeCard.spinBox.value()), self.subOutlineSizeCard.spinBox.value())
+            )
+            self.subShadowCard.spinBox.setValue(
+                _as_float(state.get("sub_shadow", self.subShadowCard.spinBox.value()), self.subShadowCard.spinBox.value())
+            )
+            self.subShadowColorCard.setColor(
+                _qcolor(
+                    str(state.get("sub_shadow_color", "")),
+                    self.subShadowColorCard.colorPicker.color,
+                )
+            )
+            self.subBlurCard.spinBox.setValue(
+                _as_float(state.get("sub_blur", self.subBlurCard.spinBox.value()), self.subBlurCard.spinBox.value())
+            )
+
+            self.previewTextCard.comboBox.setCurrentText(
+                str(state.get("preview_text_label", self.previewTextCard.comboBox.currentText()))
+            )
+            self.customPreviewTextInput.setText(
+                str(state.get("preview_custom_text", self.customPreviewTextInput.text()))
+            )
+            self.orientationCard.comboBox.setCurrentText(
+                str(state.get("orientation_label", self.orientationCard.comboBox.currentText()))
+            )
+        finally:
+            self._loading_style = False
+
+        self._update_motion_controls_state()
+        self.onSettingChanged()
+
+    def _refresh_custom_preset_items(self, select_name: str = ""):
+        data = self._read_custom_presets()
+        items = sorted((data.get("presets") or {}).keys(), key=lambda x: x.lower())
+        last_selected = str(data.get("last_selected_preset", "") or "").strip()
+        self.customPresetComboBox.comboBox.blockSignals(True)
+        self.customPresetComboBox.comboBox.clear()
+        self.customPresetComboBox.comboBox.addItem("—")
+        if items:
+            self.customPresetComboBox.comboBox.addItems(items)
+
+        if select_name in items:
+            target = select_name
+        elif last_selected in items:
+            target = last_selected
+        else:
+            target = "—"
+        self.customPresetComboBox.comboBox.setCurrentText(target)
+        self.customPresetComboBox.comboBox.blockSignals(False)
+
+        # Автоматически применяем последний использованный пресет при открытии вкладки
+        if target != "—":
+            self.onCustomPresetChanged(target)
+
+    def saveCurrentCustomPreset(self):
+        data = self._read_custom_presets()
+        presets = data.get("presets") if isinstance(data.get("presets"), dict) else {}
+
+        selected_name = (self.customPresetComboBox.comboBox.currentText() or "").strip()
+        if selected_name and selected_name != "—" and selected_name in presets:
+            preset_name = selected_name
+            mode = "updated"
+        else:
+            dialog = PresetNameDialog(self)
+            if not dialog.exec():
+                return
+            preset_name = dialog.nameLineEdit.text().strip()
+            if not preset_name:
+                return
+            mode = "created"
+
+        presets[preset_name] = self._collect_custom_preset_state()
+        data["presets"] = presets
+        data["last_selected_preset"] = preset_name
+        self._write_custom_presets(data)
+        self._refresh_custom_preset_items(select_name=preset_name)
+
+        InfoBar.success(
+            title="Успешно",
+            content=(
+                f"Кастомный пресет обновлён: {preset_name}"
+                if mode == "updated"
+                else f"Кастомный пресет сохранён: {preset_name}"
+            ),
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP,
+            duration=1800,
+            parent=self,
+        )
+
+    def onCustomPresetChanged(self, preset_name: str):
+        preset_name = (preset_name or "").strip()
+        if not preset_name or preset_name == "—":
+            return
+
+        data = self._read_custom_presets()
+        presets = data.get("presets") if isinstance(data.get("presets"), dict) else {}
+        state = presets.get(preset_name)
+        if not isinstance(state, dict):
+            return
+
+        data["last_selected_preset"] = preset_name
+        self._write_custom_presets(data)
+        self._apply_custom_preset_state(state)
 
     def on_subtitle_layout_changed(self, layout: str):
         cfg.subtitle_layout.value = layout
@@ -1354,6 +1795,19 @@ class SubtitleStyleInterface(QWidget):
             return PREVIEW_TEXTS_WORD
         return PREVIEW_TEXTS_SENTENCE
 
+    def _resolve_preview_text_pair(self, base_pair: Tuple[str, Optional[str]]) -> Tuple[str, Optional[str]]:
+        custom = (self.customPreviewTextInput.text() or "").strip()
+        if not custom:
+            return base_pair
+
+        if "||" in custom:
+            left, right = custom.split("||", 1)
+            main = (left or "").strip()
+            sub = (right or "").strip() or None
+            return main, sub
+
+        return custom, custom
+
     def _refresh_preview_text_options(self):
         texts_map = self._current_preview_texts()
         current = self.previewTextCard.comboBox.currentText()
@@ -1366,11 +1820,30 @@ class SubtitleStyleInterface(QWidget):
             self.previewTextCard.comboBox.setCurrentIndex(0)
         self.previewTextCard.comboBox.blockSignals(False)
 
+    @staticmethod
+    def _select_word_for_preview(text: Optional[str], timeline_ratio: float) -> Optional[str]:
+        raw = (text or "").strip()
+        if not raw:
+            return text
+
+        words = [w for w in raw.split() if w]
+        if len(words) <= 1:
+            return raw
+
+        ratio = max(0.0, min(0.9999, float(timeline_ratio or 0.0)))
+        idx = int(ratio * len(words))
+        idx = max(0, min(len(words) - 1, idx))
+        return words[idx]
+
     def _update_motion_controls_state(self):
         effect_label = self.effectCard.comboBox.currentText()
         effect_value = self.effect_options.get(effect_label, "none")
         is_word_mode = self._is_word_mode()
         enabled = is_word_mode and EffectManager.is_motion_customizable(effect_value)
+
+        if is_word_mode and self.karaokeModeCard.comboBox.currentText() != "Выкл":
+            self.karaokeModeCard.comboBox.setCurrentText("Выкл")
+
         self.karaokeModeCard.setEnabled(not is_word_mode)
         self.karaokeWindowCard.setEnabled(not is_word_mode)
 
@@ -1409,6 +1882,24 @@ class SubtitleStyleInterface(QWidget):
     def onTimelineChanged(self, value: int):
         self.timelineLabel.setText(f"{value / 1000:.2f} c")
         self._schedulePreviewUpdate(immediate=self._live_playing)
+
+    def _apply_live_duration_ms(self, duration_ms: int):
+        duration = max(500, min(15000, int(duration_ms or 1000)))
+        prev_max = max(1, self.timelineSlider.maximum())
+        prev_ratio = self.timelineSlider.value() / prev_max
+
+        self.timelineSlider.setRange(0, duration)
+        self.timelineSlider.setValue(min(duration, int(prev_ratio * duration)))
+        self.timelineLabel.setText(f"{self.timelineSlider.value() / 1000:.2f} c")
+
+    def onLiveDurationChanged(self, value: int):
+        cfg.set(cfg.subtitle_preview_live_duration_ms, int(value))
+        self._apply_live_duration_ms(int(value))
+        self.onSettingChanged()
+
+    def onCustomPreviewTextChanged(self, text: str):
+        cfg.set(cfg.subtitle_preview_custom_text, text or "")
+        self.onSettingChanged()
 
     def onPresetChanged(self, preset_label: str):
         if self._loading_style:
@@ -1594,6 +2085,7 @@ class SubtitleStyleInterface(QWidget):
         # 获取预览文本
         preview_texts = self._current_preview_texts()
         main_text, sub_text = preview_texts[self.previewTextCard.comboBox.currentText()]
+        main_text, sub_text = self._resolve_preview_text_pair((main_text, sub_text))
 
         # 字幕布局
         layout = self.layoutCard.comboBox.currentText()
@@ -1606,6 +2098,13 @@ class SubtitleStyleInterface(QWidget):
             main_text, sub_text = sub_text, None
         elif layout_value == "仅原文":
             main_text, sub_text = main_text, None
+
+        timeline_ms = self.timelineSlider.value()
+        timeline_ratio = timeline_ms / max(1, self.timelineSlider.maximum())
+        if self._is_word_mode():
+            main_text = self._select_word_for_preview(main_text, timeline_ratio)
+            if sub_text:
+                sub_text = self._select_word_for_preview(sub_text, timeline_ratio)
 
         # 获取预览方向
         orientation_label = self.orientationCard.comboBox.currentText()
@@ -1625,7 +2124,6 @@ class SubtitleStyleInterface(QWidget):
             width = default_preview["width"]
             height = default_preview["height"]
 
-        timeline_ms = self.timelineSlider.value()
         effect_type = cfg.get(cfg.subtitle_effect)
         if effect_type != "none":
             preview_window_ms = self.timelineSlider.maximum()
@@ -1655,7 +2153,7 @@ class SubtitleStyleInterface(QWidget):
             motion_easing=cfg.get(cfg.subtitle_motion_easing),
             motion_jitter=cfg.get(cfg.subtitle_motion_jitter) / 100,
             motion_blur_strength=cfg.get(cfg.subtitle_motion_blur_strength),
-            karaoke_mode=cfg.get(cfg.subtitle_karaoke_mode),
+            karaoke_mode=(not self._is_word_mode()) and bool(cfg.get(cfg.subtitle_karaoke_mode)),
             karaoke_window_ms=cfg.get(cfg.subtitle_karaoke_window_ms),
             auto_contrast=cfg.get(cfg.subtitle_auto_contrast),
             anti_flicker=cfg.get(cfg.subtitle_anti_flicker),
@@ -1756,6 +2254,7 @@ class SubtitleStyleInterface(QWidget):
         style_str = self.generateAssStyles()
         preview_texts = self._current_preview_texts()
         main_text, sub_text = preview_texts[self.previewTextCard.comboBox.currentText()]
+        main_text, sub_text = self._resolve_preview_text_pair((main_text, sub_text))
 
         layout_value = LAYOUT_LABEL_TO_VALUE.get(
             self.layoutCard.comboBox.currentText(), "译文在上"
@@ -1791,7 +2290,7 @@ class SubtitleStyleInterface(QWidget):
             motion_easing=cfg.get(cfg.subtitle_motion_easing),
             motion_jitter=cfg.get(cfg.subtitle_motion_jitter) / 100,
             motion_blur_strength=cfg.get(cfg.subtitle_motion_blur_strength),
-            karaoke_mode=cfg.get(cfg.subtitle_karaoke_mode),
+            karaoke_mode=(not self._is_word_mode()) and bool(cfg.get(cfg.subtitle_karaoke_mode)),
             karaoke_window_ms=cfg.get(cfg.subtitle_karaoke_window_ms),
             auto_contrast=cfg.get(cfg.subtitle_auto_contrast),
             anti_flicker=cfg.get(cfg.subtitle_anti_flicker),
@@ -1802,6 +2301,8 @@ class SubtitleStyleInterface(QWidget):
             safe_margin_x=cfg.get(cfg.subtitle_safe_margin_x),
             safe_margin_y=cfg.get(cfg.subtitle_safe_margin_y),
             speaker_color_mode=cfg.get(cfg.subtitle_speaker_color_mode),
+            duration_sec=max(1.0, self.timelineSlider.maximum() / 1000.0),
+            word_by_word_preview=self._is_word_mode(),
         )
 
         if sys.platform == "win32":
@@ -2046,6 +2547,30 @@ class StyleNameDialog(MessageBoxBase):
         self.cancelButton.setText("Отмена")
 
         self.widget.setMinimumWidth(350)
+        self.yesButton.setDisabled(True)
+        self.nameLineEdit.textChanged.connect(self._validateInput)
+
+    def _validateInput(self, text):
+        self.yesButton.setEnabled(bool(text.strip()))
+
+
+class PresetNameDialog(MessageBoxBase):
+    """Диалог имени пользовательского пресета"""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.titleLabel = BodyLabel("Новый кастомный пресет", self)
+        self.nameLineEdit = LineEdit(self)
+
+        self.nameLineEdit.setPlaceholderText("Введите название пресета")
+        self.nameLineEdit.setClearButtonEnabled(True)
+
+        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addWidget(self.nameLineEdit)
+
+        self.yesButton.setText("Сохранить")
+        self.cancelButton.setText("Отмена")
+        self.widget.setMinimumWidth(380)
         self.yesButton.setDisabled(True)
         self.nameLineEdit.textChanged.connect(self._validateInput)
 

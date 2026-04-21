@@ -22,7 +22,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qfluentwidgets import Action, BodyLabel, CardWidget, CheckBox, ComboBox, CommandBar, FluentIcon, InfoBar, InfoBarPosition, PrimaryPushButton, ProgressBar, PushButton, ScrollArea, StrongBodyLabel, SpinBox, isDarkTheme
+from qfluentwidgets import Action, BodyLabel, CardWidget, CheckBox, ComboBox, CommandBar, FluentIcon, InfoBar, InfoBarPosition, LineEdit, MessageBoxBase, PrimaryPushButton, ProgressBar, PushButton, ScrollArea, StrongBodyLabel, SpinBox, isDarkTheme
 
 from app.common.config import cfg
 from app.common.theme_manager import get_theme_palette
@@ -450,24 +450,22 @@ class AutoShortsInterface(QWidget):
         control_layout.addLayout(title_row)
 
         template_actions_top = QHBoxLayout()
-        template_actions_top.addWidget(BodyLabel("Шаблон:"))
-        self.load_template_btn = PushButton("Загрузить шаблон")
-        self.load_template_btn.clicked.connect(self._choose_and_load_layout_template)
-        self.save_template_btn = PushButton("Сохранить шаблон")
-        self.save_template_btn.clicked.connect(self._save_layout_template)
-        self.save_as_template_btn = PushButton("Сохранить как...")
-        self.save_as_template_btn.clicked.connect(self._save_layout_template_as)
-        self.reset_template_btn = PushButton("Сбросить шаблон")
+        template_actions_top.addWidget(BodyLabel("Пресет:"))
+        self.template_preset_combo = ComboBox(self)
+        self.template_preset_combo.setMinimumWidth(260)
+        self.template_preset_combo.currentTextChanged.connect(self._on_template_preset_selected)
+        template_actions_top.addWidget(self.template_preset_combo)
+        self.save_preset_quick_btn = PushButton("Сохранить/обновить пресет")
+        self.save_preset_quick_btn.clicked.connect(self._save_template_as_named_preset)
+        template_actions_top.addWidget(self.save_preset_quick_btn)
+        self.reset_template_btn = PushButton("Сбросить пресет")
         self.reset_template_btn.clicked.connect(self._reset_layout_template)
-        template_actions_top.addWidget(self.load_template_btn)
-        template_actions_top.addWidget(self.save_template_btn)
-        template_actions_top.addWidget(self.save_as_template_btn)
         template_actions_top.addWidget(self.reset_template_btn)
         template_actions_top.addStretch(1)
         control_layout.addLayout(template_actions_top)
 
         template_scope_hint_top = BodyLabel(
-            "Шаблон сохраняет: кроп/позиции WEBCAM+GAME, 2-слойный режим, цветокоррекцию, "
+            "Пресет сохраняет: кроп/позиции WEBCAM+GAME, 2-слойный режим, цветокоррекцию, "
             "параметры этапов (диапазон, длительность, лимиты кандидатов, анти-дубль, склейку речи) "
             "и настройки рендера. Не сохраняет: выбранные кандидаты и текущий список шортсов."
         )
@@ -818,7 +816,7 @@ class AutoShortsInterface(QWidget):
         self.template_card = CardWidget(self)
         self.template_card.setObjectName("shortsTemplateCard")
         template_layout = QVBoxLayout(self.template_card)
-        template_layout.addWidget(StrongBodyLabel("Наглядный шаблон монтажа"))
+        template_layout.addWidget(StrongBodyLabel("Наглядный пресет монтажа"))
         frame_row = QHBoxLayout()
         frame_row.addWidget(BodyLabel("Кадр предпросмотра (сек):"))
         self.preview_time_s = SpinBox(self)
@@ -877,7 +875,7 @@ class AutoShortsInterface(QWidget):
         self.output_preview.changed.connect(lambda _: self._on_layout_changed())
 
         row_tpl_actions = QHBoxLayout()
-        self.dual_layer_enabled = CheckBox("Включить двухслойный шаблон")
+        self.dual_layer_enabled = CheckBox("Включить двухслойный пресет")
         self.dual_layer_enabled.setChecked(True)
         row_tpl_actions.addWidget(self.dual_layer_enabled)
         row_tpl_actions.addStretch(1)
@@ -1158,9 +1156,95 @@ class AutoShortsInterface(QWidget):
 
         self._set_stage(0)
         self._set_active_progress_stage(0)
-        # Важный UX-фикс: откладываем загрузку шаблона до следующего цикла UI,
+        self._refresh_template_preset_combo(select_path=self.template_path)
+        # Важный UX-фикс: откладываем загрузку пресета до следующего цикла UI,
         # чтобы старт окна не подвисал на тяжёлой инициализации предпросмотра.
         QTimer.singleShot(0, self._load_initial_template_deferred)
+
+    def _refresh_template_preset_combo(self, select_path: Optional[Path] = None):
+        if not hasattr(self, "template_preset_combo"):
+            return
+        try:
+            self.templates_dir.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            pass
+
+        combo = self.template_preset_combo
+        combo.blockSignals(True)
+        combo.clear()
+        # Пустой пункт = режим создания нового пресета (аналогично вкладке стилей субтитров)
+        combo.addItem("")
+
+        template_files = sorted(self.templates_dir.glob("*.json"), key=lambda p: p.stem.lower())
+        for p in template_files:
+            combo.addItem(p.stem)
+
+        selected = Path(select_path) if select_path else Path(self.template_path)
+        selected_stem = selected.stem if selected else ""
+        last_state = self._read_template_state()
+        last_preset_name = str(last_state.get("last_preset_name", "") or "").strip()
+
+        target_stem = selected_stem or last_preset_name
+        if target_stem:
+            idx = combo.findText(target_stem)
+            combo.setCurrentIndex(idx if idx >= 0 else 0)
+        else:
+            combo.setCurrentIndex(0)
+
+        combo.blockSignals(False)
+
+    def _on_template_preset_selected(self, preset_name: str):
+        preset_name = (preset_name or "").strip()
+        if not preset_name:
+            return
+        target = self.templates_dir / f"{preset_name}.json"
+        if not target.exists():
+            return
+        self._load_layout_template(target, persist_last=True)
+        self._persist_last_template_path(target, preset_name=preset_name)
+
+    def _save_template_as_named_preset(self):
+        selected_name = (self.template_preset_combo.currentText() or "").strip()
+        if selected_name and (self.templates_dir / f"{selected_name}.json").exists():
+            preset_name = selected_name
+            mode = "updated"
+        else:
+            dialog = TemplatePresetNameDialog(self)
+            if not dialog.exec():
+                return
+            preset_name = dialog.nameLineEdit.text().strip()
+            if not preset_name:
+                return
+            mode = "created"
+        safe_name = (
+            preset_name.replace("\\", "_")
+            .replace("/", "_")
+            .replace(":", "_")
+            .replace("*", "_")
+            .replace("?", "_")
+            .replace('"', "_")
+            .replace("<", "_")
+            .replace(">", "_")
+            .replace("|", "_")
+            .strip()
+        )
+        if not safe_name:
+            return
+        self.templates_dir.mkdir(parents=True, exist_ok=True)
+        self.template_path = self.templates_dir / f"{safe_name}.json"
+        self._save_layout_template()
+        self._refresh_template_preset_combo(select_path=self.template_path)
+        InfoBar.success(
+            "Пресет сохранён",
+            (
+                f"Обновлён пресет: {safe_name}"
+                if mode == "updated"
+                else f"Создан пресет: {safe_name}"
+            ),
+            duration=2200,
+            position=InfoBarPosition.TOP,
+            parent=self,
+        )
 
     def _load_initial_template_deferred(self):
         try:
@@ -1851,16 +1935,20 @@ class AutoShortsInterface(QWidget):
                 json.dumps(self._build_layout_template(), ensure_ascii=False, indent=2),
                 encoding="utf-8",
             )
-            self._persist_last_template_path(self.template_path)
+            self._persist_last_template_path(
+                self.template_path,
+                preset_name=self.template_path.stem,
+            )
+            self._refresh_template_preset_combo(select_path=self.template_path)
             InfoBar.success(
-                "Шаблон сохранён",
+                "Пресет сохранён",
                 str(self.template_path),
                 duration=2000,
                 position=InfoBarPosition.TOP,
                 parent=self,
             )
         except Exception as e:
-            InfoBar.error("Ошибка", f"Не удалось сохранить шаблон: {e}", duration=3000, parent=self)
+            InfoBar.error("Ошибка", f"Не удалось сохранить пресет: {e}", duration=3000, parent=self)
 
     def _save_layout_template_as(self):
         try:
@@ -1879,6 +1967,7 @@ class AutoShortsInterface(QWidget):
                 chosen = chosen.with_suffix(".json")
             self.template_path = chosen
             self._save_layout_template()
+            self._refresh_template_preset_combo(select_path=self.template_path)
         except Exception as e:
             InfoBar.error("Ошибка", f"Не удалось сохранить шаблон: {e}", duration=3000, parent=self)
 
@@ -1894,6 +1983,7 @@ class AutoShortsInterface(QWidget):
             if not file_path:
                 return
             self._load_layout_template(Path(file_path), persist_last=True)
+            self._refresh_template_preset_combo(select_path=self.template_path)
         except Exception as e:
             InfoBar.error("Ошибка", f"Не удалось загрузить шаблон: {e}", duration=3000, parent=self)
 
@@ -1910,7 +2000,10 @@ class AutoShortsInterface(QWidget):
             data = json.loads(path_to_load.read_text(encoding="utf-8"))
             self.template_path = path_to_load
             if persist_last:
-                self._persist_last_template_path(self.template_path)
+                self._persist_last_template_path(
+                    self.template_path,
+                    preset_name=self.template_path.stem,
+                )
             source_canvas = data.get("source_canvas", {}) if isinstance(data, dict) else {}
             try:
                 saved_w = int(source_canvas.get("w", self.source_width))
@@ -2074,6 +2167,7 @@ class AutoShortsInterface(QWidget):
 
             self._refresh_output_composite_preview()
             self._update_llm_token_estimate()
+            self._refresh_template_preset_combo(select_path=self.template_path)
         except Exception:
             pass
 
@@ -2229,25 +2323,36 @@ class AutoShortsInterface(QWidget):
     def _resolve_startup_template_path(self) -> Path:
         legacy_default = APPDATA_PATH / "shorts_layout_template.json"
         try:
-            if self.template_state_path.exists():
-                raw = json.loads(self.template_state_path.read_text(encoding="utf-8"))
-                if isinstance(raw, dict):
-                    p = str(raw.get("last_template", "") or "").strip()
-                    if p:
-                        candidate = Path(p)
-                        if candidate.exists():
-                            return candidate
+            raw = self._read_template_state()
+            p = str(raw.get("last_template", "") or "").strip()
+            if p:
+                candidate = Path(p)
+                if candidate.exists():
+                    return candidate
         except Exception:
             pass
         if legacy_default.exists():
             return legacy_default
         return self.templates_dir / "default.json"
 
-    def _persist_last_template_path(self, path: Path):
+    def _read_template_state(self) -> Dict:
         try:
+            if not self.template_state_path.exists():
+                return {}
+            raw = json.loads(self.template_state_path.read_text(encoding="utf-8"))
+            return raw if isinstance(raw, dict) else {}
+        except Exception:
+            return {}
+
+    def _persist_last_template_path(self, path: Path, preset_name: str = ""):
+        try:
+            state = self._read_template_state()
+            state["last_template"] = str(path)
+            if preset_name:
+                state["last_preset_name"] = str(preset_name)
             self.template_state_path.parent.mkdir(parents=True, exist_ok=True)
             self.template_state_path.write_text(
-                json.dumps({"last_template": str(path)}, ensure_ascii=False, indent=2),
+                json.dumps(state, ensure_ascii=False, indent=2),
                 encoding="utf-8",
             )
         except Exception:
@@ -2707,11 +2812,11 @@ class AutoShortsInterface(QWidget):
                     self.source_height = pix.height()
                     self.source_preview.set_canvas_size(self.source_width, self.source_height)
                     self.source_preview.set_background(pix)
-                    # Если шаблон сохранён — применяем его, иначе дефолт
+                    # Если пресет сохранён — применяем его, иначе дефолт
                     if self.template_path.exists():
                         # Важно: при выборе нового ролика не перетираем только что
                         # рассчитанный диапазон анализа (0..длина ролика) значениями
-                        # из шаблона. Иначе ползунок диапазона не растягивается на весь ролик.
+                        # из пресета. Иначе ползунок диапазона не растягивается на весь ролик.
                         self._load_layout_template(persist_last=False, apply_ui_settings=False)
                     else:
                         self._reset_layout_template()
@@ -2869,3 +2974,27 @@ class AutoShortsInterface(QWidget):
         if hasattr(self, "render_thread") and self.render_thread.isRunning():
             self.render_thread.terminate()
         super().closeEvent(event)
+
+
+class TemplatePresetNameDialog(MessageBoxBase):
+    """Диалог сохранения пользовательского пресета шортсов"""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.titleLabel = BodyLabel("Сохранить пресет шортсов", self)
+        self.nameLineEdit = LineEdit(self)
+
+        self.nameLineEdit.setPlaceholderText("Введите название пресета")
+        self.nameLineEdit.setClearButtonEnabled(True)
+
+        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addWidget(self.nameLineEdit)
+
+        self.yesButton.setText("Сохранить")
+        self.cancelButton.setText("Отмена")
+        self.widget.setMinimumWidth(380)
+        self.yesButton.setDisabled(True)
+        self.nameLineEdit.textChanged.connect(self._validateInput)
+
+    def _validateInput(self, text: str):
+        self.yesButton.setEnabled(bool((text or "").strip()))

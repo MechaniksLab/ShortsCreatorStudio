@@ -19632,3 +19632,96 @@ CUDA可用
 视频总时长: 45.02秒
 视频合成完成
 视频合成完成，保存路径: E:\Neyro\ShortsCreatorStudio\work-dir\shorts\шорты_НАШЁЛ_ИЕРИХОН!_КОННОР_НЕДОВОЛЕН!_｜_Det_d043be7f_20260420_234125\видео_шорт_030_Заключительное общение_2924-2969с.mp4
+Latest version info: v1.3.3
+2026-04-21 00:06:18 - VideoCaptioner - ERROR - Traceback (most recent call last):
+  File "E:\Neyro\ShortsCreatorStudio\runtime\Lib\site-packages\qfluentwidgets\components\widgets\info_bar.py", line 420, in eventFilter
+    return super().eventFilter(obj, e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type TopRightInfoBarManager has been deleted
+
+2026-04-21 00:06:18 - VideoCaptioner - ERROR - Traceback (most recent call last):
+  File "E:\Neyro\ShortsCreatorStudio\runtime\Lib\site-packages\qfluentwidgets\components\widgets\info_bar.py", line 420, in eventFilter
+    return super().eventFilter(obj, e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type TopRightInfoBarManager has been deleted
+
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+2026-04-21 14:06:01 - VideoCaptioner - ERROR - Traceback (most recent call last):
+  File "E:\Neyro\ShortsCreatorStudio\runtime\Lib\site-packages\qfluentwidgets\components\widgets\info_bar.py", line 420, in eventFilter
+    return super().eventFilter(obj, e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type TopInfoBarManager has been deleted
+
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-21 15:34:14.642031
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 01_6.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp3lec5_9u.wav
+视频时长: 23.82秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_6\subtitle\исх_Последовательность 01_6-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-21 15:34:14.753044
+命中处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\960383d9ce05c2e17b810d4d5c4f8250.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_6\subtitle\стил__Последовательность 01_6-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260421_153414.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-21 15:34:14.802980
+开始合成视频: E:/Render/Последовательность 01_6.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 01_6.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Последовательность 01_6.mp4"
+视频总时长: 23.82秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_Последовательность 01_6.mp4
+
+===========转录任务开始===========
+时间：2026-04-21 15:35:52.155596
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 01_6.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp1pcto53v.wav
+视频时长: 23.82秒
+开始语音转录
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_6\subtitle\исх_Последовательность 01_6-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-21 15:35:52.248596
+命中处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\960383d9ce05c2e17b810d4d5c4f8250.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_6\subtitle\стил__Последовательность 01_6-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260421_153552.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-21 15:35:52.288596
+开始合成视频: E:/Render/Последовательность 01_6.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 01_6.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Последовательность 01_6.mp4"
+视频总时长: 23.82秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_Последовательность 01_6.mp4
