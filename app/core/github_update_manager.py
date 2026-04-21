@@ -71,6 +71,40 @@ class GitHubUpdateManager:
         except Exception:
             pass
 
+    def _get_git_head_sha(self) -> str:
+        """Если приложение запущено из git-рабочей копии, берём текущий HEAD.
+        Для прод-пользователей (без .git) вернёт пусто.
+        """
+        try:
+            git_dir = self.app_root / ".git"
+            if not git_dir.exists():
+                return ""
+            p = subprocess.run(
+                ["git", "-C", str(self.app_root), "rev-parse", "HEAD"],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                creationflags=(subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0),
+            )
+            if p.returncode != 0:
+                return ""
+            return str((p.stdout or "").strip())
+        except Exception:
+            return ""
+
+    def _get_effective_known_sha(self) -> str:
+        """Текущая версия приложения для сравнения с master.
+
+        Приоритет:
+        1) git HEAD (если мы в dev-рабочей копии),
+        2) сохранённый baseline (cfg/state) для обычных пользователей без git.
+        """
+        git_head = self._get_git_head_sha()
+        if git_head:
+            return git_head
+        return self._get_known_sha()
+
     @staticmethod
     def _creation_flags() -> int:
         flags = 0
@@ -135,7 +169,7 @@ class GitHubUpdateManager:
     def check_update(self) -> Dict:
         latest = self.fetch_latest_commit()
         latest_sha = latest.get("sha", "")
-        known_sha = self._get_known_sha()
+        known_sha = self._get_effective_known_sha()
 
         # Первый запуск: фиксируем baseline без навязчивого апдейта.
         if not known_sha and latest_sha:
@@ -173,8 +207,7 @@ class GitHubUpdateManager:
         if not sha:
             return {"ok": False, "error": "Не удалось получить SHA последнего коммита"}
 
-        known_sha = str(cfg.update_last_known_commit.value or "").strip()
-        known_sha = self._get_known_sha()
+        known_sha = self._get_effective_known_sha()
 
         owner, name, _ = self._repo()
 
