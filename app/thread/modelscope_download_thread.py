@@ -1,7 +1,6 @@
 import re
 import sys
 
-from modelscope.hub.snapshot_download import snapshot_download
 from PyQt5.QtCore import QThread, pyqtSignal
 
 
@@ -37,6 +36,16 @@ class ModelscopeDownloadThread(QThread):
         
     def run(self):
         try:
+            try:
+                from modelscope.hub.snapshot_download import snapshot_download
+            except Exception as e:
+                self.error.emit(
+                    "ModelScope недоступен в текущем runtime. "
+                    "Переустановите зависимости ASR (faster-whisper/modelscope). "
+                    f"Технические детали: {e}"
+                )
+                return
+
             # 发送开始下载信号
             self.progress.emit(0, "开始下载...")
             
@@ -102,5 +111,6 @@ if __name__ == "__main__":
     
     # 运行事件循环
     sys.exit(app.exec_())
+
 
 

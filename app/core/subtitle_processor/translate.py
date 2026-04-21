@@ -276,10 +276,28 @@ class OpenAITranslator(BaseTranslator):
                 )
                 # 解析结果
                 result = json_repair.loads(response.choices[0].message.content)
-                # 检查翻译结果数量是否匹配
+
+                # 检查翻译结果数量是否匹配。
+                # 先做一次“强约束重试”，避免立刻退化到逐条翻译（会导致大量请求）。
                 if len(result) != len(subtitle_chunk):
-                    logger.warning(f"翻译结果数量不匹配，将使用单条翻译模式重试")
-                    return self._translate_chunk_single(subtitle_chunk)
+                    logger.warning("翻译结果数量不匹配，尝试强约束批量重试")
+                    strict_prompt = (
+                        f"{prompt}\n\n"
+                        f"IMPORTANT: Return ONLY a JSON object with EXACTLY these keys: "
+                        f"{list(subtitle_chunk.keys())}. Do not add or remove keys."
+                    )
+                    strict_resp = self._call_api(
+                        strict_prompt, json.dumps(subtitle_chunk, ensure_ascii=False)
+                    )
+                    strict_result = json_repair.loads(strict_resp.choices[0].message.content)
+                    if len(strict_result) == len(subtitle_chunk):
+                        result = strict_result
+                    else:
+                        logger.warning("强约束批量重试仍不匹配，启用低请求兜底")
+                        # 大块字幕不再逐条请求，避免出现大量连续 LLM 调用。
+                        if len(subtitle_chunk) > 12:
+                            return self._salvage_batch_result(subtitle_chunk, strict_result)
+                        return self._translate_chunk_single(subtitle_chunk)
                 # 保存到缓存
                 if self.use_cache:
                     self.cache_manager.set_llm_result(
@@ -297,10 +315,62 @@ class OpenAITranslator(BaseTranslator):
             return result
         except Exception as e:
             try:
+                # 避免大块字幕在异常时退化为逐条请求风暴。
+                if len(subtitle_chunk) > 12:
+                    logger.warning("批量翻译异常，使用低请求兜底: %s", str(e))
+                    return self._salvage_batch_result(subtitle_chunk, {})
                 return self._translate_chunk_single(subtitle_chunk)
             except Exception as e:
                 logger.error(f"翻译失败：{str(e)}")
                 raise RuntimeError(f"OpenAI API调用失败：{str(e)}")
+
+    @staticmethod
+    def _salvage_batch_result(subtitle_chunk: Dict[str, str], raw_result: Any) -> Dict[str, str]:
+        """低请求兜底：尽量复用批量结果，缺失项回退原文，避免逐条请求风暴。"""
+        result: Dict[str, str] = {}
+        if isinstance(raw_result, dict):
+            for k, v in raw_result.items():
+                key = str(k)
+                if key in subtitle_chunk:
+                    result[key] = str(v).strip() if v is not None else ""
+
+        for k, src in subtitle_chunk.items():
+            if k not in result or not (result[k] or "").strip():
+                result[k] = str(src or "")
+        return result
+
+    def translate_subtitle(self, subtitle_data: Union[str, ASRData]) -> ASRData:
+        """短视频优先单批次翻译，减少 LLM 请求数。"""
+        try:
+            if isinstance(subtitle_data, str):
+                asr_data = ASRData.from_subtitle_file(subtitle_data)
+            else:
+                asr_data = subtitle_data
+
+            subtitle_dict = {
+                str(i): seg.text for i, seg in enumerate(asr_data.segments, 1)
+            }
+
+            total_items = len(subtitle_dict)
+            total_chars = sum(len(v or "") for v in subtitle_dict.values())
+            force_single_batch = total_items <= 40 and total_chars <= 9000
+
+            if force_single_batch and total_items > 0:
+                logger.info(
+                    "Short-form detected: use single LLM batch (items=%s, chars=%s)",
+                    total_items,
+                    total_chars,
+                )
+                chunks = [subtitle_dict]
+            else:
+                chunks = self._split_chunks(subtitle_dict)
+
+            translated_dict = self._parallel_translate(chunks)
+            new_segments = self._create_segments(asr_data.segments, translated_dict)
+            return ASRData(new_segments)
+        except Exception as e:
+            logger.error(f"翻译失败：{str(e)}")
+            raise RuntimeError(f"翻译失败：{str(e)}")
 
     def _translate_chunk_single(self, subtitle_chunk: Dict[str, str]) -> Dict[str, str]:
         """单条翻译模式"""

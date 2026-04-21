@@ -15,10 +15,13 @@ from app.core.entities import (
     SubtitleTask,
     SynthesisConfig,
     SynthesisTask,
+    TranslatorServiceEnum,
     TranscribeConfig,
     TranscribeModelEnum,
     TranscribeTask,
     TranscriptAndSubtitleTask,
+    VideoTranslateConfig,
+    VideoTranslateTask,
 )
 
 
@@ -33,6 +36,7 @@ class TaskFactory:
     PREFIX_SPLIT_SUBTITLE = "разб"
     PREFIX_SMART_SPLIT_SUBTITLE = "умразб"
     PREFIX_RENDERED_VIDEO = "видео"
+    PREFIX_TRANSLATED_VIDEO = "перевод"
 
     # Безопасные лимиты для Windows-путей
     MAX_FILENAME_LEN = 180
@@ -444,4 +448,149 @@ class TaskFactory:
             queued_at=datetime.datetime.now(),
             file_path=file_path,
             output_path=output_path,
+        )
+
+    @staticmethod
+    def create_video_translate_task(video_path: str) -> VideoTranslateTask:
+        """Создать задачу перевода видео с клонированием голоса."""
+        safe_name = TaskFactory._safe_fs_name(Path(video_path).stem, max_len=80)
+        output_path = TaskFactory._build_output_path(
+            parent=Path(video_path).parent,
+            base_name=safe_name,
+            ext=".mp4",
+            prefix=TaskFactory.PREFIX_TRANSLATED_VIDEO,
+            suffix=f"-{cfg.video_translate_target_language.value.value}",
+            base_max_len=96,
+        )
+        output_subtitle_path = TaskFactory._build_output_path(
+            parent=Path(video_path).parent,
+            base_name=safe_name,
+            ext=".srt",
+            prefix="перевод_суб",
+            suffix=f"-{cfg.video_translate_target_language.value.value}",
+            base_max_len=96,
+        )
+
+        # Переиспользуем текущие настройки ASR
+        transcribe_task = TaskFactory.create_transcribe_task(video_path, need_next_task=False)
+        # Для video translate используем отдельный флаг/namespace кэша ASR,
+        # чтобы не смешивать его с обычными задачами транскрибации.
+        transcribe_task.transcribe_config.use_asr_cache = bool(
+            cfg.video_translate_use_asr_cache.value
+        )
+        base_asr_tag = str(transcribe_task.transcribe_config.asr_cache_tag or "default")
+        transcribe_task.transcribe_config.asr_cache_tag = f"video_translate:{base_asr_tag}"
+
+        # Получаем LLM endpoint/key/model как в subtitle task
+        current_service = cfg.llm_service.value
+        if current_service == LLMServiceEnum.OPENAI:
+            base_url, api_key, llm_model = (
+                cfg.openai_api_base.value,
+                cfg.openai_api_key.value,
+                cfg.openai_model.value,
+            )
+        elif current_service == LLMServiceEnum.SILICON_CLOUD:
+            base_url, api_key, llm_model = (
+                cfg.silicon_cloud_api_base.value,
+                cfg.silicon_cloud_api_key.value,
+                cfg.silicon_cloud_model.value,
+            )
+        elif current_service == LLMServiceEnum.DEEPSEEK:
+            base_url, api_key, llm_model = (
+                cfg.deepseek_api_base.value,
+                cfg.deepseek_api_key.value,
+                cfg.deepseek_model.value,
+            )
+        elif current_service == LLMServiceEnum.OLLAMA:
+            base_url, api_key, llm_model = (
+                cfg.ollama_api_base.value,
+                cfg.ollama_api_key.value,
+                cfg.ollama_model.value,
+            )
+        elif current_service == LLMServiceEnum.LM_STUDIO:
+            base_url, api_key, llm_model = (
+                cfg.lm_studio_api_base.value,
+                cfg.lm_studio_api_key.value,
+                cfg.lm_studio_model.value,
+            )
+        elif current_service == LLMServiceEnum.GEMINI:
+            base_url, api_key, llm_model = (
+                cfg.gemini_api_base.value,
+                cfg.gemini_api_key.value,
+                cfg.gemini_model.value,
+            )
+        elif current_service == LLMServiceEnum.CHATGLM:
+            base_url, api_key, llm_model = (
+                cfg.chatglm_api_base.value,
+                cfg.chatglm_api_key.value,
+                cfg.chatglm_model.value,
+            )
+        else:
+            base_url, api_key, llm_model = (
+                cfg.public_api_base.value,
+                cfg.public_api_key.value,
+                cfg.public_model.value,
+            )
+
+        subtitle_cfg = SubtitleConfig(
+            base_url=base_url,
+            api_key=api_key,
+            llm_model=llm_model,
+            deeplx_endpoint=cfg.deeplx_endpoint.value,
+            translator_service=cfg.translator_service.value,
+            need_translate=True,
+            need_optimize=False,
+            need_reflect=cfg.need_reflect_translate.value,
+            use_cache=cfg.video_translate_use_translation_cache.value,
+            thread_num=cfg.thread_num.value,
+            batch_size=cfg.batch_size.value,
+            target_language=cfg.video_translate_target_language.value.value,
+            custom_prompt_text=cfg.custom_prompt_text.value,
+        )
+
+        vt_cfg = VideoTranslateConfig(
+            target_language=cfg.video_translate_target_language.value.value,
+            translator_service=cfg.translator_service.value,
+            llm_base_url=base_url,
+            llm_api_key=api_key,
+            llm_model=llm_model,
+            deeplx_endpoint=cfg.deeplx_endpoint.value,
+            enable_diarization=cfg.video_translate_enable_diarization.value,
+            expected_speaker_count=cfg.video_translate_expected_speaker_count.value,
+            enable_source_separation=cfg.video_translate_enable_source_separation.value,
+            keep_background_music=cfg.video_translate_keep_background_music.value,
+            enable_lipsync=cfg.video_translate_enable_lipsync.value,
+            voice_clone_provider=cfg.video_translate_voice_provider.value,
+            voice_clone_quality=cfg.video_translate_voice_quality.value,
+            voice_reference_mode=cfg.video_translate_voice_reference_mode.value,
+            manual_voice_map_json=cfg.video_translate_manual_voice_map_json.value,
+            elevenlabs_api_key=cfg.video_translate_elevenlabs_api_key.value,
+            azure_speech_key=cfg.video_translate_azure_speech_key.value,
+            azure_speech_region=cfg.video_translate_azure_speech_region.value,
+            cartesia_api_key=cfg.video_translate_cartesia_api_key.value,
+            xtts_model_path=cfg.video_translate_xtts_model_path.value,
+            openvoice_model_path=cfg.video_translate_openvoice_model_path.value,
+            fish_speech_model_path=cfg.video_translate_fish_speech_model_path.value,
+            local_tts_endpoint=cfg.video_translate_local_tts_endpoint.value,
+            autonomous_mode=cfg.video_translate_autonomous_mode.value,
+            auto_download_models=cfg.video_translate_auto_download_models.value,
+            tts_parallel_workers=cfg.video_translate_tts_parallel_workers.value,
+            use_translation_cache=cfg.video_translate_use_translation_cache.value,
+        )
+
+        # Для автономного режима форсируем локальный ASR-маршрут
+        if vt_cfg.autonomous_mode:
+            transcribe_task.transcribe_config.transcribe_model = TranscribeModelEnum.FASTER_WHISPER
+            transcribe_task.transcribe_config.faster_whisper_program = cfg.faster_whisper_program.value
+            transcribe_task.transcribe_config.faster_whisper_model = cfg.faster_whisper_model.value.value
+            transcribe_task.transcribe_config.faster_whisper_model_dir = str(MODEL_PATH)
+
+        return VideoTranslateTask(
+            queued_at=datetime.datetime.now(),
+            video_path=video_path,
+            output_path=output_path,
+            output_subtitle_path=output_subtitle_path,
+            transcribe_config=transcribe_task.transcribe_config,
+            subtitle_config=subtitle_cfg,
+            video_translate_config=vt_cfg,
         )

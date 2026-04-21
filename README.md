@@ -166,6 +166,26 @@
 
 Без настроенной LLM-модели качество/работа автоматического отбора моментов для шортсов будет ограничена.
 
+### Важно для модуля «Перевод видео» (voice clone)
+
+В проект добавлен production-подход для установки зависимостей video translate под разные ПК:
+
+- `scripts\install_video_translate_cpu.cmd` — стабильный CPU-профиль (работает почти везде);
+- `scripts\install_video_translate_gpu_cu124.cmd` — GPU-профиль (NVIDIA + CUDA-совместимый драйвер);
+- `scripts\check_video_translate_env.py` — диагностика готовности окружения.
+
+Рекомендуемый порядок:
+
+1. Запустите `scripts\install_video_translate_cpu.cmd`.
+2. Проверьте отчёт диагностики в консоли.
+3. Если есть NVIDIA GPU и нужен максимум скорости — запустите `scripts\install_video_translate_gpu_cu124.cmd`.
+
+Технически модуль поддерживает fallback-режимы:
+
+- ASR: `faster-whisper` CLI или python fallback;
+- speaker diarization: `pyannote` (high) или heuristic fallback;
+- voice clone: Coqui XTTS (high) или базовый fallback-режим.
+
 Это и есть рекомендованный сценарий обновления/запуска на текущий момент.
 
 ---

@@ -426,6 +426,90 @@ class Config(QConfig):
         OptionsValidator(["cpu", "gpu"]),
     )
 
+    # ------------------- Video Translate -------------------
+    video_translate_target_language = OptionsConfigItem(
+        "VideoTranslate",
+        "TargetLanguage",
+        TargetLanguageEnum.ENGLISH,
+        OptionsValidator(TargetLanguageEnum),
+        EnumSerializer(TargetLanguageEnum),
+    )
+    video_translate_enable_diarization = ConfigItem(
+        "VideoTranslate", "EnableDiarization", True, BoolValidator()
+    )
+    video_translate_expected_speaker_count = RangeConfigItem(
+        "VideoTranslate", "ExpectedSpeakerCount", 0, RangeValidator(0, 12)
+    )
+    video_translate_enable_source_separation = ConfigItem(
+        "VideoTranslate", "EnableSourceSeparation", True, BoolValidator()
+    )
+    video_translate_keep_background_music = ConfigItem(
+        "VideoTranslate", "KeepBackgroundMusic", True, BoolValidator()
+    )
+    video_translate_enable_lipsync = ConfigItem(
+        "VideoTranslate", "EnableLipsync", False, BoolValidator()
+    )
+    video_translate_voice_provider = OptionsConfigItem(
+        "VideoTranslate",
+        "VoiceProvider",
+        "xtts",
+        OptionsValidator(["auto", "xtts", "openvoice", "fish_speech", "elevenlabs", "azure", "cartesia"]),
+    )
+    video_translate_voice_quality = OptionsConfigItem(
+        "VideoTranslate",
+        "VoiceQuality",
+        "high",
+        OptionsValidator(["fast", "balanced", "high", "studio"]),
+    )
+    video_translate_voice_reference_mode = OptionsConfigItem(
+        "VideoTranslate",
+        "VoiceReferenceMode",
+        "auto",
+        OptionsValidator(["auto", "manual"]),
+    )
+    video_translate_manual_voice_map_json = ConfigItem(
+        "VideoTranslate", "ManualVoiceMapJson", ""
+    )
+    video_translate_xtts_model_path = ConfigItem(
+        "VideoTranslate", "XTTSModelPath", ""
+    )
+    video_translate_openvoice_model_path = ConfigItem(
+        "VideoTranslate", "OpenVoiceModelPath", ""
+    )
+    video_translate_fish_speech_model_path = ConfigItem(
+        "VideoTranslate", "FishSpeechModelPath", ""
+    )
+    video_translate_local_tts_endpoint = ConfigItem(
+        "VideoTranslate", "LocalTTSEndpoint", "http://127.0.0.1:8020"
+    )
+    video_translate_autonomous_mode = ConfigItem(
+        "VideoTranslate", "AutonomousMode", True, BoolValidator()
+    )
+    video_translate_auto_download_models = ConfigItem(
+        "VideoTranslate", "AutoDownloadModels", True, BoolValidator()
+    )
+    video_translate_tts_parallel_workers = RangeConfigItem(
+        "VideoTranslate", "TTSParallelWorkers", 3, RangeValidator(1, 8)
+    )
+    video_translate_use_asr_cache = ConfigItem(
+        "VideoTranslate", "UseASRCache", True, BoolValidator()
+    )
+    video_translate_use_translation_cache = ConfigItem(
+        "VideoTranslate", "UseTranslationCache", True, BoolValidator()
+    )
+    video_translate_elevenlabs_api_key = ConfigItem(
+        "VideoTranslate", "ElevenLabsApiKey", ""
+    )
+    video_translate_azure_speech_key = ConfigItem(
+        "VideoTranslate", "AzureSpeechKey", ""
+    )
+    video_translate_azure_speech_region = ConfigItem(
+        "VideoTranslate", "AzureSpeechRegion", ""
+    )
+    video_translate_cartesia_api_key = ConfigItem(
+        "VideoTranslate", "CartesiaApiKey", ""
+    )
+
     # ------------------- 更新配置 -------------------
     checkUpdateAtStartUp = ConfigItem(
         "Update", "CheckUpdateAtStartUp", True, BoolValidator()

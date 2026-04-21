@@ -18,6 +18,7 @@ from app.common.theme_manager import apply_vscode_theme, get_theme_palette
 from app.components.DonateDialog import DonateDialog
 from app.config import APP_ICON_PATH, APP_NAME, APP_SPLASH_LOGO_PATH, GITHUB_REPO_URL
 from app.core.github_update_manager import GitHubUpdateManager
+from app.core.video_translate import VideoTranslateServiceManager
 from app.thread.version_manager_thread import VersionManager
 from app.view.batch_process_interface import BatchProcessInterface
 from app.view.home_interface import HomeInterface
@@ -302,6 +303,12 @@ class MainWindow(FluentWindow):
         # os._exit(0)
 
     def stop(self):
+        # Остановка встроенных локальных сервисов (video translate)
+        try:
+            VideoTranslateServiceManager.instance().shutdown_all()
+        except Exception:
+            pass
+
         # Закрываем только медиа-процессы, не трогаем updater/restart скрипты
         process = psutil.Process(os.getpid())
         kill_names = {

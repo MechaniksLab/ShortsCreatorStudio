@@ -8,6 +8,7 @@ from app.view.auto_shorts_interface import AutoShortsInterface
 from app.view.subtitle_interface import SubtitleInterface
 from app.view.task_creation_interface import TaskCreationInterface
 from app.view.transcription_interface import TranscriptionInterface
+from app.view.video_translate_interface import VideoTranslateInterface
 from app.view.video_synthesis_interface import VideoSynthesisInterface
 
 
@@ -33,6 +34,7 @@ class HomeInterface(QWidget):
         self.subtitle_optimization_interface = SubtitleInterface(self)
         self.video_synthesis_interface = VideoSynthesisInterface(self)
         self.auto_shorts_interface = AutoShortsInterface(self)
+        self.video_translate_interface = VideoTranslateInterface(self)
 
         self.addSubInterface(
             self.auto_shorts_interface,
@@ -56,6 +58,11 @@ class HomeInterface(QWidget):
             self.video_synthesis_interface,
             "VideoSynthesisInterface",
             "Синтез видео с субтитрами",
+        )
+        self.addSubInterface(
+            self.video_translate_interface,
+            "VideoTranslateInterface",
+            "Перевод видео",
         )
         self.vBoxLayout.addWidget(self.pivot)
         self.vBoxLayout.addWidget(self.stackedWidget)
@@ -126,6 +133,7 @@ class HomeInterface(QWidget):
         self.subtitle_optimization_interface.close()
         self.video_synthesis_interface.close()
         self.auto_shorts_interface.close()
+        self.video_translate_interface.close()
         super().closeEvent(event)
 
     def refresh_theme(self):
