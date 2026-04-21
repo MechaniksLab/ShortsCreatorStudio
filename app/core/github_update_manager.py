@@ -26,25 +26,28 @@ class GitHubUpdateManager:
 
     def _get_known_sha(self) -> str:
         """Берём baseline SHA из cfg, при необходимости из резервного state-файла."""
-        known_sha = str(cfg.update_last_known_commit.value or "").strip()
-        if known_sha:
-            return known_sha
+        cfg_sha = str(cfg.update_last_known_commit.value or "").strip()
+        state_sha = ""
         try:
-            if not self.state_file.exists():
-                return ""
-            raw = self.state_file.read_text(encoding="utf-8")
-            data = json.loads(raw) if raw else {}
-            if isinstance(data, dict):
-                restored = str(data.get("last_known_commit") or "").strip()
-                if restored:
-                    try:
-                        cfg.set(cfg.update_last_known_commit, restored)
-                    except Exception:
-                        pass
-                return restored
+            if self.state_file.exists():
+                raw = self.state_file.read_text(encoding="utf-8")
+                data = json.loads(raw) if raw else {}
+                if isinstance(data, dict):
+                    state_sha = str(data.get("last_known_commit") or "").strip()
         except Exception:
-            return ""
-        return ""
+            state_sha = ""
+
+        # Если есть state_sha — считаем его более надёжным источником:
+        # он пишется прямо в процессе обновления и переживает сбои записи qconfig.
+        if state_sha:
+            if state_sha != cfg_sha:
+                try:
+                    cfg.set(cfg.update_last_known_commit, state_sha)
+                except Exception:
+                    pass
+            return state_sha
+
+        return cfg_sha
 
     def _set_known_sha(self, sha: str):
         """Надёжно сохраняем baseline SHA в cfg и резервный state-файл."""
