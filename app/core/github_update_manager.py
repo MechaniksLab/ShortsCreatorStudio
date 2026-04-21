@@ -225,7 +225,7 @@ class GitHubUpdateManager:
         latest_sha = latest.get("sha", "")
         saved_sha = self._get_known_sha()
         git_head_sha = self._get_git_head_sha()
-        has_git_repo = (self.app_root / ".git").exists()
+        has_git_repo = bool(git_head_sha) or (self.app_root / ".git").exists()
         git_clean = self._is_git_tracked_worktree_clean() if has_git_repo else False
 
         # Если уже зафиксирован именно тот же коммит, который сейчас в master,
@@ -250,12 +250,10 @@ class GitHubUpdateManager:
         else:
             known_sha = saved_sha
 
-        # Инициализируем baseline ТОЛЬКО в пользовательском окружении без git.
-        # В dev-репозитории baseline не фиксируем автоматически, чтобы не затирать
-        # состояние и не терять предложение обновления.
-        if not known_sha and latest_sha and not has_git_repo:
-            self._set_known_sha(latest_sha)
-            return {"has_update": False, "latest": latest, "known": latest_sha, "baseline_initialized": True}
+        # ВАЖНО: в check_update() больше не фиксируем latest_sha автоматически.
+        # Фиксация происходит только после запуска обновления в apply_update_and_restart().
+        if not known_sha and latest_sha:
+            return {"has_update": False, "latest": latest, "known": "", "baseline_initialized": False}
 
         has_update = bool(latest_sha and known_sha and latest_sha != known_sha)
         commits_behind = 0
