@@ -79,6 +79,34 @@ class GitHubUpdateManager:
             git_dir = self.app_root / ".git"
             if not git_dir.exists():
                 return ""
+
+            # 1) Без внешнего git: читаем .git/HEAD напрямую
+            head_file = git_dir / "HEAD"
+            if head_file.exists():
+                head = str(head_file.read_text(encoding="utf-8", errors="replace") or "").strip()
+                if head.startswith("ref:"):
+                    ref_name = head.split(":", 1)[1].strip()
+                    if ref_name:
+                        ref_path = git_dir / ref_name.replace("/", os.sep)
+                        if ref_path.exists():
+                            sha = str(ref_path.read_text(encoding="utf-8", errors="replace") or "").strip()
+                            if sha:
+                                return sha
+                        packed = git_dir / "packed-refs"
+                        if packed.exists():
+                            for line in packed.read_text(encoding="utf-8", errors="replace").splitlines():
+                                line = line.strip()
+                                if not line or line.startswith("#") or line.startswith("^"):
+                                    continue
+                                parts = line.split(" ")
+                                if len(parts) == 2 and parts[1].strip() == ref_name:
+                                    sha = parts[0].strip()
+                                    if sha:
+                                        return sha
+                elif head:
+                    return head
+
+            # 2) fallback: через git CLI
             p = subprocess.run(
                 ["git", "-C", str(self.app_root), "rev-parse", "HEAD"],
                 capture_output=True,
@@ -171,6 +199,7 @@ class GitHubUpdateManager:
         latest_sha = latest.get("sha", "")
         saved_sha = self._get_known_sha()
         git_head_sha = self._get_git_head_sha()
+        has_git_repo = (self.app_root / ".git").exists()
 
         # Если уже зафиксирован именно тот же коммит, который сейчас в master,
         # то обновления нет (избегаем зацикливания после успешного апдейта).
@@ -188,8 +217,10 @@ class GitHubUpdateManager:
         # Для пользователей без git сравниваем с сохранённым baseline.
         known_sha = git_head_sha or saved_sha
 
-        # Первый запуск без git и без baseline: инициализируем baseline без навязчивого апдейта.
-        if not known_sha and latest_sha:
+        # Инициализируем baseline ТОЛЬКО в пользовательском окружении без git.
+        # В dev-репозитории baseline не фиксируем автоматически, чтобы не затирать
+        # состояние и не терять предложение обновления.
+        if not known_sha and latest_sha and not has_git_repo:
             self._set_known_sha(latest_sha)
             return {"has_update": False, "latest": latest, "known": latest_sha, "baseline_initialized": True}
 
