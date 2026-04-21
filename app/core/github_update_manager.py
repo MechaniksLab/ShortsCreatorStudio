@@ -124,10 +124,14 @@ class GitHubUpdateManager:
     def _get_effective_known_sha(self) -> str:
         """Текущая версия приложения для сравнения с master.
 
-        Приоритет всегда за сохранённым baseline (cfg/state),
-        т.к. после автообновления именно он фиксирует применённый коммит.
-        git HEAD используется только как fallback, если baseline ещё не инициализирован.
+        Для git-окружения (dev) приоритет у HEAD ветки,
+        для пользовательского окружения (без .git) — у сохранённого baseline.
         """
+        has_git_repo = (self.app_root / ".git").exists()
+        if has_git_repo:
+            git_head = self._get_git_head_sha()
+            if git_head:
+                return git_head
         known = self._get_known_sha()
         if known:
             return known
@@ -203,7 +207,7 @@ class GitHubUpdateManager:
 
         # Если уже зафиксирован именно тот же коммит, который сейчас в master,
         # то обновления нет (избегаем зацикливания после успешного апдейта).
-        if latest_sha and saved_sha and latest_sha == saved_sha:
+        if (not has_git_repo) and latest_sha and saved_sha and latest_sha == saved_sha:
             return {
                 "has_update": False,
                 "latest": latest,
@@ -215,7 +219,7 @@ class GitHubUpdateManager:
         # Для dev-сценария (есть .git) сравниваем с фактическим HEAD ветки разработчика,
         # чтобы видеть, что master отличается.
         # Для пользователей без git сравниваем с сохранённым baseline.
-        known_sha = git_head_sha or saved_sha
+        known_sha = (git_head_sha or saved_sha) if has_git_repo else saved_sha
 
         # Инициализируем baseline ТОЛЬКО в пользовательском окружении без git.
         # В dev-репозитории baseline не фиксируем автоматически, чтобы не затирать
