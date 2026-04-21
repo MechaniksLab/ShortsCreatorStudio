@@ -51,6 +51,7 @@ class GitHubUpdateManager:
         clean = str(sha or "").strip()
         if not clean:
             return
+        current_head = self._get_git_head_sha()
         try:
             cfg.set(cfg.update_last_known_commit, clean)
         except Exception:
@@ -62,6 +63,7 @@ class GitHubUpdateManager:
                     {
                         "last_known_commit": clean,
                         "applied_via_updater": True,
+                        "applied_from_head": current_head,
                     },
                     ensure_ascii=False,
                     indent=2,
@@ -227,6 +229,7 @@ class GitHubUpdateManager:
         state = self._read_state()
         state_sha = str(state.get("last_known_commit") or "").strip()
         state_applied = bool(state.get("applied_via_updater"))
+        state_from_head = str(state.get("applied_from_head") or "").strip()
         git_head_sha = self._get_git_head_sha()
         has_git_repo = bool(git_head_sha) or (self.app_root / ".git").exists()
         git_clean = self._is_git_tracked_worktree_clean() if has_git_repo else False
@@ -250,7 +253,8 @@ class GitHubUpdateManager:
             and latest_sha == saved_sha
             and state_applied
             and state_sha == saved_sha
-            and not git_clean
+            and state_from_head
+            and state_from_head == git_head_sha
         ):
             return {
                 "has_update": False,

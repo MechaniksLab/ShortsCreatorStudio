@@ -19726,3 +19726,128 @@ CUDA可用
 视频合成完成
 视频合成完成，保存路径: E:\Render\видео_Последовательность 01_6.mp4
 Latest version info: v1.3.3
+Latest version info: v1.3.3
+
+===========转录任务开始===========
+时间：2026-04-21 17:12:26.969163
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 01_7.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpjj_dtimv.wav
+视频时长: 55.56秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp_srepncb\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp_srepncb\audio.wav
+48% | 27/56 | 00:09<<00:09 |  2.94 audio seconds/s
+98% | 55/56 | 00:14<<00:00 |  3.71 audio seconds/s
+100% | 56/56 | 00:15<<00:00 |  3.71 audio seconds/s
+Transcription speed: 3.67 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp_srepncb' directory.
+Operation finished in:  0:00:17.487
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_7\subtitle\исх_Последовательность 01_7-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-21 17:12:50.948670
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\e27a6f28383a459089e5232e0bc2fa20.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_7\subtitle\стил__Последовательность 01_7-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260421_171250.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-21 17:12:50.996669
+开始合成视频: E:/Render/Последовательность 01_7.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 01_7.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Последовательность 01_7.mp4"
+视频总时长: 55.56秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_Последовательность 01_7.mp4
+
+===========转录任务开始===========
+时间：2026-04-21 17:15:53.562746
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 01_8.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmp9h8s_4q9.wav
+视频时长: 18.95秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmpa0dy9wh7\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmpa0dy9wh7\audio.wav
+95% | 18/19 | 00:06<<00:00 |  2.61 audio seconds/s
+100% | 19/19 | 00:07<<00:00 |  2.64 audio seconds/s
+Transcription speed: 2.63 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmpa0dy9wh7' directory.
+Operation finished in:  0:00:08.985
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_8\subtitle\исх_Последовательность 01_8-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-21 17:16:04.034607
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\0e7cbc6eb96f407add07ac2548218363.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_8\subtitle\стил__Последовательность 01_8-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260421_171604.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-21 17:16:04.063610
+开始合成视频: E:/Render/Последовательность 01_8.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 01_8.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Последовательность 01_8.mp4"
+视频总时长: 18.95秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_Последовательность 01_8.mp4
+
+===========转录任务开始===========
+时间：2026-04-21 17:19:33.403017
+开始转换音频
+转换为音频执行命令: ffmpeg -i E:\Render\Последовательность 01_9.mp4 -map 0:a -ac 1 -ar 16000 -af aresample=async=1 -y C:\Temp\tmpjv5zqha8.wav
+视频时长: 35.37秒
+开始语音转录
+Faster Whisper 执行命令: faster-whisper-xxl -m large-v2 --print_progress --model_dir E:\Neyro\ShortsCreatorStudio\AppData\models C:\Temp\bk_asr\tmp9e5up6ak\audio.wav -l ru -d cuda --compute_type float16 --output_format srt -o source --vad_filter false --one_word 1 --beep_off
+Standalone Faster-Whisper-XXL r245.2 running on: CUDA
+Starting sequential inference to transcribe: C:\Temp\bk_asr\tmp9e5up6ak\audio.wav
+77% | 27/35 | 00:09<<00:02 |  2.99 audio seconds/s
+100% | 35/35 | 00:12<<00:00 |  2.73 audio seconds/s
+Transcription speed: 2.69 audio seconds/s
+Subtitles are written to 'C:\Temp\bk_asr\tmp9e5up6ak' directory.
+Operation finished in:  0:00:14.969
+Faster Whisper 返回值: 0
+Faster Whisper 识别完成
+字幕文件已保存到: E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_9\subtitle\исх_Последовательность 01_9-FasterWhisper ✨-俄语.srt
+
+===========字幕处理任务开始===========
+时间：2026-04-21 17:19:50.076446
+Режим 'по словам': пропускаем LLM-разбиение, оставляем word-level сегменты
+写入处理后字幕缓存：E:\Neyro\ShortsCreatorStudio\AppData\cache\processed_subtitles\1c1602d13d36b1ea888cac2abe2e8ca0.json
+字幕保存到 E:\Neyro\VideoCaptioner\work-dir\Последовательность 01_9\subtitle\стил__Последовательность 01_9-FasterWhisper ✨-俄语.ass
+诊断报告保存到 E:\Neyro\ShortsCreatorStudio\work-dir\subtitle_diagnostics_20260421_171950.json
+优化完成
+
+===========视频合成任务开始===========
+时间：2026-04-21 17:19:50.104448
+开始合成视频: E:/Render/Последовательность 01_9.mp4
+使用硬字幕
+检查CUDA是否可用
+CUDA可用
+Выбран GPU-рендер: используем h264_nvenc
+使用CUDA加速
+添加硬字幕执行命令: ffmpeg -hwaccel cuda -i "E:/Render/Последовательность 01_9.mp4" -acodec copy -vcodec h264_nvenc -preset p5 -cq 19 -b:v 0 -vf "ass='C\:/Temp/MechaniksLab Creator Studio/temp_subtitle..ass',fps=60" -pix_fmt yuv420p -movflags +faststart -y "E:\Render\видео_Последовательность 01_9.mp4"
+视频总时长: 35.37秒
+视频合成完成
+视频合成完成，保存路径: E:\Render\видео_Последовательность 01_9.mp4
+2026-04-21 17:22:38 - VideoCaptioner - ERROR - Traceback (most recent call last):
+  File "E:\Neyro\ShortsCreatorStudio\runtime\Lib\site-packages\qfluentwidgets\components\widgets\info_bar.py", line 420, in eventFilter
+    return super().eventFilter(obj, e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type BottomInfoBarManager has been deleted
+
