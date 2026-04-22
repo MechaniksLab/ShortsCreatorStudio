@@ -18,6 +18,21 @@ from app.config import CACHE_PATH, ROOT_PATH, UPDATE_REPO_BRANCH, UPDATE_REPO_NA
 class GitHubUpdateManager:
     """Проверка и применение обновлений из GitHub-репозитория."""
 
+    # Критично: синхронизируем только проектные директории,
+    # НИКОГДА не трогаем .git, runtime и пользовательские данные.
+    SAFE_MIRROR_DIRS = [
+        "app",
+        "icons",
+        "resource",
+        "scripts",
+    ]
+
+    # Корневые файлы, которые безопасно обновлять из репозитория.
+    SAFE_ROOT_FILES = [
+        "README.md",
+        ".gitignore",
+    ]
+
     def __init__(self):
         self.app_root = ROOT_PATH.parent
         self.updater_root = CACHE_PATH / "updater"
@@ -489,20 +504,64 @@ class GitHubUpdateManager:
         # fallback: просто текущий python
         return f'"{py}"'
 
-    @staticmethod
-    def _build_update_script(src_root: Path, dst_root: Path, launcher: str) -> str:
+    @classmethod
+    def _build_update_script(cls, src_root: Path, dst_root: Path, launcher: str) -> str:
         src = str(src_root)
         dst = str(dst_root)
-        # /MIR зеркалирует дерево: удаляет файлы, которых больше нет в master.
-        # /XD исключает пользовательские и runtime-каталоги.
-        return (
-            "@echo off\n"
-            "chcp 65001 >nul\n"
-            "setlocal\n"
-            f"set SRC={src}\n"
-            f"set DST={dst}\n"
-            "timeout /t 4 /nobreak >nul\n"
-            "robocopy \"%SRC%\" \"%DST%\" /MIR /R:2 /W:1 /XD \"%DST%\\runtime\" \"%DST%\\AppData\" \"%DST%\\work-dir\" >nul\n"
-            f"start \"\" {launcher}\n"
-            "endlocal\n"
+
+        lines = [
+            "@echo off",
+            "chcp 65001 >nul",
+            "setlocal EnableExtensions",
+            f"set SRC={src}",
+            f"set DST={dst}",
+            "timeout /t 4 /nobreak >nul",
+            "",
+            "rem ------------------------------------------------------------",
+            "rem БЕЗОПАСНОЕ ОБНОВЛЕНИЕ: никакого /MIR по корню проекта.",
+            "rem Это защищает .git и пользовательские каталоги (AppData/runtime/work-dir).",
+            "rem ------------------------------------------------------------",
+            "",
+        ]
+
+        for d in cls.SAFE_MIRROR_DIRS:
+            lines.extend(
+                [
+                    f"call :SyncMirror \"%SRC%\\{d}\" \"%DST%\\{d}\"",
+                ]
+            )
+
+        for f in cls.SAFE_ROOT_FILES:
+            lines.extend(
+                [
+                    f"call :CopyFile \"%SRC%\\{f}\" \"%DST%\\{f}\"",
+                ]
+            )
+
+        lines.extend(
+            [
+                "",
+                f"start \"\" {launcher}",
+                "endlocal",
+                "exit /b 0",
+                "",
+                ":SyncMirror",
+                "set SRC_DIR=%~1",
+                "set DST_DIR=%~2",
+                "if not exist \"%SRC_DIR%\" exit /b 0",
+                "if not exist \"%DST_DIR%\" mkdir \"%DST_DIR%\"",
+                "",
+                "rem /MIR применяем только к явно разрешённым папкам проекта",
+                "robocopy \"%SRC_DIR%\" \"%DST_DIR%\" /MIR /R:2 /W:1 >nul",
+                "exit /b 0",
+                "",
+                ":CopyFile",
+                "set SRC_FILE=%~1",
+                "set DST_FILE=%~2",
+                "if not exist \"%SRC_FILE%\" exit /b 0",
+                "copy /Y \"%SRC_FILE%\" \"%DST_FILE%\" >nul",
+                "exit /b 0",
+            ]
         )
+
+        return "\n".join(lines) + "\n"

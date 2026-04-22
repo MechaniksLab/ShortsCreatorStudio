@@ -17,11 +17,13 @@ UPDATE_REPO_BRANCH = "master"
 
 # 路径
 ROOT_PATH = Path(__file__).parent
+PROJECT_ROOT = ROOT_PATH.parent
 
 RESOURCE_PATH = ROOT_PATH.parent / "resource"
 ICONS_PATH = ROOT_PATH.parent / "icons"
 APPDATA_PATH = ROOT_PATH.parent / "AppData"
 WORK_PATH = ROOT_PATH.parent / "work-dir"
+RUNTIME_SCRIPTS_PATH = PROJECT_ROOT / "runtime" / "Scripts"
 
 
 BIN_PATH = RESOURCE_PATH / "bin"
@@ -45,6 +47,8 @@ LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 # 环境变量添加 bin 路径，添加到PATH开头以优先使用
 os.environ["PATH"] = str(BIN_PATH) + os.pathsep + os.environ["PATH"]
 os.environ["PATH"] = str(FASER_WHISPER_PATH) + os.pathsep + os.environ["PATH"]
+if RUNTIME_SCRIPTS_PATH.exists():
+    os.environ["PATH"] = str(RUNTIME_SCRIPTS_PATH) + os.pathsep + os.environ["PATH"]
 
 # 添加 VLC 路径
 os.environ["PYTHON_VLC_MODULE_PATH"] = str(BIN_PATH / "vlc")

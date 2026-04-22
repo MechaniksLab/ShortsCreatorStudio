@@ -756,6 +756,47 @@ class SynthesisConfig:
 
 
 @dataclass
+class VideoTranslateConfig:
+    """Конфигурация модуля перевода видео с клонированием голосов."""
+
+    target_language: str = "英语"
+    translator_service: Optional[TranslatorServiceEnum] = None
+    llm_base_url: str = ""
+    llm_api_key: str = ""
+    llm_model: str = ""
+    deeplx_endpoint: str = ""
+
+    # Параметры пайплайна
+    enable_diarization: bool = True
+    expected_speaker_count: int = 0
+    enable_source_separation: bool = True
+    keep_background_music: bool = True
+    enable_lipsync: bool = False
+
+    # Клонирование/синтез
+    voice_clone_provider: str = "auto"  # auto|xtts|openvoice|fish_speech|elevenlabs|azure|cartesia
+    voice_clone_quality: str = "high"  # fast|balanced|high|studio
+    voice_reference_mode: str = "auto"  # auto|manual
+    manual_voice_map_json: str = ""
+
+    # Провайдеры API
+    elevenlabs_api_key: str = ""
+    azure_speech_key: str = ""
+    azure_speech_region: str = ""
+    cartesia_api_key: str = ""
+
+    # Локальные движки
+    xtts_model_path: str = ""
+    openvoice_model_path: str = ""
+    fish_speech_model_path: str = ""
+    local_tts_endpoint: str = "http://127.0.0.1:8020"
+    autonomous_mode: bool = True
+    auto_download_models: bool = True
+    tts_parallel_workers: int = 3
+    use_translation_cache: bool = True
+
+
+@dataclass
 class TranscribeTask:
     """转录任务类"""
 
@@ -816,6 +857,23 @@ class SynthesisTask:
     need_next_task: bool = False
 
     synthesis_config: Optional[SynthesisConfig] = None
+
+
+@dataclass
+class VideoTranslateTask:
+    """Задача перевода видео с озвучкой на другом языке."""
+
+    queued_at: Optional[datetime.datetime] = None
+    started_at: Optional[datetime.datetime] = None
+    completed_at: Optional[datetime.datetime] = None
+
+    video_path: Optional[str] = None
+    output_path: Optional[str] = None
+    output_subtitle_path: Optional[str] = None
+
+    transcribe_config: Optional[TranscribeConfig] = None
+    subtitle_config: Optional[SubtitleConfig] = None
+    video_translate_config: Optional[VideoTranslateConfig] = None
 
 
 @dataclass

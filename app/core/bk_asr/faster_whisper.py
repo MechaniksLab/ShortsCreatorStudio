@@ -111,6 +111,8 @@ class FasterWhisperASR(BaseASR):
     def _build_command(self, audio_path: str) -> List[str]:
         """构建命令行参数"""
 
+        compute_type = "float16" if str(self.device).lower() == "cuda" else "int8"
+
         cmd = [
             str(self.faster_whisper_program),
             "-m",
@@ -131,7 +133,7 @@ class FasterWhisperASR(BaseASR):
                 self.language,
                 "-d",
                 self.device,
-                "--compute_type", "float16",
+                "--compute_type", compute_type,
                 "--output_format",
                 self.output_format,
             ]

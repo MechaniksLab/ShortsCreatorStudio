@@ -1,8 +1,21 @@
+import os
+import subprocess
 import webbrowser
+from pathlib import Path
 
 from PyQt5.QtCore import Qt, QThread, QUrl, pyqtSignal
 from PyQt5.QtGui import QDesktopServices, QColor
-from PyQt5.QtWidgets import QFileDialog, QLabel, QWidget
+from PyQt5.QtWidgets import (
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
 from qfluentwidgets import ComboBoxSettingCard, CustomColorSettingCard, ExpandLayout
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import (
@@ -23,8 +36,9 @@ from app.common.theme_manager import apply_vscode_theme, get_theme_palette
 from app.common.signal_bus import signalBus
 from app.components.EditComboBoxSettingCard import EditComboBoxSettingCard
 from app.components.LineEditSettingCard import LineEditSettingCard
-from app.config import APP_NAME, AUTHOR, FEEDBACK_URL, HELP_URL, RELEASE_URL, VERSION, YEAR
-from app.core.entities import LLMServiceEnum, TranscribeModelEnum, TranslatorServiceEnum
+from app.config import APP_NAME, AUTHOR, FEEDBACK_URL, HELP_URL, LOG_PATH, RELEASE_URL, VERSION, YEAR
+from app.config import MODEL_PATH, PROJECT_ROOT
+from app.core.entities import LLMServiceEnum, TranscribeModelEnum, TranslatorServiceEnum, language_value_to_ru, TargetLanguageEnum
 from app.core.utils.test_opanai import get_openai_models, test_openai
 from app.core.github_update_manager import GitHubUpdateManager
 from app.thread.version_manager_thread import VersionManager
@@ -41,6 +55,8 @@ class SettingInterface(ScrollArea):
         self.githubUpdateManager = GitHubUpdateManager()
         self.scrollWidget = QWidget()
         self.expandLayout = ExpandLayout(self.scrollWidget)
+        self._vt_install_thread = None
+        self._vt_install_dialog = None
         self.settingLabel = QLabel("Настройки", self)
 
         # 初始化所有设置组
@@ -66,6 +82,10 @@ class SettingInterface(ScrollArea):
         )
         # 翻译与优化组
         self.translateGroup = SettingCardGroup("Перевод и оптимизация", self.scrollWidget)
+        # 视频-перевод с клонированием голоса
+        self.videoTranslateGroup = SettingCardGroup(
+            "Перевод видео", self.scrollWidget
+        )
         # 字幕合成配置组
         self.subtitleGroup = SettingCardGroup(
             "Параметры синтеза субтитров", self.scrollWidget
@@ -116,9 +136,231 @@ class SettingInterface(ScrollArea):
             FIF.LANGUAGE,
             "Целевой язык",
             "Выберите язык перевода субтитров",
-            texts=[lang.value for lang in cfg.target_language.validator.options],
+            texts=[language_value_to_ru(lang.value) for lang in cfg.target_language.validator.options],
             parent=self.translateGroup,
         )
+
+        # Видео-перевод
+        self.videoTranslateTargetLanguageCard = ComboBoxSettingCard(
+            cfg.video_translate_target_language,
+            FIF.LANGUAGE,
+            "Язык дубляжа",
+            "Целевой язык для перевода речи в видео",
+            texts=[language_value_to_ru(lang.value) for lang in cfg.video_translate_target_language.validator.options],
+            parent=self.videoTranslateGroup,
+        )
+        self.videoTranslateVoiceProviderCard = ComboBoxSettingCard(
+            cfg.video_translate_voice_provider,
+            FIF.MICROPHONE,
+            "Провайдер клонирования голоса",
+            "Движок TTS/Voice Clone для озвучки",
+            texts=[
+                "auto",
+                "xtts",
+                "openvoice",
+                "fish_speech",
+                "elevenlabs",
+                "azure",
+                "cartesia",
+            ],
+            parent=self.videoTranslateGroup,
+        )
+        self.videoTranslateVoiceQualityCard = ComboBoxSettingCard(
+            cfg.video_translate_voice_quality,
+            FIF.SPEED_HIGH,
+            "Качество озвучки",
+            "Профиль качества/скорости голосового клонирования",
+            texts=["fast", "balanced", "high", "studio"],
+            parent=self.videoTranslateGroup,
+        )
+        self.videoTranslateVoiceRefModeCard = ComboBoxSettingCard(
+            cfg.video_translate_voice_reference_mode,
+            FIF.PEOPLE,
+            "Режим voice reference",
+            "Auto — автоматически искать эталон голоса, Manual — использовать JSON mapping",
+            texts=["auto", "manual"],
+            parent=self.videoTranslateGroup,
+        )
+        self.videoTranslateEnableDiarizationCard = SwitchSettingCard(
+            FIF.PEOPLE,
+            "Определение спикеров (Diarization)",
+            "Определять разных говорящих и поддерживать их раздельные голоса",
+            cfg.video_translate_enable_diarization,
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateExpectedSpeakersCard = RangeSettingCard(
+            cfg.video_translate_expected_speaker_count,
+            FIF.PEOPLE,
+            "Ожидаемое число спикеров",
+            "0 = автоопределение. Полезно для повышения стабильности diarization",
+            parent=self.videoTranslateGroup,
+        )
+        self.videoTranslateSourceSeparationCard = SwitchSettingCard(
+            FIF.MUSIC,
+            "Разделение голоса и фона",
+            "Отделять речь от музыки/шума перед переводом",
+            cfg.video_translate_enable_source_separation,
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateKeepMusicCard = SwitchSettingCard(
+            FIF.MUSIC,
+            "Сохранять фоновую музыку",
+            "Подмешивать оригинальный фон к переведённой озвучке",
+            cfg.video_translate_keep_background_music,
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateEnableLipsyncCard = SwitchSettingCard(
+            FIF.VIDEO,
+            "Липсинк (экспериментально)",
+            "Дополнительная подгонка артикуляции под новый язык",
+            cfg.video_translate_enable_lipsync,
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateManualVoiceMapCard = LineEditSettingCard(
+            cfg.video_translate_manual_voice_map_json,
+            FIF.DICTIONARY,
+            "Manual Voice Map (JSON)",
+            "Пример: {\"default\":\"VOICE_ID\",\"spk_1\":\"VOICE_ID_2\"}",
+            "{}",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateElevenLabsApiCard = LineEditSettingCard(
+            cfg.video_translate_elevenlabs_api_key,
+            FIF.FINGERPRINT,
+            "ElevenLabs API Key",
+            "Ключ API ElevenLabs для облачного voice cloning",
+            "",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateAzureKeyCard = LineEditSettingCard(
+            cfg.video_translate_azure_speech_key,
+            FIF.FINGERPRINT,
+            "Azure Speech Key",
+            "Ключ Azure Speech (если используете provider=azure)",
+            "",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateAzureRegionCard = LineEditSettingCard(
+            cfg.video_translate_azure_speech_region,
+            FIF.GLOBE,
+            "Azure Region",
+            "Регион Azure Speech, например: westeurope",
+            "",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateCartesiaApiCard = LineEditSettingCard(
+            cfg.video_translate_cartesia_api_key,
+            FIF.FINGERPRINT,
+            "Cartesia API Key",
+            "Ключ Cartesia (если используете provider=cartesia)",
+            "",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateXttsPathCard = LineEditSettingCard(
+            cfg.video_translate_xtts_model_path,
+            FIF.FOLDER,
+            "Путь к XTTS модели (опционально)",
+            "Можно оставить пустым: XTTS загрузится/используется автоматически из runtime",
+            "",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateOpenVoicePathCard = LineEditSettingCard(
+            cfg.video_translate_openvoice_model_path,
+            FIF.FOLDER,
+            "Путь к OpenVoice модели (опционально)",
+            "Нужен только если вы реально выбрали provider=openvoice",
+            "",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateFishSpeechPathCard = LineEditSettingCard(
+            cfg.video_translate_fish_speech_model_path,
+            FIF.FOLDER,
+            "Путь к Fish-Speech модели (опционально)",
+            "Нужен только если вы реально выбрали provider=fish_speech",
+            "",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateLocalEndpointCard = LineEditSettingCard(
+            cfg.video_translate_local_tts_endpoint,
+            FIF.LINK,
+            "Local TTS Endpoint",
+            "Локальный HTTP endpoint XTTS/OpenVoice/Fish-Speech сервера",
+            "http://127.0.0.1:8020",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateAutonomousModeCard = SwitchSettingCard(
+            FIF.ROBOT,
+            "Автономный режим",
+            "Программа сама поднимает локальные сервисы и использует локальный пайплайн",
+            cfg.video_translate_autonomous_mode,
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateAutoDownloadCard = SwitchSettingCard(
+            FIF.DOWNLOAD,
+            "Автозагрузка моделей",
+            "Автоматически догружать отсутствующие локальные модели при первом запуске",
+            cfg.video_translate_auto_download_models,
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateCheckEnvCard = PushSettingCard(
+            "Проверить",
+            FIF.INFO,
+            "Проверить окружение Video Translate",
+            "Показывает готовность XTTS/ASR/диаризации и точную причину ошибок",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateInstallCpuCard = PushSettingCard(
+            "Установить CPU",
+            FIF.DOWNLOAD,
+            "Установить зависимости Video Translate (CPU)",
+            "Установит/обновит XTTS, faster-whisper, pyannote и зависимости в runtime",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateInstallGpuCard = PushSettingCard(
+            "Установить GPU (CUDA 12.4)",
+            FIF.DOWNLOAD,
+            "Установить зависимости Video Translate (GPU)",
+            "Установит CUDA-пакеты PyTorch и зависимости для лучшего качества/скорости",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateDownloadXttsCard = PushSettingCard(
+            "Скачать XTTS",
+            FIF.DOWNLOAD,
+            "Скачать/подготовить модель XTTS v2",
+            "Предзагрузка XTTS-модели в runtime (чтобы не ждать первого запуска)",
+            self.videoTranslateGroup,
+        )
+        self.videoTranslateOpenModuleCard = PushSettingCard(
+            "Открыть",
+            FIF.VIDEO,
+            "Основные параметры перевода видео",
+            "Базовые настройки (язык, качество, кэш, провайдер, параллелизм) находятся во вкладке «Перевод видео»",
+            self.videoTranslateGroup,
+        )
+
+        # Все пользовательские параметры перенесены на отдельную вкладку
+        # "Перевод видео". В окне настроек скрываем их, чтобы они не
+        # перекрывали заголовок группы и не дублировали UI.
+        self.videoTranslateTargetLanguageCard.setVisible(False)
+        self.videoTranslateVoiceProviderCard.setVisible(False)
+        self.videoTranslateVoiceQualityCard.setVisible(False)
+        self.videoTranslateVoiceRefModeCard.setVisible(False)
+        self.videoTranslateEnableDiarizationCard.setVisible(False)
+        self.videoTranslateExpectedSpeakersCard.setVisible(False)
+        self.videoTranslateSourceSeparationCard.setVisible(False)
+        self.videoTranslateKeepMusicCard.setVisible(False)
+        self.videoTranslateEnableLipsyncCard.setVisible(False)
+        self.videoTranslateLocalEndpointCard.setVisible(False)
+
+        # Также скрываем продвинутые/необязательные поля.
+        self.videoTranslateManualVoiceMapCard.setVisible(False)
+        self.videoTranslateElevenLabsApiCard.setVisible(False)
+        self.videoTranslateAzureKeyCard.setVisible(False)
+        self.videoTranslateAzureRegionCard.setVisible(False)
+        self.videoTranslateCartesiaApiCard.setVisible(False)
+        self.videoTranslateXttsPathCard.setVisible(False)
+        self.videoTranslateOpenVoicePathCard.setVisible(False)
+        self.videoTranslateFishSpeechPathCard.setVisible(False)
 
         # 字幕合成配置卡片
         self.subtitleStyleCard = HyperlinkCard(
@@ -297,6 +539,16 @@ class SettingInterface(ScrollArea):
         self.translateGroup.addSettingCard(self.subtitleCorrectCard)
         self.translateGroup.addSettingCard(self.subtitleTranslateCard)
         self.translateGroup.addSettingCard(self.targetLanguageCard)
+
+        # Основные пользовательские настройки перенесены во вкладку "Перевод видео".
+        # Здесь оставляем только сервисные/инфраструктурные параметры.
+        self.videoTranslateGroup.addSettingCard(self.videoTranslateOpenModuleCard)
+        self.videoTranslateGroup.addSettingCard(self.videoTranslateAutonomousModeCard)
+        self.videoTranslateGroup.addSettingCard(self.videoTranslateAutoDownloadCard)
+        self.videoTranslateGroup.addSettingCard(self.videoTranslateCheckEnvCard)
+        self.videoTranslateGroup.addSettingCard(self.videoTranslateInstallCpuCard)
+        self.videoTranslateGroup.addSettingCard(self.videoTranslateInstallGpuCard)
+        self.videoTranslateGroup.addSettingCard(self.videoTranslateDownloadXttsCard)
 
         self.subtitleGroup.addSettingCard(self.subtitleStyleCard)
         self.subtitleGroup.addSettingCard(self.subtitleLayoutCard)
@@ -614,6 +866,7 @@ class SettingInterface(ScrollArea):
         self.expandLayout.addWidget(self.llmGroup)
         self.expandLayout.addWidget(self.translate_serviceGroup)
         self.expandLayout.addWidget(self.translateGroup)
+        self.expandLayout.addWidget(self.videoTranslateGroup)
         self.expandLayout.addWidget(self.subtitleGroup)
         self.expandLayout.addWidget(self.saveGroup)
         self.expandLayout.addWidget(self.personalGroup)
@@ -679,6 +932,21 @@ class SettingInterface(ScrollArea):
         self.softSubtitleCard.checkedChanged.connect(signalBus.soft_subtitle_changed)
         self.needVideoCard.checkedChanged.connect(signalBus.need_video_changed)
 
+        self.videoTranslateCheckEnvCard.clicked.connect(self._check_video_translate_env)
+        self.videoTranslateInstallCpuCard.clicked.connect(
+            lambda: self._install_video_translate_runtime("cpu")
+        )
+        self.videoTranslateInstallGpuCard.clicked.connect(
+            lambda: self._install_video_translate_runtime("gpu-cu124")
+        )
+        self.videoTranslateDownloadXttsCard.clicked.connect(self._download_xtts_model)
+        self.videoTranslateOpenModuleCard.clicked.connect(
+            lambda: self.window().switchTo(self.window().video_translate_interface)
+        )
+        self.videoTranslateVoiceProviderCard.comboBox.currentTextChanged.connect(
+            self.__onVideoTranslateProviderChanged
+        )
+
     def _cfg_color_or_default(self, item, fallback: str) -> QColor:
         value = cfg.get(item)
         q = QColor(str(value) if value is not None else "")
@@ -737,6 +1005,141 @@ class SettingInterface(ScrollArea):
             duration=1500,
             parent=self,
         )
+
+    def _check_video_translate_env(self):
+        runtime_python = PROJECT_ROOT / "runtime" / "python.exe"
+        script = PROJECT_ROOT / "scripts" / "check_video_translate_env.py"
+        if not runtime_python.exists() or not script.exists():
+            InfoBar.error(
+                "Ошибка",
+                "Не найден runtime python или скрипт проверки окружения",
+                duration=3500,
+                parent=self,
+            )
+            return
+        try:
+            p = subprocess.run(
+                [
+                    str(runtime_python),
+                    str(script),
+                    "--runtime-python",
+                    str(runtime_python),
+                    "--model",
+                    str(cfg.faster_whisper_model.value.value),
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                creationflags=(subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0),
+            )
+            out = ((p.stdout or "") + "\n" + (p.stderr or "")).strip()
+            dlg = _TextReportDialog("Отчёт Video Translate", self)
+            dlg.set_text(out if out else "Нет вывода")
+            dlg.exec()
+        except Exception as e:
+            InfoBar.error("Ошибка", f"Проверка не выполнена: {e}", duration=4000, parent=self)
+
+    def _install_video_translate_runtime(self, profile: str):
+        runtime_python = PROJECT_ROOT / "runtime" / "python.exe"
+        script = PROJECT_ROOT / "scripts" / "setup_video_translate_runtime.py"
+        if not runtime_python.exists() or not script.exists():
+            InfoBar.error(
+                "Ошибка",
+                "Не найден runtime python или скрипт установки",
+                duration=3500,
+                parent=self,
+            )
+            return
+        try:
+            if self._vt_install_thread and self._vt_install_thread.isRunning():
+                InfoBar.warning(
+                    "Установка уже выполняется",
+                    "Дождитесь завершения текущей установки зависимостей.",
+                    duration=3000,
+                    parent=self,
+                )
+                return
+
+            self._vt_install_dialog = _TextReportDialog(
+                f"Установка Video Translate ({profile})",
+                self,
+                with_progress=True,
+            )
+            self._vt_install_dialog.set_text("Запуск установки...\n")
+            self._vt_install_dialog.show()
+
+            self._vt_install_thread = _VideoTranslateInstallThread(
+                runtime_python=str(runtime_python),
+                setup_script=str(script),
+                profile=str(profile),
+                log_file=str(LOG_PATH / "video_translate_install.log"),
+            )
+            self._vt_install_thread.log_line.connect(self._vt_install_dialog.append_text)
+            self._vt_install_thread.progress.connect(self._vt_install_dialog.set_progress)
+            self._vt_install_thread.finished_status.connect(self._on_vt_install_finished)
+            self._vt_install_thread.start()
+
+            InfoBar.success(
+                "Установка запущена",
+                "Открылось окно прогресса. После завершения перезапустите программу.",
+                duration=3500,
+                parent=self,
+            )
+        except Exception as e:
+            InfoBar.error("Ошибка", f"Не удалось запустить установку: {e}", duration=4500, parent=self)
+
+    def _download_xtts_model(self):
+        runtime_python = PROJECT_ROOT / "runtime" / "python.exe"
+        script = PROJECT_ROOT / "scripts" / "download_xtts_model.py"
+        if not runtime_python.exists() or not script.exists():
+            InfoBar.error(
+                "Ошибка",
+                "Не найден runtime python или скрипт загрузки XTTS",
+                duration=3500,
+                parent=self,
+            )
+            return
+        try:
+            if self._vt_install_thread and self._vt_install_thread.isRunning():
+                InfoBar.warning(
+                    "Задача уже выполняется",
+                    "Дождитесь завершения текущей установки/загрузки.",
+                    duration=3000,
+                    parent=self,
+                )
+                return
+
+            self._vt_install_dialog = _TextReportDialog(
+                "Загрузка XTTS v2",
+                self,
+                with_progress=True,
+            )
+            self._vt_install_dialog.set_text("Запуск загрузки XTTS...\n")
+            self._vt_install_dialog.show()
+
+            self._vt_install_thread = _VideoTranslateInstallThread(
+                runtime_python=str(runtime_python),
+                setup_script="",
+                profile="",
+                log_file=str(LOG_PATH / "video_translate_install.log"),
+                custom_cmd=[str(runtime_python), str(script)],
+            )
+            self._vt_install_thread.log_line.connect(self._vt_install_dialog.append_text)
+            self._vt_install_thread.progress.connect(self._vt_install_dialog.set_progress)
+            self._vt_install_thread.finished_status.connect(self._on_vt_install_finished)
+            self._vt_install_thread.start()
+        except Exception as e:
+            InfoBar.error("Ошибка", f"Не удалось запустить загрузку XTTS: {e}", duration=4500, parent=self)
+
+    def _on_vt_install_finished(self, ok: bool, message: str):
+        if self._vt_install_dialog:
+            self._vt_install_dialog.append_text(f"\n{message}\n")
+            self._vt_install_dialog.set_progress(100 if ok else 0)
+        if ok:
+            InfoBar.success("Установка завершена", message, duration=4500, parent=self)
+        else:
+            InfoBar.error("Установка завершилась с ошибкой", message, duration=6500, parent=self)
 
     def __onsavePathCardClicked(self):
         """处理保存路径卡片点击事件"""
@@ -945,6 +1348,42 @@ class SettingInterface(ScrollArea):
         self.translate_serviceGroup.adjustSize()
         self.expandLayout.update()
 
+    def __onVideoTranslateProviderChanged(self, provider: str):
+        provider = (provider or "").strip().lower()
+
+        # Сначала прячем всё продвинутое
+        self.videoTranslateManualVoiceMapCard.setVisible(False)
+        self.videoTranslateElevenLabsApiCard.setVisible(False)
+        self.videoTranslateAzureKeyCard.setVisible(False)
+        self.videoTranslateAzureRegionCard.setVisible(False)
+        self.videoTranslateCartesiaApiCard.setVisible(False)
+        self.videoTranslateXttsPathCard.setVisible(False)
+        self.videoTranslateOpenVoicePathCard.setVisible(False)
+        self.videoTranslateFishSpeechPathCard.setVisible(False)
+
+        # Показываем только то, что реально нужно выбранному провайдеру
+        if provider in {"auto", "xtts"}:
+            # XTTS path опционален, оставляем скрытым для простоты
+            pass
+        elif provider == "openvoice":
+            self.videoTranslateOpenVoicePathCard.setVisible(True)
+        elif provider == "fish_speech":
+            self.videoTranslateFishSpeechPathCard.setVisible(True)
+        elif provider == "elevenlabs":
+            self.videoTranslateElevenLabsApiCard.setVisible(True)
+        elif provider == "azure":
+            self.videoTranslateAzureKeyCard.setVisible(True)
+            self.videoTranslateAzureRegionCard.setVisible(True)
+        elif provider == "cartesia":
+            self.videoTranslateCartesiaApiCard.setVisible(True)
+
+        # Manual voice map нужен только в manual mode
+        if str(cfg.video_translate_voice_reference_mode.value).lower() == "manual":
+            self.videoTranslateManualVoiceMapCard.setVisible(True)
+
+        self.videoTranslateGroup.adjustSize()
+        self.expandLayout.update()
+
 
 class LLMConnectionThread(QThread):
     finished = pyqtSignal(bool, str, list)
@@ -964,3 +1403,130 @@ class LLMConnectionThread(QThread):
             self.finished.emit(is_success, message, models)
         except Exception as e:
             self.error.emit(str(e))
+
+
+class _TextReportDialog(QDialog):
+    def __init__(self, title: str, parent=None, with_progress: bool = False):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.resize(900, 620)
+        self._with_progress = with_progress
+
+        layout = QVBoxLayout(self)
+        self.text_edit = QTextEdit(self)
+        self.text_edit.setReadOnly(True)
+        layout.addWidget(self.text_edit, 1)
+
+        if with_progress:
+            from qfluentwidgets import ProgressBar
+
+            self.progress_bar = ProgressBar(self)
+            self.progress_bar.setValue(0)
+            layout.addWidget(self.progress_bar)
+        else:
+            self.progress_bar = None
+
+        btn_row = QHBoxLayout()
+        self.copy_btn = QPushButton("Копировать", self)
+        self.clear_btn = QPushButton("Очистить", self)
+        self.close_btn = QPushButton("Закрыть", self)
+        btn_row.addWidget(self.copy_btn)
+        btn_row.addWidget(self.clear_btn)
+        btn_row.addStretch(1)
+        btn_row.addWidget(self.close_btn)
+        layout.addLayout(btn_row)
+
+        self.copy_btn.clicked.connect(self.copy_text)
+        self.clear_btn.clicked.connect(self.text_edit.clear)
+        self.close_btn.clicked.connect(self.accept)
+
+    def set_text(self, text: str):
+        self.text_edit.setPlainText(text or "")
+
+    def append_text(self, text: str):
+        if not text:
+            return
+        self.text_edit.moveCursor(self.text_edit.textCursor().End)
+        self.text_edit.insertPlainText(text)
+        self.text_edit.moveCursor(self.text_edit.textCursor().End)
+
+    def copy_text(self):
+        QApplication.clipboard().setText(self.text_edit.toPlainText())
+        InfoBar.success("Скопировано", "Текст отчёта скопирован в буфер", duration=1200, parent=self)
+
+    def set_progress(self, value: int):
+        if self.progress_bar is not None:
+            self.progress_bar.setValue(max(0, min(100, int(value))))
+
+
+class _VideoTranslateInstallThread(QThread):
+    log_line = pyqtSignal(str)
+    progress = pyqtSignal(int)
+    finished_status = pyqtSignal(bool, str)
+
+    def __init__(
+        self,
+        runtime_python: str,
+        setup_script: str,
+        profile: str,
+        log_file: str,
+        custom_cmd: list[str] | None = None,
+    ):
+        super().__init__()
+        self.runtime_python = runtime_python
+        self.setup_script = setup_script
+        self.profile = profile
+        self.log_file = log_file
+        self.custom_cmd = custom_cmd
+
+    def run(self):
+        cmd = self.custom_cmd or [
+            self.runtime_python,
+            self.setup_script,
+            "--runtime-python",
+            self.runtime_python,
+            "--profile",
+            self.profile,
+            "--upgrade-pip",
+        ]
+        run_steps = 0
+        total_steps = 4
+        Path(self.log_file).parent.mkdir(parents=True, exist_ok=True)
+        with open(self.log_file, "a", encoding="utf-8", errors="replace") as lf:
+            lf.write("\n" + "=" * 40 + "\n")
+            lf.write("CMD: " + subprocess.list2cmdline(cmd) + "\n")
+            try:
+                p = subprocess.Popen(
+                    cmd,
+                    cwd=str(PROJECT_ROOT),
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    encoding="utf-8",
+                    errors="replace",
+                    creationflags=(
+                        subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                    ),
+                )
+                self.progress.emit(2)
+                while True:
+                    line = p.stdout.readline() if p.stdout else ""
+                    if not line and p.poll() is not None:
+                        break
+                    if not line:
+                        continue
+                    lf.write(line)
+                    self.log_line.emit(line)
+                    if line.strip().startswith("[RUN]"):
+                        run_steps += 1
+                        self.progress.emit(min(95, int((run_steps / total_steps) * 100)))
+
+                rc = p.wait()
+                if rc == 0:
+                    self.progress.emit(100)
+                    self.finished_status.emit(True, "Установка зависимостей выполнена успешно")
+                else:
+                    self.finished_status.emit(False, f"Установка завершилась с кодом {rc}. Лог: {self.log_file}")
+            except Exception as e:
+                lf.write(f"\nERROR: {e}\n")
+                self.finished_status.emit(False, f"Ошибка установки: {e}. Лог: {self.log_file}")

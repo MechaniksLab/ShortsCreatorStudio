@@ -19,3 +19,5 @@
 /AppData/logs/
 /app/core/shorts/__pycache__/
 /AppData/logs
+/app/core/video_translate/__pycache__/
+/scripts/__pycache__/
