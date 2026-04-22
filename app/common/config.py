@@ -450,6 +450,12 @@ class Config(QConfig):
     video_translate_enable_source_separation = ConfigItem(
         "VideoTranslate", "EnableSourceSeparation", True, BoolValidator()
     )
+    video_translate_source_separation_mode = OptionsConfigItem(
+        "VideoTranslate",
+        "SourceSeparationMode",
+        "demucs_plus_uvr",
+        OptionsValidator(["auto", "demucs", "uvr_mdx_kim", "demucs_plus_uvr"]),
+    )
     video_translate_keep_background_music = ConfigItem(
         "VideoTranslate", "KeepBackgroundMusic", True, BoolValidator()
     )
@@ -460,7 +466,7 @@ class Config(QConfig):
         "VideoTranslate",
         "VoiceProvider",
         "xtts",
-        OptionsValidator(["auto", "xtts", "openvoice", "fish_speech", "elevenlabs", "azure", "cartesia"]),
+        OptionsValidator(["auto", "xtts", "rvc", "openvoice", "fish_speech", "elevenlabs", "azure", "cartesia"]),
     )
     video_translate_voice_quality = OptionsConfigItem(
         "VideoTranslate",
@@ -485,6 +491,36 @@ class Config(QConfig):
     )
     video_translate_fish_speech_model_path = ConfigItem(
         "VideoTranslate", "FishSpeechModelPath", ""
+    )
+    video_translate_rvc_runtime_python = ConfigItem(
+        "VideoTranslate", "RVCRuntimePython", ""
+    )
+    video_translate_rvc_model_dir = ConfigItem(
+        "VideoTranslate", "RVCModelDir", ""
+    )
+    video_translate_rvc_default_model = ConfigItem(
+        "VideoTranslate", "RVCDefaultModel", ""
+    )
+    video_translate_rvc_auto_male_models = ConfigItem(
+        "VideoTranslate", "RVCAutoMaleModels", ""
+    )
+    video_translate_rvc_auto_female_models = ConfigItem(
+        "VideoTranslate", "RVCAutoFemaleModels", ""
+    )
+    video_translate_rvc_index_rate = RangeConfigItem(
+        "VideoTranslate", "RVCIndexRate", 0.75, RangeValidator(0.0, 1.0)
+    )
+    video_translate_rvc_protect = RangeConfigItem(
+        "VideoTranslate", "RVCProtect", 0.33, RangeValidator(0.0, 0.5)
+    )
+    video_translate_rvc_filter_radius = RangeConfigItem(
+        "VideoTranslate", "RVCFilterRadius", 3, RangeValidator(0, 7)
+    )
+    video_translate_rvc_male_f0_up_key = RangeConfigItem(
+        "VideoTranslate", "RVCMaleF0UpKey", 0, RangeValidator(-24, 24)
+    )
+    video_translate_rvc_female_f0_up_key = RangeConfigItem(
+        "VideoTranslate", "RVCFemaleF0UpKey", 0, RangeValidator(-24, 24)
     )
     video_translate_local_tts_endpoint = ConfigItem(
         "VideoTranslate", "LocalTTSEndpoint", "http://127.0.0.1:8020"
@@ -530,6 +566,27 @@ class Config(QConfig):
     )
     video_translate_enable_background_ducking = ConfigItem(
         "VideoTranslate", "EnableBackgroundDucking", True, BoolValidator()
+    )
+    video_translate_aggressive_vocal_suppression = ConfigItem(
+        "VideoTranslate", "AggressiveVocalSuppression", False, BoolValidator()
+    )
+    video_translate_reference_enhancement_enabled = ConfigItem(
+        "VideoTranslate", "ReferenceEnhancementEnabled", True, BoolValidator()
+    )
+    video_translate_reference_min_mean_db = RangeConfigItem(
+        "VideoTranslate", "ReferenceMinMeanDb", -48.0, RangeValidator(-70.0, -10.0)
+    )
+    video_translate_reference_target_total_sec = RangeConfigItem(
+        "VideoTranslate", "ReferenceTargetTotalSec", 18.0, RangeValidator(4.0, 60.0)
+    )
+    video_translate_uvr_model_dir = ConfigItem(
+        "VideoTranslate", "UVRModelDir", ""
+    )
+    video_translate_uvr_inst_hq3_model_name = ConfigItem(
+        "VideoTranslate", "UVRInstHQ3ModelName", "UVR-MDX-NET-Inst_HQ_3.onnx"
+    )
+    video_translate_uvr_kim_vocal_model_name = ConfigItem(
+        "VideoTranslate", "UVRKimVocalModelName", "Kim_Vocal_2.onnx"
     )
     video_translate_elevenlabs_api_key = ConfigItem(
         "VideoTranslate", "ElevenLabsApiKey", ""

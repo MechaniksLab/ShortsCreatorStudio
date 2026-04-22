@@ -90,10 +90,21 @@ def main() -> int:
 
     checks = report.get("checks", [])
     failed = [c for c in checks if not c.get("ok")]
+
+    # Доп. локальная проверка наличия UVR моделей (для режима Demucs+UVR / UVR MDX/Kim)
+    project_root = Path(__file__).resolve().parents[1]
+    uvr_dir = project_root / "AppData" / "models" / "uvr"
+    uvr_inst = uvr_dir / "UVR-MDX-NET-Inst_HQ_3.onnx"
+    uvr_kim = uvr_dir / "Kim_Vocal_2.onnx"
+    uvr_ok = uvr_inst.exists() and uvr_kim.exists()
+    _safe_print(f"uvr_models: {'ok' if uvr_ok else 'missing'} ({uvr_dir})")
+
     if failed:
         _safe_print("\nПроблемы:")
         for c in failed:
             _safe_print(f"- {c.get('name')}: {c.get('hint')}")
+    if not uvr_ok:
+        _safe_print("- uvr-models: Для более чистого отделения голоса от музыки нужны Inst_HQ_3 + Kim_Vocal_2")
 
     _safe_print("\nРекомендации:")
     if report.get("asr_runtime") == "missing":
@@ -108,6 +119,11 @@ def main() -> int:
         )
     if report.get("clone_quality") != "high":
         _safe_print("- Для точного клонирования тембра проверьте Coqui TTS и модель XTTS v2")
+    if not uvr_ok:
+        _safe_print(
+            "- Скачайте UVR-модели: "
+            f"{runtime_python} scripts\\download_uvr_models.py"
+        )
 
     return 0
 

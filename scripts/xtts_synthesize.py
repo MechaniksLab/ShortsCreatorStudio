@@ -24,6 +24,7 @@ def main() -> int:
     parser.add_argument("--out", required=True)
     parser.add_argument("--lang", default="en")
     parser.add_argument("--speaker-wav", default="")
+    parser.add_argument("--device", choices=["auto", "cuda", "cpu"], default="auto")
     parser.add_argument("--log-file", default="")
     args = parser.parse_args()
 
@@ -102,14 +103,23 @@ def main() -> int:
     _log("xtts.torchaudio.load patched -> soundfile (no torchcodec)")
 
     tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
-    if torch.cuda.is_available():
-        try:
-            tts.to("cuda")
-            _log("xtts_device=cuda")
-        except Exception as e:
-            _log(f"xtts_cuda_move_warning={e}")
+    req_device = str(args.device or "auto").strip().lower()
+    if req_device == "cpu":
+        _log("xtts_device=cpu (requested)")
+    elif req_device == "cuda":
+        if not torch.cuda.is_available():
+            raise RuntimeError("CUDA requested for XTTS synth, but torch.cuda.is_available() is False")
+        tts.to("cuda")
+        _log("xtts_device=cuda (requested)")
     else:
-        _log("xtts_device=cpu")
+        if torch.cuda.is_available():
+            try:
+                tts.to("cuda")
+                _log("xtts_device=cuda")
+            except Exception as e:
+                _log(f"xtts_cuda_move_warning={e}")
+        else:
+            _log("xtts_device=cpu")
     speaker_wav = Path(args.speaker_wav) if str(args.speaker_wav).strip() else None
     if speaker_wav:
         _log(f"speaker_wav={speaker_wav}, exists={speaker_wav.exists()}")

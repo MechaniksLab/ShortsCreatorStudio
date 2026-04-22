@@ -51,6 +51,7 @@ def _read_json(handler: BaseHTTPRequestHandler) -> dict:
 class _State:
     tts: TTS | None = None
     device: str = "cpu"
+    requested_device: str = "auto"
     model_name: str = "tts_models/multilingual/multi-dataset/xtts_v2"
 
 
@@ -71,6 +72,7 @@ class Handler(BaseHTTPRequestHandler):
                 {
                     "ok": True,
                     "device": _State.device,
+                    "requested_device": _State.requested_device,
                     "cuda_available": bool(torch.cuda.is_available()),
                     "model": _State.model_name,
                     "ready": _State.tts is not None,
@@ -128,17 +130,27 @@ def main() -> int:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8021)
     parser.add_argument("--model", default="tts_models/multilingual/multi-dataset/xtts_v2")
+    parser.add_argument("--device", choices=["auto", "cuda", "cpu"], default="auto")
     args = parser.parse_args()
 
     _State.model_name = str(args.model)
+    _State.requested_device = str(args.device or "auto")
     _patch_audio_loading()
     _State.tts = TTS(_State.model_name)
-    if torch.cuda.is_available():
-        try:
-            _State.tts.to("cuda")
-            _State.device = "cuda"
-        except Exception:
-            _State.device = "cpu"
+    if _State.requested_device == "cpu":
+        _State.device = "cpu"
+    elif _State.requested_device == "cuda":
+        if not torch.cuda.is_available():
+            raise RuntimeError("CUDA requested for XTTS runtime server, but torch.cuda.is_available() is False")
+        _State.tts.to("cuda")
+        _State.device = "cuda"
+    else:
+        if torch.cuda.is_available():
+            try:
+                _State.tts.to("cuda")
+                _State.device = "cuda"
+            except Exception:
+                _State.device = "cpu"
 
     httpd = ThreadingHTTPServer((args.host, int(args.port)), Handler)
     httpd.serve_forever()

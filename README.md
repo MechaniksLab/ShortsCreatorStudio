@@ -174,7 +174,7 @@
 - `scripts\\install_video_translate_gpu_cu124.cmd` — принудительный GPU-профиль CUDA 12.4;
 - `scripts\\install_video_translate_gpu_cu128.cmd` — принудительный GPU-профиль CUDA 12.8;
 - `scripts\\install_video_translate_deps_only.cmd` — установка/обновление core-пакетов (XTTS/faster-whisper/pyannote/demucs) без переустановки torch;
-- `scripts\\install_video_translate_studio_addons.cmd` — безопасные studio-дополнения для улучшения микса/шумоподавления (pyloudnorm, noisereduce, pedalboard);
+- `scripts\\install_video_translate_studio_addons.cmd` — безопасные studio-дополнения для улучшения микса/шумоподавления (pyloudnorm, noisereduce, pedalboard, audio-separator);
 - `scripts\\install_video_translate_experimental_addons.cmd` — экспериментальные дополнения (WhisperX/Resemblyzer/WebRTCVAD) в best-effort режиме + авто-восстановление production core-версий;
 - `scripts\\check_video_translate_env.py` — диагностика готовности окружения.
 
@@ -200,6 +200,13 @@
 - ASR: `faster-whisper` CLI или python fallback;
 - speaker diarization: `pyannote` (high) или heuristic fallback;
 - voice clone: Coqui XTTS (high) или базовый fallback-режим.
+
+Дополнительно для максимально похожего дубляжа (новый каскад quality-mode):
+
+- source separation: **Demucs + UVR/MDX (Inst_HQ_3 + Kim_Vocal_2)** с авто-fallback;
+- улучшенная сборка voice reference: фильтрация тихих/плохих сегментов + мягкая очистка перед XTTS;
+- выбор режима separation в UI модуля «Перевод видео»: Demucs+UVR / Demucs / UVR / Auto;
+- UVR модели автоматически подтягиваются в `AppData/models/uvr` при запуске install `*.cmd` для video translate.
 
 Это и есть рекомендованный сценарий обновления/запуска на текущий момент.
 

@@ -1,8 +1,10 @@
 import datetime
 import json
+import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -10,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
+import numpy as np
 import requests
 
 from app.config import PROJECT_ROOT
@@ -27,6 +30,7 @@ from app.core.video_translate.diarization import (
     SpeakerTurn,
 )
 from app.core.video_translate.service_manager import VideoTranslateServiceManager
+from app.core.video_translate.rvc_model_registry import default_rvc_model_root, scan_rvc_models
 
 logger = setup_logger("video_translate_processor")
 
@@ -101,6 +105,22 @@ def _build_atempo_filter(speed: float) -> str:
 def _runtime_python() -> Optional[Path]:
     p = PROJECT_ROOT / "runtime" / "python.exe"
     return p if p.exists() else None
+
+
+def _runtime_python_for_rvc(cfg) -> Optional[Path]:
+    raw = str(getattr(cfg, "rvc_runtime_python", "") or "").strip()
+    if raw:
+        p = Path(raw)
+        if p.exists() and p.is_file():
+            return p
+    candidates = [
+        PROJECT_ROOT / "runtime_rvc" / "Scripts" / "python.exe",
+        PROJECT_ROOT / "runtime" / "python.exe",
+    ]
+    for p in candidates:
+        if p.exists() and p.is_file():
+            return p
+    return None
 
 
 def _find_demucs_stem(demucs_out: Path, model_name: str, track_name: str, stem_name: str) -> Optional[Path]:
@@ -186,6 +206,145 @@ def _try_demucs_split(source_audio: Path, work_dir: Path) -> tuple[Optional[Path
     return vocals, no_vocals
 
 
+def _default_uvr_model_dir() -> Path:
+    return PROJECT_ROOT / "AppData" / "models" / "uvr"
+
+
+def _resolve_uvr_model_dir(cfg) -> Path:
+    raw = str(getattr(cfg, "uvr_model_dir", "") or "").strip()
+    return Path(raw) if raw else _default_uvr_model_dir()
+
+
+def _try_uvr_mdx_kim_split(source_audio: Path, work_dir: Path, cfg) -> tuple[Optional[Path], Optional[Path]]:
+    """Пытается разделить дорожку через локальный UVR/MDX каскад (Inst HQ3 + Kim Vocal 2)."""
+    py = _runtime_python()
+    if py is None:
+        return None, None
+
+    uvr_script = PROJECT_ROOT / "scripts" / "uvr_separate.py"
+    if not uvr_script.exists():
+        return None, None
+
+    model_dir = _resolve_uvr_model_dir(cfg)
+    inst_model = str(
+        getattr(cfg, "uvr_inst_hq3_model_name", "UVR-MDX-NET-Inst_HQ_3.onnx")
+        or "UVR-MDX-NET-Inst_HQ_3.onnx"
+    )
+    vocal_model = str(
+        getattr(cfg, "uvr_kim_vocal_model_name", "Kim_Vocal_2.onnx")
+        or "Kim_Vocal_2.onnx"
+    )
+
+    uvr_out = work_dir / "uvr"
+    uvr_out.mkdir(parents=True, exist_ok=True)
+    vocals = uvr_out / "vocals.wav"
+    no_vocals = uvr_out / "no_vocals.wav"
+
+    cmd = [
+        str(py),
+        str(uvr_script),
+        "--input",
+        str(source_audio),
+        "--output-dir",
+        str(uvr_out),
+        "--model-dir",
+        str(model_dir),
+        "--inst-model",
+        inst_model,
+        "--vocal-model",
+        vocal_model,
+    ]
+    try:
+        _safe_run(cmd)
+    except Exception as e:
+        logger.warning("UVR/MDX split failed: %s", e)
+        return None, None
+
+    v = vocals if vocals.exists() and vocals.stat().st_size > 0 else None
+    nv = no_vocals if no_vocals.exists() and no_vocals.stat().st_size > 0 else None
+    if v is not None:
+        logger.info("UVR vocals stem: %s", v)
+    if nv is not None:
+        logger.info("UVR no_vocals stem: %s", nv)
+    return v, nv
+
+
+def _finalize_selected_stems(work_dir: Path, speech_audio: Path, background_audio: Path) -> tuple[Path, Path]:
+    """Нормализует пути итоговых stem-файлов в рабочей папке."""
+    out_speech = work_dir / "speech_audio.wav"
+    out_bg = work_dir / "background_audio.wav"
+    try:
+        if speech_audio.exists() and speech_audio != out_speech:
+            shutil.copy2(speech_audio, out_speech)
+        elif speech_audio.exists():
+            out_speech = speech_audio
+    except Exception:
+        out_speech = speech_audio
+
+    try:
+        if background_audio.exists() and background_audio != out_bg:
+            shutil.copy2(background_audio, out_bg)
+        elif background_audio.exists():
+            out_bg = background_audio
+    except Exception:
+        out_bg = background_audio
+
+    return out_speech, out_bg
+
+
+def _split_model_tokens(raw: str) -> List[str]:
+    text = str(raw or "").strip()
+    if not text:
+        return []
+    return [p.strip() for p in re.split(r"[;,\n\r]+", text) if p.strip()]
+
+
+def _guess_gender_from_name(name: str) -> str:
+    n = str(name or "").lower()
+    female_hints = [
+        "female", "girl", "woman", "дев", "жен", "оля", "olesya", "yumilia", "мейбл", "sandy",
+    ]
+    male_hints = [
+        "male", "boy", "man", "муж", "диппер", "putin", "стэтхэм", "kuplinov", "брежнев", "levitan", "neo", "loki", "dominic", "shrek", "spongebob",
+    ]
+    if any(h in n for h in female_hints):
+        return "female"
+    if any(h in n for h in male_hints):
+        return "male"
+    return "unknown"
+
+
+def _resolve_mmvc_root(cfg) -> Optional[Path]:
+    candidates: List[Path] = []
+    raw_server = str(getattr(cfg, "rvc_server_exe", "") or "").strip()
+    if raw_server:
+        p = Path(raw_server)
+        if p.exists() and p.is_file():
+            return p.parent
+
+    # Приоритет: встроенный tools-каталог проекта
+    candidates.append(PROJECT_ROOT / "AppData" / "tools" / "MMVCServerSIO")
+    # Путь пользователя из задачи
+    candidates.append(Path(r"E:\Downloads\voice-changer-windows-amd64-cuda.zip.001\MMVCServerSIO"))
+
+    for c in candidates:
+        exe = c / "MMVCServerSIO.exe"
+        if exe.exists():
+            return c
+    return None
+
+
+def _load_msgpack_from_mmvc(mmvc_root: Path):
+    internal = mmvc_root / "_internal"
+    if internal.exists():
+        path_s = str(internal)
+        if path_s not in sys.path:
+            sys.path.insert(0, path_s)
+    import msgpack  # type: ignore
+
+    return msgpack
+
+
 @dataclass
 class VoiceSegment:
     idx: int
@@ -215,6 +374,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         text: str,
         speaker_wav: Path,
         lang: str,
+        device_preference: str,
         out_path: Path,
         require_xtts: bool,
         prefer_xtts: bool,
@@ -229,6 +389,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             "text": text,
             "language": lang,
             "speaker_wav": str(speaker_wav),
+            "device_preference": str(device_preference or "auto"),
             "require_xtts": bool(require_xtts),
             "prefer_xtts": bool(prefer_xtts),
         }
@@ -341,6 +502,79 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
 
         return True, "ok"
 
+    @classmethod
+    def _enhance_reference_clip(cls, src_wav: Path, dst_wav: Path) -> Path:
+        """Мягкая очистка/нормализация эталона голоса для XTTS."""
+        try:
+            _safe_run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    str(src_wav),
+                    "-af",
+                    "highpass=f=70,lowpass=f=7600,afftdn=nf=-24,acompressor=threshold=-18dB:ratio=2.2:attack=8:release=140,loudnorm=I=-20:TP=-2:LRA=10",
+                    "-ac",
+                    "1",
+                    "-ar",
+                    "24000",
+                    str(dst_wav),
+                ]
+            )
+            if dst_wav.exists() and dst_wav.stat().st_size > 0:
+                return dst_wav
+        except Exception:
+            pass
+        return src_wav
+
+    @staticmethod
+    def _run_native_rvc_convert(
+        *,
+        runtime_python: Optional[Path],
+        input_wav: Path,
+        output_wav: Path,
+        model_path: Path,
+        index_path: Optional[Path],
+        f0_up_key: int,
+        index_rate: float,
+        protect: float,
+        filter_radius: int,
+        device: str,
+    ) -> None:
+        runtime_py = runtime_python
+        if runtime_py is None:
+            raise RuntimeError("Не найден Python для native RVC (ожидался config RVCRuntimePython или runtime_rvc)")
+        script = PROJECT_ROOT / "scripts" / "rvc_native_infer.py"
+        if not script.exists():
+            raise RuntimeError(f"Не найден скрипт native RVC: {script}")
+
+        cmd = [
+            str(runtime_py),
+            str(script),
+            "--input",
+            str(input_wav),
+            "--output",
+            str(output_wav),
+            "--model",
+            str(model_path),
+            "--f0-up-key",
+            str(int(f0_up_key)),
+            "--index-rate",
+            f"{float(index_rate):.4f}",
+            "--protect",
+            f"{float(protect):.4f}",
+            "--filter-radius",
+            str(int(filter_radius)),
+            "--device",
+            str(device or "cuda"),
+        ]
+        if index_path and index_path.exists():
+            cmd += ["--index", str(index_path)]
+
+        _safe_run(cmd)
+        if not output_wav.exists() or output_wav.stat().st_size <= 0:
+            raise RuntimeError("native RVC не создал выходной wav")
+
     def synthesize(
         self,
         segments: List[VoiceSegment],
@@ -354,6 +588,9 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             raise RuntimeError("Не задан local TTS endpoint")
 
         quality = str(getattr(cfg, "voice_clone_quality", "balanced") or "balanced").strip().lower()
+        tts_device_pref = str(getattr(task.transcribe_config, "faster_whisper_device", "auto") or "auto").strip().lower()
+        gpu_pref = tts_device_pref == "cuda"
+        allow_overlap_cfg = bool(getattr(cfg, "allow_speaker_overlap", quality in {"high", "studio"}))
         qa_enabled = bool(getattr(cfg, "segment_qa_enabled", quality in {"high", "studio"}))
         qa_retry_count = max(0, int(getattr(cfg, "segment_qa_retry_count", 1) or 1))
         if quality == "fast":
@@ -363,9 +600,10 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             max_retries = 1
             req_timeout = 45
         elif quality == "high":
-            strict_xtts = False
+            # Для high требуем реальный XTTS-клон, иначе получаем «робо-голос» fallback.
+            strict_xtts = True
             prefer_xtts = True
-            allow_non_strict_fallback = True
+            allow_non_strict_fallback = False
             max_retries = 2
             req_timeout = 90
         elif quality == "studio":
@@ -387,13 +625,60 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                 f"Local TTS mode: {quality}, clone={'strict' if strict_xtts else ('soft' if prefer_xtts else 'off')}",
             )
 
+        # RVC mapping (спикер -> slot) + использование params.json каждой модели.
+        voice_provider = str(getattr(cfg, "voice_clone_provider", "auto") or "auto").strip().lower()
+        manual_map_raw = str(getattr(cfg, "manual_voice_map_json", "") or "").strip()
+        speaker_slot_map: Dict[str, str] = {}
+        if manual_map_raw:
+            try:
+                parsed = json.loads(manual_map_raw)
+                if isinstance(parsed, dict):
+                    speaker_slot_map = {str(k): str(v) for k, v in parsed.items() if v is not None}
+            except Exception:
+                speaker_slot_map = {}
+
+        rvc_models_by_slot = {}
+        if voice_provider == "rvc" or speaker_slot_map:
+            model_root_raw = str(getattr(cfg, "rvc_model_dir", "") or "").strip()
+            model_root = Path(model_root_raw) if model_root_raw else default_rvc_model_root()
+            for m in scan_rvc_models(model_root):
+                rvc_models_by_slot[str(m.slot)] = m
+
+            # Если явно выбран provider=rvc, но mapping пустой — назначаем default автоматически.
+            if voice_provider == "rvc" and not speaker_slot_map and rvc_models_by_slot:
+                default_raw = str(getattr(cfg, "rvc_default_model", "") or "").strip()
+                default_slot = ""
+                if default_raw:
+                    if default_raw in rvc_models_by_slot:
+                        default_slot = default_raw
+                    else:
+                        for _slot, _m in rvc_models_by_slot.items():
+                            if str(getattr(_m, "name", "")).strip().lower() == default_raw.lower():
+                                default_slot = _slot
+                                break
+                if not default_slot:
+                    default_slot = sorted(rvc_models_by_slot.keys())[0]
+                speaker_slot_map["default"] = default_slot
+
+            if progress_cb:
+                progress_cb(
+                    1,
+                    f"RVC registry: {len(rvc_models_by_slot)} моделей ({model_root})",
+                )
+
+        rvc_runtime_py = _runtime_python_for_rvc(cfg)
+        if progress_cb:
+            progress_cb(2, "Подготовка эталонов спикеров")
+
         # Для стабильного voice cloning XTTS нужен более длинный референс (обычно 3-6с).
         ref_duration_sec = 6.0 if quality == "studio" else (4.0 if quality == "high" else 3.0)
 
-        # Эталон голоса: берём исходную дорожку (доступно локально и бесплатно)
+        # Эталон голоса: при наличии используем speech stem после separation.
         source_audio = work_dir / "source_audio.wav"
         if not source_audio.exists():
             raise RuntimeError("Не найден source_audio.wav для клонирования голоса")
+        speech_audio = work_dir / "speech_audio.wav"
+        reference_audio = speech_audio if speech_audio.exists() else source_audio
 
         # Speaker-aware reference wav: собираем лучший эталон из нескольких кусков спикера.
         speaker_refs: Dict[str, Path] = {}
@@ -401,8 +686,25 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         for seg in segments:
             by_speaker.setdefault(seg.speaker_id, []).append(seg)
 
-        target_ref_total = 18.0 if quality == "studio" else (10.0 if quality == "high" else 5.0)
-        for spk, spk_segs in by_speaker.items():
+        target_ref_total = float(
+            getattr(
+                cfg,
+                "reference_target_total_sec",
+                18.0 if quality == "studio" else (10.0 if quality == "high" else 5.0),
+            )
+            or 18.0
+        )
+        reference_enhance = bool(getattr(cfg, "reference_enhancement_enabled", quality in {"high", "studio"}))
+        # В режиме provider=rvc сам тембр вносится RVC-конвертером,
+        # поэтому не тратим лишний CPU на слишком длинные эталоны XTTS.
+        if voice_provider == "rvc":
+            target_ref_total = min(target_ref_total, 6.0)
+            reference_enhance = False
+        reference_min_mean_db = float(getattr(cfg, "reference_min_mean_db", -48.0) or -48.0)
+        total_speakers = max(1, len(by_speaker))
+        for spk_idx, (spk, spk_segs) in enumerate(by_speaker.items(), start=1):
+            if progress_cb:
+                progress_cb(2 + int(8 * spk_idx / total_speakers), f"Эталоны спикеров {spk_idx}/{total_speakers}")
             ref_wav = work_dir / f"ref_{spk}.wav"
             # Берём самые длинные реплики как более стабильный voiceprint.
             ordered = sorted(spk_segs, key=lambda s: max(0, s.end_ms - s.start_ms), reverse=True)
@@ -424,7 +726,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                             "-t",
                             f"{dur_sec:.3f}",
                             "-i",
-                            str(source_audio),
+                            str(reference_audio),
                             "-ac",
                             "1",
                             "-ar",
@@ -433,6 +735,15 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                         ]
                     )
                     if clip.exists() and clip.stat().st_size > 0:
+                        stats = self._probe_volumedetect(clip)
+                        mean_db = stats.get("mean_db", -120.0)
+                        if mean_db < reference_min_mean_db:
+                            continue
+                        if reference_enhance:
+                            clip = self._enhance_reference_clip(
+                                clip,
+                                work_dir / f"ref_{spk}_{n:02d}_enh.wav",
+                            )
                         parts.append(clip)
                         acc += dur_sec
                 except Exception:
@@ -491,6 +802,11 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         configured_workers = int(getattr(cfg, "tts_parallel_workers", 3) or 3)
         configured_workers = max(1, min(8, configured_workers))
         max_workers = configured_workers if quality == "studio" else 1
+        if gpu_pref and quality in {"high", "studio"}:
+            # В GPU-режиме избегаем тяжёлой CPU-постобработки каждого сегмента,
+            # чтобы Local TTS меньше упирался в процессор.
+            qa_enabled = False
+            max_workers = configured_workers
 
         def _job(i_seg):
             i, seg = i_seg
@@ -500,14 +816,26 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             attempts = max(1, qa_retry_count + 1)
             last_reason = ""
 
+            # Если назначен RVC-slot для текущего спикера — берём его params.json.
+            slot = str(
+                speaker_slot_map.get(seg.speaker_id)
+                or speaker_slot_map.get("default")
+                or ""
+            ).strip()
+            model_meta = rvc_models_by_slot.get(slot) if slot else None
+            model_tune = int(getattr(model_meta, "default_tune", 0) or 0)
+            # Безопасный clamp, чтобы не «ломать» голос.
+            model_tune = max(-6, min(6, model_tune))
+
             for attempt in range(1, attempts + 1):
                 # На повторных попытках делаем синтез мягче/стабильнее.
                 soft_pass = attempt > 1
                 self._synthesize_one(
                     endpoint=endpoint,
                     text=seg.text,
-                    speaker_wav=speaker_refs.get(seg.speaker_id, source_audio),
+                    speaker_wav=speaker_refs.get(seg.speaker_id, reference_audio),
                     lang=lang,
+                    device_preference=tts_device_pref,
                     out_path=wav_path,
                     require_xtts=(strict_xtts if quality == "studio" else (strict_xtts and not soft_pass)),
                     prefer_xtts=(prefer_xtts or quality in {"high", "studio"}),
@@ -516,9 +844,9 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     req_timeout=req_timeout + (12 if soft_pass else 0),
                 )
 
-                if quality == "studio":
+                if quality in {"high", "studio"} and gpu_pref:
                     # XTTS обычно уже даёт mono/24k. Пропускаем лишний ffmpeg per-segment,
-                    # чтобы не тратить CPU и ускорить pipeline.
+                    # чтобы не тратить CPU и ускорить pipeline в GPU-режиме.
                     fixed_wav = wav_path
                 else:
                     fixed_wav = tts_dir / f"seg_{i:04d}_fixed.wav"
@@ -559,22 +887,52 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                         )
                         fixed_wav = timefit_wav
 
-                # Финальная подрезка/добивка тишиной до целевого окна.
-                align_wav = tts_dir / f"seg_{i:04d}_align.wav"
-                _safe_run(
-                    [
-                        "ffmpeg",
-                        "-y",
-                        "-i",
-                        str(fixed_wav),
-                        "-af",
-                        "apad",
-                        "-t",
-                        f"{target_ms/1000.0:.3f}",
-                        str(align_wav),
-                    ]
-                )
-                fixed_wav = align_wav
+                # Никогда не режем реплику жёстко по окну — иначе «съедаются» окончания слов.
+                # Если короткая, добиваем тишиной до target_ms; если длинная — оставляем как есть.
+                post_ms = _probe_audio_duration_ms(fixed_wav)
+                if post_ms < target_ms:
+                    align_wav = tts_dir / f"seg_{i:04d}_align.wav"
+                    _safe_run(
+                        [
+                            "ffmpeg",
+                            "-y",
+                            "-i",
+                            str(fixed_wav),
+                            "-af",
+                            "apad",
+                            "-t",
+                            f"{target_ms/1000.0:.3f}",
+                            str(align_wav),
+                        ]
+                    )
+                    fixed_wav = align_wav
+
+                # Native RVC post-convert по params.json и назначению спикера.
+                if model_meta is not None:
+                    model_pth = model_meta.slot_dir / str(model_meta.model_file)
+                    index_file_name = str(model_meta.index_file or "").strip()
+                    model_index = model_meta.slot_dir / index_file_name if index_file_name else None
+                    rvc_wav = tts_dir / f"seg_{i:04d}_rvc.wav"
+                    try:
+                        self._run_native_rvc_convert(
+                            runtime_python=rvc_runtime_py,
+                            input_wav=fixed_wav,
+                            output_wav=rvc_wav,
+                            model_path=model_pth,
+                            index_path=model_index,
+                            f0_up_key=model_tune,
+                            index_rate=float(getattr(model_meta, "default_index_ratio", 0.0) or 0.0),
+                            protect=float(getattr(model_meta, "default_protect", 0.5) or 0.5),
+                            filter_radius=int(getattr(cfg, "rvc_filter_radius", 3) or 3),
+                            device=("cuda" if gpu_pref else "cpu"),
+                        )
+                        fixed_wav = rvc_wav
+                    except Exception as e:
+                        if voice_provider == "rvc":
+                            raise RuntimeError(
+                                f"Native RVC convert failed for slot={slot} seg={i}: {e}"
+                            )
+                        logger.warning("Native RVC skipped for slot=%s seg=%s: %s", slot, i, e)
 
                 if not qa_enabled:
                     break
@@ -620,7 +978,26 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                 if progress_cb:
                     progress_cb(int(i * 100 / total), f"Local TTS {i}/{total} ({quality})")
 
-        total_duration_sec = max((s.end_ms for s in segments), default=1000) / 1000.0
+        wav_durations_ms: List[int] = [max(1, _probe_audio_duration_ms(w)) for w in wav_segments]
+
+        # Перестановка стартов под реальную длительность синтезированных кусков,
+        # чтобы не было наложений/обрубания окончаний при миксе.
+        adjusted_starts: List[int] = []
+        if allow_overlap_cfg:
+            adjusted_starts = [max(0, int(seg.start_ms)) for seg in segments]
+        else:
+            min_gap_ms = 55
+            prev_end = 0
+            for seg, dur_ms in zip(segments, wav_durations_ms):
+                start_ms = max(int(seg.start_ms), prev_end)
+                adjusted_starts.append(start_ms)
+                prev_end = start_ms + int(dur_ms) + min_gap_ms
+
+        total_duration_sec = max(
+            [
+                (st + dur) for st, dur in zip(adjusted_starts, wav_durations_ms)
+            ] + [max((s.end_ms for s in segments), default=1000)]
+        ) / 1000.0
         silence = work_dir / "silence.wav"
         _safe_run(
             [
@@ -640,10 +1017,6 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         cmd = ["ffmpeg", "-y", "-i", str(silence)]
         for p in wav_segments:
             cmd += ["-i", str(p)]
-
-        # Для точного совпадения с артикуляцией/сценой используем исходные тайминги начала.
-        # Реплики уже заранее time-fit под свою длительность, поэтому сильный сдвиг больше не нужен.
-        adjusted_starts: List[int] = [max(0, int(seg.start_ms)) for seg in segments]
 
         filters = []
         for i, start_ms in enumerate(adjusted_starts, start=1):
@@ -1026,7 +1399,7 @@ class VideoTranslationProcessor:
 
     def _select_provider(self, task: VideoTranslateTask) -> BaseVoiceCloneProvider:
         provider = (task.video_translate_config.voice_clone_provider or "auto").strip().lower()
-        if provider in {"auto", "xtts", "openvoice", "fish_speech"}:
+        if provider in {"auto", "xtts", "openvoice", "fish_speech", "rvc"}:
             endpoint = (task.video_translate_config.local_tts_endpoint or "").strip()
             ok = VideoTranslateServiceManager.instance().ensure_local_tts(endpoint)
             if not ok:
@@ -1052,15 +1425,39 @@ class VideoTranslationProcessor:
         """
         cfg = task.video_translate_config
         if not bool(getattr(cfg, "enable_source_separation", True)):
-            return source_audio, source_audio
+            return _finalize_selected_stems(work_dir, source_audio, source_audio)
 
-        vocals, no_vocals = _try_demucs_split(source_audio, work_dir)
-        if vocals is not None and no_vocals is not None:
-            return vocals, no_vocals
-        if vocals is not None:
-            return vocals, source_audio
-        if no_vocals is not None:
-            return source_audio, no_vocals
+        mode = str(getattr(cfg, "source_separation_mode", "demucs_plus_uvr") or "demucs_plus_uvr").strip().lower()
+        if mode == "auto":
+            mode = "demucs_plus_uvr"
+
+        demucs_vocals: Optional[Path] = None
+        demucs_bg: Optional[Path] = None
+        uvr_vocals: Optional[Path] = None
+        uvr_bg: Optional[Path] = None
+
+        if mode in {"demucs", "demucs_plus_uvr"}:
+            demucs_vocals, demucs_bg = _try_demucs_split(source_audio, work_dir)
+        if mode in {"uvr_mdx_kim", "demucs_plus_uvr"}:
+            uvr_vocals, uvr_bg = _try_uvr_mdx_kim_split(source_audio, work_dir, cfg)
+
+        if mode == "demucs":
+            speech = demucs_vocals or source_audio
+            bg = demucs_bg or source_audio
+            return _finalize_selected_stems(work_dir, speech, bg)
+
+        if mode == "uvr_mdx_kim":
+            speech = uvr_vocals or source_audio
+            bg = uvr_bg or source_audio
+            return _finalize_selected_stems(work_dir, speech, bg)
+
+        # demucs_plus_uvr: комбинируем сильные стороны обоих подходов.
+        speech = uvr_vocals or demucs_vocals or source_audio
+        # Для удаления оригинального голоса в финальном миксе лучше сначала брать UVR background
+        # (обычно чище по вокалу), а затем demucs fallback.
+        bg = uvr_bg or demucs_bg or source_audio
+        if speech.exists() and bg.exists() and (speech != source_audio or bg != source_audio):
+            return _finalize_selected_stems(work_dir, speech, bg)
 
         # Fallback: ослабление центрального канала (где часто находится голос).
         pseudo_bg = work_dir / "bg_pseudo_no_vocals.wav"
@@ -1072,32 +1469,59 @@ class VideoTranslationProcessor:
                     "-i",
                     str(source_audio),
                     "-af",
-                    "stereotools=mlev=-0.9,highpass=f=120,lowpass=f=9000,volume=0.78",
+                    "highpass=f=120,lowpass=f=9000,volume=0.78",
                     str(pseudo_bg),
                 ]
             )
             if pseudo_bg.exists() and pseudo_bg.stat().st_size > 0:
-                return source_audio, pseudo_bg
+                return _finalize_selected_stems(work_dir, source_audio, pseudo_bg)
         except Exception as e:
             logger.warning("Pseudo source-separation fallback failed: %s", e)
 
-        return source_audio, source_audio
+        return _finalize_selected_stems(work_dir, source_audio, source_audio)
 
     def _mux_video(self, task: VideoTranslateTask, background_audio: Path, dubbed_audio: Path, output_path: str):
         keep_bg = bool(getattr(task.video_translate_config, "keep_background_music", True))
         bg_ducking = bool(getattr(task.video_translate_config, "enable_background_ducking", True))
+        src_sep_on = bool(getattr(task.video_translate_config, "enable_source_separation", True))
+        aggressive_vocal_suppress = bool(
+            getattr(task.video_translate_config, "aggressive_vocal_suppression", False)
+        )
         if keep_bg:
+            # Агрессивнее чистим фон от остаточного вокала (особенно если stem неидеален).
+            if aggressive_vocal_suppress:
+                bg_cleanup = (
+                    "highpass=f=120,lowpass=f=7000,"
+                    "equalizer=f=280:t=q:w=1.1:g=-6,"
+                    "equalizer=f=1800:t=q:w=1.0:g=-4,"
+                    "acompressor=threshold=-30dB:ratio=2.4:attack=8:release=180"
+                )
+                # В этом режиме сохраняем громкость окружения, а не «топим» весь фон.
+                bg_volume = "1.0"
+                no_duck_weights = "1.0 1.55"
+                duck_weights = "0.95 1.6"
+                sidechain = "threshold=0.020:ratio=8:attack=10:release=260"
+            else:
+                bg_cleanup = (
+                    "highpass=f=90,lowpass=f=8200,"
+                    "acompressor=threshold=-26dB:ratio=1.8:attack=10:release=160"
+                ) if src_sep_on else "highpass=f=70,lowpass=f=9000"
+                bg_volume = "0.88"
+                no_duck_weights = "0.65 1.9"
+                duck_weights = "0.72 1.95"
+                sidechain = "threshold=0.012:ratio=16:attack=6:release=340"
+            effective_ducking = (bg_ducking and not aggressive_vocal_suppress)
             filter_chain = (
-                "[1:a]loudnorm=I=-23:TP=-2:LRA=12,volume=0.95[bg];"
+                f"[1:a]{bg_cleanup},loudnorm=I=-26:TP=-2:LRA=10,volume={bg_volume}[bg];"
                 "[2:a]loudnorm=I=-16:TP=-1.5:LRA=11[dub];"
             )
-            if bg_ducking:
+            if effective_ducking:
                 filter_chain += (
-                    "[bg][dub]sidechaincompress=threshold=0.03:ratio=8:attack=18:release=280[bgduck];"
-                    "[bgduck][dub]amix=inputs=2:weights='1.0 1.6':normalize=0,alimiter=limit=0.98[mix]"
+                    f"[bg][dub]sidechaincompress={sidechain}[bgduck];"
+                    f"[bgduck][dub]amix=inputs=2:weights='{duck_weights}':normalize=0,alimiter=limit=0.98[mix]"
                 )
             else:
-                filter_chain += "[bg][dub]amix=inputs=2:weights='0.95 1.55':normalize=0[mix]"
+                filter_chain += f"[bg][dub]amix=inputs=2:weights='{no_duck_weights}':normalize=0[mix]"
 
             cmd = [
                 "ffmpeg",
@@ -1127,9 +1551,9 @@ class VideoTranslationProcessor:
                 # Некоторые сборки ffmpeg не содержат sidechaincompress или лимитер.
                 logger.warning("Advanced bg/dub mix failed, fallback to simple amix: %s", e)
                 fallback_chain = (
-                    "[1:a]loudnorm=I=-23:TP=-2:LRA=12,volume=0.95[bg];"
+                    f"[1:a]{bg_cleanup},loudnorm=I=-26:TP=-2:LRA=10,volume={bg_volume}[bg];"
                     "[2:a]loudnorm=I=-16:TP=-1.5:LRA=11[dub];"
-                    "[bg][dub]amix=inputs=2:weights='0.95 1.55':normalize=0[mix]"
+                    f"[bg][dub]amix=inputs=2:weights='{no_duck_weights}':normalize=0[mix]"
                 )
                 _safe_run(
                     [

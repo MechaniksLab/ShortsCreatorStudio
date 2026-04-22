@@ -771,11 +771,12 @@ class VideoTranslateConfig:
     enable_diarization: bool = True
     expected_speaker_count: int = 0
     enable_source_separation: bool = True
+    source_separation_mode: str = "demucs_plus_uvr"  # auto|demucs|uvr_mdx_kim|demucs_plus_uvr
     keep_background_music: bool = True
     enable_lipsync: bool = False
 
     # Клонирование/синтез
-    voice_clone_provider: str = "auto"  # auto|xtts|openvoice|fish_speech|elevenlabs|azure|cartesia
+    voice_clone_provider: str = "auto"  # auto|xtts|rvc|openvoice|fish_speech|elevenlabs|azure|cartesia
     voice_clone_quality: str = "high"  # fast|balanced|high|studio
     voice_reference_mode: str = "auto"  # auto|manual
     manual_voice_map_json: str = ""
@@ -790,6 +791,16 @@ class VideoTranslateConfig:
     xtts_model_path: str = ""
     openvoice_model_path: str = ""
     fish_speech_model_path: str = ""
+    rvc_runtime_python: str = ""
+    rvc_model_dir: str = ""
+    rvc_default_model: str = ""
+    rvc_auto_male_models: str = ""
+    rvc_auto_female_models: str = ""
+    rvc_index_rate: float = 0.75
+    rvc_protect: float = 0.33
+    rvc_filter_radius: int = 3
+    rvc_male_f0_up_key: int = 0
+    rvc_female_f0_up_key: int = 0
     local_tts_endpoint: str = "http://127.0.0.1:8020"
     autonomous_mode: bool = True
     auto_download_models: bool = True
@@ -806,6 +817,13 @@ class VideoTranslateConfig:
     segment_min_mean_db: float = -43.0
     segment_max_peak_db: float = -0.2
     enable_background_ducking: bool = True
+    aggressive_vocal_suppression: bool = False
+    reference_enhancement_enabled: bool = True
+    reference_min_mean_db: float = -48.0
+    reference_target_total_sec: float = 18.0
+    uvr_model_dir: str = ""
+    uvr_inst_hq3_model_name: str = "UVR-MDX-NET-Inst_HQ_3.onnx"
+    uvr_kim_vocal_model_name: str = "Kim_Vocal_2.onnx"
     manual_translation_json: str = ""
 
 

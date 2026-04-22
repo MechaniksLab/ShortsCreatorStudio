@@ -13,7 +13,11 @@ from __future__ import annotations
 import argparse
 import os
 import subprocess
+import sys
 from pathlib import Path
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
 
 
 CORE_PACKAGES = [
@@ -25,17 +29,31 @@ CORE_PACKAGES = [
     "tokenizers==0.22.1",
 ]
 
+ONNXRUNTIME_CANDIDATES = [
+    # На разных зеркалах/архитектурах конкретный pin может отсутствовать.
+    "onnxruntime==1.22.1",
+    "onnxruntime==1.21.1",
+    "onnxruntime",
+]
+
+RVC_NATIVE_PACKAGES = [
+    # Нативный RVC-конвертер (без MMVC-сервера)
+    "rvc-python",
+]
+
 STUDIO_ADDON_PACKAGES = [
     # Улучшение профиля «студийного» дубляжа и QA-аудио
     "pyloudnorm==0.1.1",
     "noisereduce==3.0.3",
     "pedalboard==0.9.19",
+    "audio-separator==0.30.1",
 ]
 
 STUDIO_ADDON_MODULES = [
     "pyloudnorm",
     "noisereduce",
     "pedalboard",
+    "audio_separator",
 ]
 
 # Эти пакеты часто конфликтуют/требуют сборку на Windows (Python headers/VS Build Tools).
@@ -64,17 +82,38 @@ def try_run(cmd: list[str]) -> bool:
     return p.returncode == 0
 
 
-def install_packages_best_effort(runtime_python: str, packages: list[str], group_name: str) -> tuple[list[str], list[str]]:
+def install_packages_best_effort(
+    runtime_python: str,
+    packages: list[str],
+    group_name: str,
+    env: dict[str, str] | None = None,
+) -> tuple[list[str], list[str]]:
     ok: list[str] = []
     failed: list[str] = []
     for pkg in packages:
         cmd = [runtime_python, "-m", "pip", "install", "--upgrade", pkg]
-        if try_run(cmd):
+        print("[TRY]", " ".join(cmd))
+        merged = os.environ.copy()
+        if env:
+            merged.update(env)
+        p = subprocess.run(cmd, env=merged)
+        if p.returncode == 0:
             ok.append(pkg)
         else:
             failed.append(pkg)
             print(f"[WARN] {group_name}: failed to install {pkg}")
     return ok, failed
+
+
+def install_onnxruntime_with_fallback(runtime_python: str) -> str:
+    last_err = ""
+    for pkg in ONNXRUNTIME_CANDIDATES:
+        cmd = [runtime_python, "-m", "pip", "install", "--upgrade", pkg]
+        if try_run(cmd):
+            print(f"[OK] onnxruntime selected: {pkg}")
+            return pkg
+        last_err = pkg
+    raise RuntimeError(f"Failed to install onnxruntime (last attempt: {last_err})")
 
 
 def run_with_env(cmd: list[str], env: dict[str, str] | None = None) -> None:
@@ -83,6 +122,14 @@ def run_with_env(cmd: list[str], env: dict[str, str] | None = None) -> None:
     if env:
         merged.update(env)
     subprocess.run(cmd, check=True, env=merged)
+
+
+def maybe_download_uvr_models(runtime_python: str) -> None:
+    downloader = SCRIPT_DIR / "download_uvr_models.py"
+    if not downloader.exists():
+        print(f"[WARN] UVR downloader script not found: {downloader}")
+        return
+    run([runtime_python, str(downloader)])
 
 
 def install_torch(runtime_python: str, profile: str) -> None:
@@ -206,6 +253,16 @@ def main() -> int:
         action="store_true",
         help="После experimental-установки вернуть production-версии core-пакетов",
     )
+    parser.add_argument(
+        "--with-uvr-models",
+        action="store_true",
+        help="Скачать UVR/MDX модели (Inst HQ3 + Kim Vocal 2) в AppData/models/uvr",
+    )
+    parser.add_argument(
+        "--with-rvc-native",
+        action="store_true",
+        help="Установить зависимости для native RVC inference (без MMVC)",
+    )
     args = parser.parse_args()
 
     runtime_python = str(Path(args.runtime_python))
@@ -213,24 +270,33 @@ def main() -> int:
         print(f"[ERROR] runtime python not found: {runtime_python}")
         return 2
 
-    run(
-        [
+    if args.upgrade_pip:
+        # Для rvc-python нужен fairseq -> omegaconf==2.0.6.
+        # У pip>=24.1 строгая валидация метаданных, из-за чего эта версия
+        # omegaconf отбрасывается (ResolutionImpossible). Поэтому при включенном
+        # native RVC удерживаем pip на ветке <24.1.
+        pip_spec = "pip<24.1" if args.with_rvc_native else "pip"
+        pip_upgrade_cmd = [
             runtime_python,
             "-m",
             "pip",
             "install",
             "--upgrade",
-            "pip",
+            pip_spec,
             "setuptools<82",
             "wheel",
         ]
-        if args.upgrade_pip
-        else [runtime_python, "-m", "pip", "--version"]
-    )
+        # Сетевые/зеркальные проблемы не должны ломать весь installer.
+        if not try_run(pip_upgrade_cmd):
+            print("[WARN] pip/setuptools/wheel upgrade failed, continue with current versions")
+            run([runtime_python, "-m", "pip", "--version"])
+    else:
+        run([runtime_python, "-m", "pip", "--version"])
 
     install_torch(runtime_python, args.profile)
     if not args.skip_core_packages:
         run([runtime_python, "-m", "pip", "install", "--upgrade", *CORE_PACKAGES])
+        install_onnxruntime_with_fallback(runtime_python)
     else:
         print("[INFO] CORE packages install skipped")
 
@@ -262,9 +328,41 @@ def main() -> int:
         # Неинтерактивное принятие CPML/TOS для XTTS при автоподготовке.
         # Это убирает блокирующий input() в Coqui TTS manager.
         run_with_env(
-            [runtime_python, "scripts\\download_xtts_model.py"],
+            [runtime_python, str(SCRIPT_DIR / "download_xtts_model.py")],
             env={"COQUI_TOS_AGREED": "1"},
         )
+
+    if args.with_uvr_models:
+        maybe_download_uvr_models(runtime_python)
+
+    rvc_modules_for_smoke: list[str] = []
+    if args.with_rvc_native:
+        if sys.version_info >= (3, 11):
+            print(
+                "[WARN] Python >= 3.11: rvc-python/fairseq в текущем виде нестабильны "
+                "(ломают импорт и тянут конфликтные версии). Пропускаем rvc-native в этом runtime."
+            )
+            failed_groups["rvc-native"] = ["unsupported-python>=3.11"]
+        else:
+            rvc_modules_for_smoke = ["rvc_python", "rvc"]
+            _, failed = install_packages_best_effort(
+                runtime_python,
+                RVC_NATIVE_PACKAGES,
+                group_name="rvc-native",
+                # fairseq из rvc-python на Windows часто пытается собирать C/C++
+                # расширения (libbleu) и падает на portable runtime без Python.h.
+                # READTHEDOCS=1 отключает сборку extensions в setup.py fairseq.
+                env={"READTHEDOCS": "1"},
+            )
+            if failed:
+                failed_groups["rvc-native"] = failed
+
+            # Важно: rvc-python может понижать numpy/scipy/omegaconf и ломать
+            # production-стек XTTS/pyannote/faster-whisper в общем runtime.
+            # Возвращаем рабочие пины сразу после попытки RVC-установки.
+            print("[INFO] Restoring production core package pins after rvc-native step...")
+            run([runtime_python, "-m", "pip", "install", "--upgrade", *CORE_PACKAGES])
+            install_onnxruntime_with_fallback(runtime_python)
 
     # Быстрая проверка импортов
     addon_modules: list[str] = []
@@ -273,7 +371,7 @@ def main() -> int:
     if args.with_experimental_addons and not args.restore_core_after_experimental:
         addon_modules += EXPERIMENTAL_ADDON_MODULES
 
-    addon_modules_expr = repr(addon_modules)
+    addon_modules_expr = repr(addon_modules + rvc_modules_for_smoke)
     smoke_code = (
         "import torch,importlib\n"
         "mods=[]\n"

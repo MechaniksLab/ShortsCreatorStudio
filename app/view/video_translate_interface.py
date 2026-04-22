@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import (
     QApplication,
     QDialog,
@@ -46,6 +47,11 @@ from app.core.bk_asr.transcribe import transcribe
 from app.core.utils.video_utils import video2audio
 from app.core.video_translate.bootstrap import VideoTranslateBootstrap
 from app.core.video_translate.processor import VideoTranslationProcessor
+from app.core.video_translate.rvc_model_registry import (
+    default_rvc_model_root,
+    save_rvc_model_params,
+    scan_rvc_models,
+)
 from app.thread.video_translate_thread import VideoTranslateThread
 from app.common.config import cfg
 from app.config import PROJECT_ROOT
@@ -114,8 +120,14 @@ class VideoTranslateInterface(QWidget):
         self.preview_thread: _PreviewTranslationThread | None = None
         self.diag_thread: _DiagnosticsThread | None = None
         self.manual_translation_json_path: str = ""
+        self._rvc_models = []
+        self._refresh_rvc_models()
         self._build_ui()
         self._connect_signals()
+
+    def _refresh_rvc_models(self):
+        root = Path(str(getattr(cfg, "video_translate_rvc_model_dir", None).value or "").strip()) if str(getattr(cfg, "video_translate_rvc_model_dir", None).value or "").strip() else default_rvc_model_root()
+        self._rvc_models = scan_rvc_models(root)
 
     def _build_ui(self):
         self.main_layout = QVBoxLayout(self)
@@ -135,6 +147,10 @@ class VideoTranslateInterface(QWidget):
         choose_video_action = Action(FIF.FOLDER_ADD, "Выбрать видео", triggered=self.choose_video_file)
         self.command_bar.addAction(open_folder_action)
         self.command_bar.addAction(choose_video_action)
+        manage_rvc_action = Action(FIF.SETTING, "Менеджер RVC моделей", triggered=self.open_rvc_model_manager)
+        self.command_bar.addAction(manage_rvc_action)
+        speaker_map_action = Action(FIF.PEOPLE, "Голоса спикеров", triggered=self.open_speaker_voice_map_dialog)
+        self.command_bar.addAction(speaker_map_action)
         check_translate_action = Action(FIF.DICTIONARY, "Проверить перевод", triggered=self.preview_translation)
         self.command_bar.addAction(check_translate_action)
         open_translate_action = Action(FIF.DOCUMENT, "Открыть перевод (srt)", triggered=self.open_translation_file)
@@ -174,10 +190,16 @@ class VideoTranslateInterface(QWidget):
         settings_grid = QVBoxLayout()
         settings_grid.setSpacing(8)
 
+        # Единая ширина label/combo, чтобы второй столбец не "плавал".
+        form_label_w = 220
+        form_field_min_w = 210
+
         row1 = QHBoxLayout()
         row1.setSpacing(10)
         self.device_label = BodyLabel("Устройство", self)
+        self.device_label.setMinimumWidth(form_label_w)
         self.device_combo = ComboBox(self)
+        self.device_combo.setMinimumWidth(form_field_min_w)
         self.device_combo.addItems(["GPU (CUDA)", "CPU"])
         current_dev = str(cfg.faster_whisper_device.value or "cuda").strip().lower()
         self.device_combo.setCurrentIndex(0 if current_dev == "cuda" else 1)
@@ -185,7 +207,9 @@ class VideoTranslateInterface(QWidget):
         row1.addWidget(self.device_combo, 1)
 
         self.quality_label = BodyLabel("Режим озвучки", self)
+        self.quality_label.setMinimumWidth(form_label_w)
         self.quality_combo = ComboBox(self)
+        self.quality_combo.setMinimumWidth(form_field_min_w)
         self.quality_combo.addItems(["Быстрый", "Сбалансированный", "Качество", "Студийный"])
         quality_to_idx = {"fast": 0, "balanced": 1, "high": 2, "studio": 3}
         current_quality = str(cfg.video_translate_voice_quality.value or "balanced").strip().lower()
@@ -197,7 +221,9 @@ class VideoTranslateInterface(QWidget):
         row2 = QHBoxLayout()
         row2.setSpacing(10)
         self.overlap_label = BodyLabel("Разрешить overlap реплик", self)
+        self.overlap_label.setMinimumWidth(form_label_w)
         self.overlap_combo = ComboBox(self)
+        self.overlap_combo.setMinimumWidth(form_field_min_w)
         self.overlap_combo.addItems(["Да", "Нет"])
         self.overlap_combo.setCurrentIndex(
             0 if bool(getattr(cfg.video_translate_allow_speaker_overlap, "value", True)) else 1
@@ -206,7 +232,9 @@ class VideoTranslateInterface(QWidget):
         row2.addWidget(self.overlap_combo, 1)
 
         self.mix_label = BodyLabel("Overlap-aware микс по спикерам", self)
+        self.mix_label.setMinimumWidth(form_label_w)
         self.mix_combo = ComboBox(self)
+        self.mix_combo.setMinimumWidth(form_field_min_w)
         self.mix_combo.addItems(["Да", "Нет"])
         self.mix_combo.setCurrentIndex(
             0 if bool(getattr(cfg.video_translate_overlap_aware_mix, "value", True)) else 1
@@ -218,7 +246,9 @@ class VideoTranslateInterface(QWidget):
         row3 = QHBoxLayout()
         row3.setSpacing(10)
         self.qa_label = BodyLabel("QA проверка TTS-сегментов", self)
+        self.qa_label.setMinimumWidth(form_label_w)
         self.qa_combo = ComboBox(self)
+        self.qa_combo.setMinimumWidth(form_field_min_w)
         self.qa_combo.addItems(["Да", "Нет"])
         self.qa_combo.setCurrentIndex(
             0 if bool(getattr(cfg.video_translate_segment_qa_enabled, "value", True)) else 1
@@ -227,7 +257,9 @@ class VideoTranslateInterface(QWidget):
         row3.addWidget(self.qa_combo, 1)
 
         self.qa_retry_label = BodyLabel("Повторы QA", self)
+        self.qa_retry_label.setMinimumWidth(form_label_w)
         self.qa_retry_combo = ComboBox(self)
+        self.qa_retry_combo.setMinimumWidth(form_field_min_w)
         self.qa_retry_combo.addItems([str(i) for i in range(0, 5)])
         cur_qa_retry = int(getattr(cfg.video_translate_segment_qa_retry_count, "value", 1) or 1)
         self.qa_retry_combo.setCurrentText(str(max(0, min(4, cur_qa_retry))))
@@ -238,7 +270,9 @@ class VideoTranslateInterface(QWidget):
         row4 = QHBoxLayout()
         row4.setSpacing(10)
         self.duck_label = BodyLabel("Ducking фона под речь", self)
+        self.duck_label.setMinimumWidth(form_label_w)
         self.duck_combo = ComboBox(self)
+        self.duck_combo.setMinimumWidth(form_field_min_w)
         self.duck_combo.addItems(["Да", "Нет"])
         self.duck_combo.setCurrentIndex(
             0 if bool(getattr(cfg.video_translate_enable_background_ducking, "value", True)) else 1
@@ -247,22 +281,56 @@ class VideoTranslateInterface(QWidget):
         row4.addWidget(self.duck_combo, 1)
 
         self.provider_label = BodyLabel("Клонирование голоса", self)
+        self.provider_label.setMinimumWidth(form_label_w)
         self.provider_combo = ComboBox(self)
+        self.provider_combo.setMinimumWidth(form_field_min_w)
         self.provider_combo.addItems([
             "auto (рекомендуется)",
             "xtts (локально)",
+            "rvc (локально, через модели)",
         ])
         current_provider = str(cfg.video_translate_voice_provider.value or "auto").strip().lower()
-        provider_to_idx = {"auto": 0, "xtts": 1}
+        provider_to_idx = {"auto": 0, "xtts": 1, "rvc": 2}
         self.provider_combo.setCurrentIndex(provider_to_idx.get(current_provider, 0))
         row4.addWidget(self.provider_label)
         row4.addWidget(self.provider_combo, 1)
         settings_grid.addLayout(row4)
 
+        row4b = QHBoxLayout()
+        row4b.setSpacing(10)
+        self.sep_label = BodyLabel("Разделение источника", self)
+        self.sep_label.setMinimumWidth(form_label_w)
+        self.sep_combo = ComboBox(self)
+        self.sep_combo.setMinimumWidth(form_field_min_w)
+        self.sep_combo.addItems([
+            "Demucs + UVR (рекомендуется)",
+            "Demucs",
+            "UVR MDX/Kim",
+            "Auto",
+        ])
+        sep_mode = str(getattr(cfg.video_translate_source_separation_mode, "value", "demucs_plus_uvr") or "demucs_plus_uvr").strip().lower()
+        sep_to_idx = {"demucs_plus_uvr": 0, "demucs": 1, "uvr_mdx_kim": 2, "auto": 3}
+        self.sep_combo.setCurrentIndex(sep_to_idx.get(sep_mode, 0))
+        row4b.addWidget(self.sep_label)
+        row4b.addWidget(self.sep_combo, 1)
+        self.vocal_kill_label = BodyLabel("Агрессивно убрать оригинальный голос", self)
+        self.vocal_kill_label.setMinimumWidth(form_label_w)
+        self.vocal_kill_combo = ComboBox(self)
+        self.vocal_kill_combo.setMinimumWidth(form_field_min_w)
+        self.vocal_kill_combo.addItems(["Да", "Нет"])
+        self.vocal_kill_combo.setCurrentIndex(
+            0 if bool(getattr(cfg.video_translate_aggressive_vocal_suppression, "value", False)) else 1
+        )
+        row4b.addWidget(self.vocal_kill_label)
+        row4b.addWidget(self.vocal_kill_combo, 1)
+        settings_grid.addLayout(row4b)
+
         row5 = QHBoxLayout()
         row5.setSpacing(10)
         self.target_lang_label = BodyLabel("Язык перевода", self)
+        self.target_lang_label.setMinimumWidth(form_label_w)
         self.target_lang_combo = ComboBox(self)
+        self.target_lang_combo.setMinimumWidth(form_field_min_w)
         self._target_lang_options = list(cfg.video_translate_target_language.validator.options)
         for opt in self._target_lang_options:
             self.target_lang_combo.addItem(language_value_to_ru(opt.value))
@@ -275,7 +343,9 @@ class VideoTranslateInterface(QWidget):
         row5.addWidget(self.target_lang_combo, 1)
 
         self.source_lang_label = BodyLabel("Исходный язык", self)
+        self.source_lang_label.setMinimumWidth(form_label_w)
         self.source_lang_combo = ComboBox(self)
+        self.source_lang_combo.setMinimumWidth(form_field_min_w)
         self._source_lang_options = list(cfg.video_translate_source_language.validator.options)
         for opt in self._source_lang_options:
             self.source_lang_combo.addItem(language_value_to_ru(opt.value))
@@ -288,7 +358,9 @@ class VideoTranslateInterface(QWidget):
         row5.addWidget(self.source_lang_combo, 1)
 
         self.translator_label = BodyLabel("Сервис перевода", self)
+        self.translator_label.setMinimumWidth(form_label_w)
         self.translator_combo = ComboBox(self)
+        self.translator_combo.setMinimumWidth(form_field_min_w)
         self._translator_options = list(cfg.translator_service.validator.options)
         for opt in self._translator_options:
             self.translator_combo.addItem(translator_service_to_ru(opt.value))
@@ -305,7 +377,9 @@ class VideoTranslateInterface(QWidget):
         row6.addWidget(self.translator_combo, 1)
 
         self.workers_label = BodyLabel("Параллельных TTS задач", self)
+        self.workers_label.setMinimumWidth(form_label_w)
         self.workers_combo = ComboBox(self)
+        self.workers_combo.setMinimumWidth(form_field_min_w)
         self.workers_combo.addItems([str(i) for i in range(1, 9)])
         current_workers = int(getattr(cfg.video_translate_tts_parallel_workers, "value", 3) or 3)
         current_workers = max(1, min(8, current_workers))
@@ -318,7 +392,9 @@ class VideoTranslateInterface(QWidget):
         row7 = QHBoxLayout()
         row7.setSpacing(10)
         self.cache_label = BodyLabel("Кэшировать перевод", self)
+        self.cache_label.setMinimumWidth(form_label_w)
         self.cache_combo = ComboBox(self)
+        self.cache_combo.setMinimumWidth(form_field_min_w)
         self.cache_combo.addItems(["Да", "Нет"])
         use_cache = bool(getattr(cfg.video_translate_use_translation_cache, "value", True))
         self.cache_combo.setCurrentIndex(0 if use_cache else 1)
@@ -326,7 +402,9 @@ class VideoTranslateInterface(QWidget):
         row7.addWidget(self.cache_combo, 1)
 
         self.asr_cache_label = BodyLabel("Кэшировать распознавание (ASR)", self)
+        self.asr_cache_label.setMinimumWidth(form_label_w)
         self.asr_cache_combo = ComboBox(self)
+        self.asr_cache_combo.setMinimumWidth(form_field_min_w)
         self.asr_cache_combo.addItems(["Да", "Нет"])
         use_asr_cache = bool(getattr(cfg.video_translate_use_asr_cache, "value", True))
         self.asr_cache_combo.setCurrentIndex(0 if use_asr_cache else 1)
@@ -371,11 +449,13 @@ class VideoTranslateInterface(QWidget):
         self.target_lang_combo.currentIndexChanged.connect(self._on_target_language_changed)
         self.translator_combo.currentIndexChanged.connect(self._on_translator_changed)
         self.provider_combo.currentIndexChanged.connect(self._on_provider_changed)
+        self.sep_combo.currentIndexChanged.connect(self._on_separation_mode_changed)
         self.overlap_combo.currentIndexChanged.connect(self._on_overlap_changed)
         self.mix_combo.currentIndexChanged.connect(self._on_overlap_mix_changed)
         self.qa_combo.currentIndexChanged.connect(self._on_qa_changed)
         self.qa_retry_combo.currentIndexChanged.connect(self._on_qa_retry_changed)
         self.duck_combo.currentIndexChanged.connect(self._on_ducking_changed)
+        self.vocal_kill_combo.currentIndexChanged.connect(self._on_aggressive_vocal_suppression_changed)
         self.diag_button.clicked.connect(self.run_gpu_diagnostics)
 
     def run_gpu_diagnostics(self):
@@ -453,8 +533,17 @@ class VideoTranslateInterface(QWidget):
             cfg.set(cfg.translator_service, self._translator_options[idx])
 
     def _on_provider_changed(self):
-        provider = {0: "auto", 1: "xtts"}.get(self.provider_combo.currentIndex(), "auto")
+        provider = {0: "auto", 1: "xtts", 2: "rvc"}.get(self.provider_combo.currentIndex(), "auto")
         cfg.set(cfg.video_translate_voice_provider, provider)
+
+    def _on_separation_mode_changed(self):
+        mode = {
+            0: "demucs_plus_uvr",
+            1: "demucs",
+            2: "uvr_mdx_kim",
+            3: "auto",
+        }.get(self.sep_combo.currentIndex(), "demucs_plus_uvr")
+        cfg.set(cfg.video_translate_source_separation_mode, mode)
 
     def _on_overlap_changed(self):
         cfg.set(cfg.video_translate_allow_speaker_overlap, self.overlap_combo.currentIndex() == 0)
@@ -475,28 +564,264 @@ class VideoTranslateInterface(QWidget):
     def _on_ducking_changed(self):
         cfg.set(cfg.video_translate_enable_background_ducking, self.duck_combo.currentIndex() == 0)
 
+    def _on_aggressive_vocal_suppression_changed(self):
+        cfg.set(
+            cfg.video_translate_aggressive_vocal_suppression,
+            self.vocal_kill_combo.currentIndex() == 0,
+        )
+
+    def _model_display_items(self):
+        self._refresh_rvc_models()
+        items = []
+        for m in self._rvc_models:
+            label = f"{m.slot}: {m.name}"
+            items.append((label, m))
+        return items
+
+    def open_rvc_model_manager(self):
+        items = self._model_display_items()
+        if not items:
+            InfoBar.warning(
+                "RVC модели не найдены",
+                f"Проверьте папку: {default_rvc_model_root()}",
+                duration=3500,
+                parent=self,
+            )
+            return
+
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Менеджер RVC моделей (params.json)")
+        dlg.resize(980, 620)
+        lay = QVBoxLayout(dlg)
+
+        table = QTableWidget(len(items), 10, dlg)
+        table.setHorizontalHeaderLabels([
+            "Slot",
+            "Name",
+            "Model",
+            "Index",
+            "Preview",
+            "Icon",
+            "Tune",
+            "IndexRatio",
+            "Protect",
+            "Params",
+        ])
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
+        table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(5, QHeaderView.Stretch)
+        table.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(7, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(8, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(9, QHeaderView.Stretch)
+
+        for i, (_, m) in enumerate(items):
+            table.setItem(i, 0, QTableWidgetItem(str(m.slot)))
+            table.setItem(i, 1, QTableWidgetItem(str(m.name)))
+            table.setItem(i, 2, QTableWidgetItem(str(m.model_file)))
+            table.setItem(i, 3, QTableWidgetItem(str(m.index_file or "")))
+            preview_item = QTableWidgetItem()
+            icon_path_text = str(m.icon_path or "")
+            if icon_path_text and Path(icon_path_text).exists():
+                pix = QPixmap(icon_path_text)
+                if not pix.isNull():
+                    preview_item.setIcon(QIcon(pix.scaled(56, 56, Qt.KeepAspectRatio, Qt.SmoothTransformation)))
+            table.setItem(i, 4, preview_item)
+            table.setItem(i, 5, QTableWidgetItem(icon_path_text))
+            table.setItem(i, 6, QTableWidgetItem(str(m.default_tune)))
+            table.setItem(i, 7, QTableWidgetItem(f"{m.default_index_ratio:.3f}"))
+            table.setItem(i, 8, QTableWidgetItem(f"{m.default_protect:.3f}"))
+            table.setItem(i, 9, QTableWidgetItem(str(m.params_path)))
+            # read-only columns
+            for col in (0, 2, 3, 4, 5, 9):
+                item = table.item(i, col)
+                if item:
+                    item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+            table.setRowHeight(i, 64)
+
+        lay.addWidget(table)
+        btn_row = QHBoxLayout()
+        save_btn = PrimaryPushButton("Сохранить в params.json", dlg)
+        close_btn = PushButton("Закрыть", dlg)
+        btn_row.addWidget(save_btn)
+        btn_row.addWidget(close_btn)
+        btn_row.addStretch(1)
+        lay.addLayout(btn_row)
+
+        def _save_models():
+            ok_count = 0
+            for i, (_, m) in enumerate(items):
+                try:
+                    name = str(table.item(i, 1).text() if table.item(i, 1) else m.name).strip() or m.name
+                    tune = int(float(table.item(i, 6).text() if table.item(i, 6) else m.default_tune))
+                    idx_ratio = float(table.item(i, 7).text() if table.item(i, 7) else m.default_index_ratio)
+                    protect = float(table.item(i, 8).text() if table.item(i, 8) else m.default_protect)
+                    save_rvc_model_params(
+                        m,
+                        name=name,
+                        default_tune=tune,
+                        default_index_ratio=max(0.0, min(1.0, idx_ratio)),
+                        default_protect=max(0.0, min(0.5, protect)),
+                    )
+                    ok_count += 1
+                except Exception:
+                    continue
+            self._refresh_rvc_models()
+            InfoBar.success(
+                "RVC модели обновлены",
+                f"Сохранено params.json: {ok_count}",
+                duration=3000,
+                parent=self,
+            )
+
+        save_btn.clicked.connect(_save_models)
+        close_btn.clicked.connect(dlg.reject)
+        dlg.exec_()
+
+    def open_speaker_voice_map_dialog(self):
+        items = self._model_display_items()
+        if not items:
+            InfoBar.warning(
+                "RVC модели не найдены",
+                f"Проверьте папку: {default_rvc_model_root()}",
+                duration=3500,
+                parent=self,
+            )
+            return
+
+        try:
+            expected = int(getattr(cfg.video_translate_expected_speaker_count, "value", 0) or 0)
+        except Exception:
+            expected = 0
+        speaker_count = max(2, expected if expected > 0 else 2)
+        speaker_count = min(12, speaker_count)
+
+        # load existing map
+        existing_raw = str(getattr(cfg.video_translate_manual_voice_map_json, "value", "") or "").strip()
+        existing = {}
+        if existing_raw:
+            try:
+                existing = json.loads(existing_raw)
+            except Exception:
+                existing = {}
+
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Голоса спикеров (RVC)")
+        dlg.resize(740, 520)
+        lay = QVBoxLayout(dlg)
+
+        hint = BodyLabel(
+            "Выберите RVC-голос для каждого спикера. Сохраняется в ManualVoiceMapJson.",
+            dlg,
+        )
+        hint.setWordWrap(True)
+        lay.addWidget(hint)
+
+        table = QTableWidget(speaker_count, 3, dlg)
+        table.setHorizontalHeaderLabels(["Спикер", "RVC модель", "Tune (из params)"])
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+
+        combos = []
+        for i in range(speaker_count):
+            spk = f"spk_{i}"
+            table.setItem(i, 0, QTableWidgetItem(spk))
+            table.item(i, 0).setFlags(table.item(i, 0).flags() & ~Qt.ItemIsEditable)
+
+            combo = ComboBox(dlg)
+            combo.addItem("(по умолчанию)")
+            for label, _m in items:
+                combo.addItem(label)
+            saved_slot = str(existing.get(spk, "")).strip()
+            if saved_slot:
+                for idx, (_label, m) in enumerate(items, start=1):
+                    if saved_slot == str(m.slot):
+                        combo.setCurrentIndex(idx)
+                        break
+            table.setCellWidget(i, 1, combo)
+            combos.append(combo)
+
+            tune = "0"
+            if combo.currentIndex() > 0:
+                tune = str(items[combo.currentIndex() - 1][1].default_tune)
+            table.setItem(i, 2, QTableWidgetItem(tune))
+            table.item(i, 2).setFlags(table.item(i, 2).flags() & ~Qt.ItemIsEditable)
+
+            def _bind_update(row=i, c=combo):
+                def _on_changed(_):
+                    t = "0"
+                    if c.currentIndex() > 0:
+                        t = str(items[c.currentIndex() - 1][1].default_tune)
+                    table.setItem(row, 2, QTableWidgetItem(t))
+                    table.item(row, 2).setFlags(table.item(row, 2).flags() & ~Qt.ItemIsEditable)
+
+                return _on_changed
+
+            combo.currentIndexChanged.connect(_bind_update())
+
+        lay.addWidget(table)
+
+        btn_row = QHBoxLayout()
+        save_btn = PrimaryPushButton("Сохранить назначение", dlg)
+        close_btn = PushButton("Закрыть", dlg)
+        btn_row.addWidget(save_btn)
+        btn_row.addWidget(close_btn)
+        btn_row.addStretch(1)
+        lay.addLayout(btn_row)
+
+        def _save_map():
+            out = {}
+            default_slot = ""
+            for i, combo in enumerate(combos):
+                if combo.currentIndex() <= 0:
+                    continue
+                model = items[combo.currentIndex() - 1][1]
+                spk = f"spk_{i}"
+                out[spk] = str(model.slot)
+                if not default_slot:
+                    default_slot = str(model.slot)
+            if default_slot:
+                out["default"] = default_slot
+            cfg.set(cfg.video_translate_manual_voice_map_json, json.dumps(out, ensure_ascii=False))
+            InfoBar.success(
+                "Сохранено",
+                "Назначение голосов спикерам сохранено",
+                duration=2500,
+                parent=self,
+            )
+
+        save_btn.clicked.connect(_save_map)
+        close_btn.clicked.connect(dlg.reject)
+        dlg.exec_()
+
     def _apply_quality_preset(self, quality: str):
         q = (quality or "balanced").strip().lower()
         if q == "fast":
-            overlap, mix, qa, qa_retry, duck = False, False, False, 0, False
+            overlap, mix, qa, qa_retry, duck, vocal_kill = False, False, False, 0, False, False
         elif q == "balanced":
-            overlap, mix, qa, qa_retry, duck = False, True, False, 0, True
+            overlap, mix, qa, qa_retry, duck, vocal_kill = False, True, False, 0, True, False
         elif q == "studio":
-            overlap, mix, qa, qa_retry, duck = True, True, True, 2, True
+            overlap, mix, qa, qa_retry, duck, vocal_kill = True, True, True, 2, True, True
         else:  # high
-            overlap, mix, qa, qa_retry, duck = True, True, True, 1, True
+            overlap, mix, qa, qa_retry, duck, vocal_kill = True, True, True, 1, True, True
 
         self.overlap_combo.setCurrentIndex(0 if overlap else 1)
         self.mix_combo.setCurrentIndex(0 if mix else 1)
         self.qa_combo.setCurrentIndex(0 if qa else 1)
         self.qa_retry_combo.setCurrentText(str(qa_retry))
         self.duck_combo.setCurrentIndex(0 if duck else 1)
+        self.vocal_kill_combo.setCurrentIndex(0 if vocal_kill else 1)
 
         cfg.set(cfg.video_translate_allow_speaker_overlap, overlap)
         cfg.set(cfg.video_translate_overlap_aware_mix, mix)
         cfg.set(cfg.video_translate_segment_qa_enabled, qa)
         cfg.set(cfg.video_translate_segment_qa_retry_count, qa_retry)
         cfg.set(cfg.video_translate_enable_background_ducking, duck)
+        cfg.set(cfg.video_translate_aggressive_vocal_suppression, vocal_kill)
 
     def choose_video_file(self):
         video_formats = " ".join(f"*.{fmt.value}" for fmt in SupportedVideoFormats)
@@ -543,11 +868,17 @@ class VideoTranslateInterface(QWidget):
         sel_src_lang = self._source_lang_options[self.source_lang_combo.currentIndex()]
         sel_lang = self._target_lang_options[self.target_lang_combo.currentIndex()]
         sel_translator = self._translator_options[self.translator_combo.currentIndex()]
-        sel_provider = {0: "auto", 1: "xtts"}.get(
+        sel_provider = {0: "auto", 1: "xtts", 2: "rvc"}.get(
             self.provider_combo.currentIndex(), "auto"
         )
         self.task.video_translate_config.voice_clone_quality = selected_quality
         self.task.video_translate_config.voice_clone_provider = sel_provider
+        self.task.video_translate_config.source_separation_mode = {
+            0: "demucs_plus_uvr",
+            1: "demucs",
+            2: "uvr_mdx_kim",
+            3: "auto",
+        }.get(self.sep_combo.currentIndex(), "demucs_plus_uvr")
         self.task.video_translate_config.tts_parallel_workers = selected_workers
         self.task.video_translate_config.use_translation_cache = selected_cache
         self.task.video_translate_config.allow_speaker_overlap = self.overlap_combo.currentIndex() == 0
@@ -555,6 +886,7 @@ class VideoTranslateInterface(QWidget):
         self.task.video_translate_config.segment_qa_enabled = self.qa_combo.currentIndex() == 0
         self.task.video_translate_config.segment_qa_retry_count = int(self.qa_retry_combo.currentText() or 1)
         self.task.video_translate_config.enable_background_ducking = self.duck_combo.currentIndex() == 0
+        self.task.video_translate_config.aggressive_vocal_suppression = self.vocal_kill_combo.currentIndex() == 0
         self.task.video_translate_config.manual_translation_json = str(self.manual_translation_json_path or "")
         self.task.video_translate_config.source_language = sel_src_lang.value
         self.task.transcribe_config.use_asr_cache = selected_asr_cache
@@ -616,9 +948,15 @@ class VideoTranslateInterface(QWidget):
         sel_src_lang = self._source_lang_options[self.source_lang_combo.currentIndex()]
         sel_lang = self._target_lang_options[self.target_lang_combo.currentIndex()]
         sel_translator = self._translator_options[self.translator_combo.currentIndex()]
-        sel_provider = {0: "auto", 1: "xtts"}.get(self.provider_combo.currentIndex(), "auto")
+        sel_provider = {0: "auto", 1: "xtts", 2: "rvc"}.get(self.provider_combo.currentIndex(), "auto")
         task.video_translate_config.voice_clone_quality = selected_quality
         task.video_translate_config.voice_clone_provider = sel_provider
+        task.video_translate_config.source_separation_mode = {
+            0: "demucs_plus_uvr",
+            1: "demucs",
+            2: "uvr_mdx_kim",
+            3: "auto",
+        }.get(self.sep_combo.currentIndex(), "demucs_plus_uvr")
         task.video_translate_config.tts_parallel_workers = selected_workers
         task.video_translate_config.use_translation_cache = selected_cache
         task.video_translate_config.allow_speaker_overlap = self.overlap_combo.currentIndex() == 0
@@ -626,6 +964,7 @@ class VideoTranslateInterface(QWidget):
         task.video_translate_config.segment_qa_enabled = self.qa_combo.currentIndex() == 0
         task.video_translate_config.segment_qa_retry_count = int(self.qa_retry_combo.currentText() or 1)
         task.video_translate_config.enable_background_ducking = self.duck_combo.currentIndex() == 0
+        task.video_translate_config.aggressive_vocal_suppression = self.vocal_kill_combo.currentIndex() == 0
         task.video_translate_config.source_language = sel_src_lang.value
         task.transcribe_config.use_asr_cache = selected_asr_cache
         from app.core.entities import LANGUAGES

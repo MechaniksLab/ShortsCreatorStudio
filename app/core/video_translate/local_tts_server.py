@@ -23,9 +23,11 @@ _XTTS_LAST_DEBUG_LOG = ""
 _XTTS_RUNTIME_FAIL_COUNT = 0
 _XTTS_RUNTIME_DISABLE_UNTIL = 0.0
 _XTTS_RUNTIME_SERVER_PROC = None
+_XTTS_INPROC_DEVICE = "cpu"
 _XTTS_RUNTIME_SERVER_URL = "http://127.0.0.1:8021"
 _XTTS_RUNTIME_SERVER_LOG = PROJECT_ROOT / "AppData" / "logs" / "xtts_runtime_server.log"
 _XTTS_RUNTIME_SERVER_LOCK = threading.Lock()
+_XTTS_DEVICE_PREF = "auto"
 
 
 def _wait_http_health(url: str, timeout_sec: float = 12.0) -> bool:
@@ -53,9 +55,18 @@ def _tail_text(path: Path, max_chars: int = 1200) -> str:
         return ""
 
 
-def _ensure_runtime_server(py: Path, server_script: Path) -> bool:
-    global _XTTS_RUNTIME_SERVER_PROC
+def _ensure_runtime_server(py: Path, server_script: Path, device_preference: str = "auto") -> bool:
+    global _XTTS_RUNTIME_SERVER_PROC, _XTTS_DEVICE_PREF
+    pref = str(device_preference or "auto").strip().lower()
+    if pref not in {"auto", "cuda", "cpu"}:
+        pref = "auto"
     with _XTTS_RUNTIME_SERVER_LOCK:
+        if _XTTS_RUNTIME_SERVER_PROC is not None and _XTTS_RUNTIME_SERVER_PROC.poll() is None and _XTTS_DEVICE_PREF != pref:
+            try:
+                _XTTS_RUNTIME_SERVER_PROC.terminate()
+            except Exception:
+                pass
+            _XTTS_RUNTIME_SERVER_PROC = None
         if _XTTS_RUNTIME_SERVER_PROC is not None and _XTTS_RUNTIME_SERVER_PROC.poll() is None:
             return True
 
@@ -67,11 +78,21 @@ def _ensure_runtime_server(py: Path, server_script: Path) -> bool:
 
         logf = open(_XTTS_RUNTIME_SERVER_LOG, "a", encoding="utf-8", buffering=1)
         _XTTS_RUNTIME_SERVER_PROC = subprocess.Popen(
-            [str(py), str(server_script), "--host", "127.0.0.1", "--port", "8021"],
+            [
+                str(py),
+                str(server_script),
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "8021",
+                "--device",
+                pref,
+            ],
             stdout=logf,
             stderr=logf,
             creationflags=(subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0),
         )
+        _XTTS_DEVICE_PREF = pref
 
     # XTTS модель может грузиться долго (первый холодный старт), даём большой таймаут.
     ok = _wait_http_health(_XTTS_RUNTIME_SERVER_URL, timeout_sec=75.0)
@@ -179,7 +200,7 @@ def _xtts_subprocess_check() -> tuple[bool, str]:
         return False, str(e)
 
 
-def _try_xtts_via_runtime(text: str, out_wav: Path, language_hint: str, speaker_wav: Optional[Path]) -> bool:
+def _try_xtts_via_runtime(text: str, out_wav: Path, language_hint: str, speaker_wav: Optional[Path], device_preference: str = "auto") -> bool:
     global _XTTS_RUNTIME_FAIL_COUNT, _XTTS_RUNTIME_DISABLE_UNTIL, _XTTS_LAST_DEBUG_LOG, _XTTS_RUNTIME_SERVER_PROC
     now = time.time()
     if _XTTS_RUNTIME_DISABLE_UNTIL > now:
@@ -193,7 +214,7 @@ def _try_xtts_via_runtime(text: str, out_wav: Path, language_hint: str, speaker_
     server_script = PROJECT_ROOT / "scripts" / "xtts_runtime_server.py"
     if server_script.exists():
         try:
-            if not _ensure_runtime_server(py, server_script):
+            if not _ensure_runtime_server(py, server_script, device_preference=device_preference):
                 raise RuntimeError(
                     f"XTTS runtime server unavailable (log: {_XTTS_RUNTIME_SERVER_LOG})"
                 )
@@ -202,6 +223,7 @@ def _try_xtts_via_runtime(text: str, out_wav: Path, language_hint: str, speaker_
                 "text": text,
                 "language": _map_lang(language_hint, for_sapi=False),
                 "speaker_wav": str(speaker_wav) if speaker_wav and speaker_wav.exists() else "",
+                "device_preference": str(device_preference or "auto"),
             }
             req = urllib.request.Request(
                 _XTTS_RUNTIME_SERVER_URL.rstrip("/") + "/tts",
@@ -232,6 +254,9 @@ def _try_xtts_via_runtime(text: str, out_wav: Path, language_hint: str, speaker_
     debug_log.parent.mkdir(parents=True, exist_ok=True)
     cmd += ["--log-file", str(debug_log)]
     _XTTS_LAST_DEBUG_LOG = str(debug_log)
+    pref = str(device_preference or "auto").strip().lower()
+    if pref in {"cpu", "cuda"}:
+        cmd += ["--device", pref]
     if speaker_wav and speaker_wav.exists():
         cmd += ["--speaker-wav", str(speaker_wav)]
     try:
@@ -283,24 +308,46 @@ def _xtts_import_check() -> tuple[bool, str]:
         return False, str(e)
 
 
-def _try_xtts_to_wav(text: str, out_wav: Path, language_hint: str, speaker_wav: Optional[Path]) -> bool:
+def _try_xtts_to_wav(text: str, out_wav: Path, language_hint: str, speaker_wav: Optional[Path], device_preference: str = "auto") -> bool:
     """Пытается использовать Coqui XTTS v2 (реальное voice cloning)."""
-    global _XTTS_ENGINE
+    global _XTTS_ENGINE, _XTTS_INPROC_DEVICE
     ok, reason = _xtts_import_check()
     if not ok:
         logger.info("XTTS in-process unavailable, try runtime subprocess: %s", reason)
-        return _try_xtts_via_runtime(text, out_wav, language_hint, speaker_wav)
+        return _try_xtts_via_runtime(text, out_wav, language_hint, speaker_wav, device_preference=device_preference)
 
     # Если проверка прошла только через runtime-subprocess, не пытаемся
     # делать in-process import (он может падать в frozen exe с WinError 1114).
     if "runtime-subprocess" in str(reason):
-        return _try_xtts_via_runtime(text, out_wav, language_hint, speaker_wav)
+        return _try_xtts_via_runtime(text, out_wav, language_hint, speaker_wav, device_preference=device_preference)
 
     try:
+        import torch  # type: ignore
         from TTS.api import TTS  # type: ignore
 
         if _XTTS_ENGINE is None:
             _XTTS_ENGINE = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
+
+        pref = str(device_preference or "auto").strip().lower()
+        if pref not in {"auto", "cuda", "cpu"}:
+            pref = "auto"
+        target_device = "cpu"
+        if pref == "cuda":
+            if not torch.cuda.is_available():
+                raise RuntimeError("XTTS in-process: CUDA requested but unavailable")
+            target_device = "cuda"
+        elif pref == "auto":
+            target_device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        if _XTTS_INPROC_DEVICE != target_device:
+            try:
+                _XTTS_ENGINE.to(target_device)
+                _XTTS_INPROC_DEVICE = target_device
+                logger.info("XTTS in-process moved to device=%s", target_device)
+            except Exception as dev_e:
+                if target_device == "cuda":
+                    raise RuntimeError(f"XTTS in-process cannot switch to CUDA: {dev_e}")
+                logger.warning("XTTS in-process device switch warning: %s", dev_e)
 
         lang = _map_lang(language_hint, for_sapi=False)
 
@@ -315,7 +362,7 @@ def _try_xtts_to_wav(text: str, out_wav: Path, language_hint: str, speaker_wav: 
     except Exception as e:
         logger.warning("XTTS fallback to SAPI: %s", e)
         # Если in-process XTTS упал (частый кейс в frozen exe), пробуем runtime-subprocess
-        if _try_xtts_via_runtime(text, out_wav, language_hint, speaker_wav):
+        if _try_xtts_via_runtime(text, out_wav, language_hint, speaker_wav, device_preference=device_preference):
             return True
     return False
 
@@ -335,6 +382,7 @@ def _synthesize_sapi_to_wav(
     speaker_wav: Optional[Path] = None,
     require_xtts: bool = False,
     prefer_xtts: bool = True,
+    device_preference: str = "auto",
 ):
     """Полностью локальный TTS через Windows SAPI (без внешних API)."""
     out_wav.parent.mkdir(parents=True, exist_ok=True)
@@ -344,12 +392,24 @@ def _synthesize_sapi_to_wav(
         ok, reason = _xtts_import_check()
         if not ok:
             raise RuntimeError(f"XTTS import недоступен: {reason}")
-        if _try_xtts_to_wav(text, out_wav, language_hint=language_hint, speaker_wav=speaker_wav):
+        if _try_xtts_to_wav(
+            text,
+            out_wav,
+            language_hint=language_hint,
+            speaker_wav=speaker_wav,
+            device_preference=device_preference,
+        ):
             return
         raise RuntimeError("XTTS synthesis failed (strict xtts mode)")
 
     if prefer_xtts:
-        if _try_xtts_to_wav(text, out_wav, language_hint=language_hint, speaker_wav=speaker_wav):
+        if _try_xtts_to_wav(
+            text,
+            out_wav,
+            language_hint=language_hint,
+            speaker_wav=speaker_wav,
+            device_preference=device_preference,
+        ):
             return
     txt_file = out_wav.with_suffix(".txt")
     txt_file.write_text(text or " ", encoding="utf-8")
@@ -448,6 +508,8 @@ class LocalTTSRequestHandler(BaseHTTPRequestHandler):
                     "xtts_import_ok": xtts_ok,
                     "xtts_reason": xtts_reason,
                     "xtts_debug_log": _XTTS_LAST_DEBUG_LOG,
+                    "xtts_device_preference": _XTTS_DEVICE_PREF,
+                    "xtts_inprocess_device": _XTTS_INPROC_DEVICE,
                 }
             )
             return
@@ -489,6 +551,9 @@ class LocalTTSRequestHandler(BaseHTTPRequestHandler):
         speaker_id = str(data.get("speaker_id") or data.get("speaker_tag") or "")
         require_xtts = bool(data.get("require_xtts", False))
         prefer_xtts = bool(data.get("prefer_xtts", True))
+        device_preference = str(data.get("device_preference") or "auto").strip().lower()
+        if device_preference not in {"auto", "cuda", "cpu"}:
+            device_preference = "auto"
 
         tmp_dir = Path(tempfile.gettempdir()) / "shorts_local_tts"
         tmp_dir.mkdir(parents=True, exist_ok=True)
@@ -510,6 +575,7 @@ class LocalTTSRequestHandler(BaseHTTPRequestHandler):
                 speaker_wav=speaker_wav,
                 require_xtts=require_xtts,
                 prefer_xtts=prefer_xtts,
+                device_preference=device_preference,
             )
             content = out_wav.read_bytes()
             self.send_response(HTTPStatus.OK)
