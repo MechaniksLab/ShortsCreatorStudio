@@ -23,8 +23,16 @@ class GitHubUpdateManager:
     SAFE_MIRROR_DIRS = [
         "app",
         "icons",
-        "resource",
         "scripts",
+    ]
+
+    # Директории, которые копируем рекурсивно БЕЗ удаления локальных файлов.
+    # Так мы подтягиваем обновления ассетов, но не сносим локальные бинарники
+    # (например resource/bin/Faster-Whisper-XXL).
+    SAFE_COPY_DIRS = [
+        "resource/assets",
+        "resource/subtitle_style",
+        "resource/translations",
     ]
 
     # Корневые файлы, которые безопасно обновлять из репозитория.
@@ -531,6 +539,13 @@ class GitHubUpdateManager:
                 ]
             )
 
+        for d in cls.SAFE_COPY_DIRS:
+            lines.extend(
+                [
+                    f"call :SyncCopy \"%SRC%\\{d}\" \"%DST%\\{d}\"",
+                ]
+            )
+
         for f in cls.SAFE_ROOT_FILES:
             lines.extend(
                 [
@@ -553,6 +568,16 @@ class GitHubUpdateManager:
                 "",
                 "rem /MIR применяем только к явно разрешённым папкам проекта",
                 "robocopy \"%SRC_DIR%\" \"%DST_DIR%\" /MIR /R:2 /W:1 >nul",
+                "exit /b 0",
+                "",
+                ":SyncCopy",
+                "set SRC_DIR=%~1",
+                "set DST_DIR=%~2",
+                "if not exist \"%SRC_DIR%\" exit /b 0",
+                "if not exist \"%DST_DIR%\" mkdir \"%DST_DIR%\"",
+                "",
+                "rem /E копирует рекурсивно, но НЕ удаляет локальные файлы",
+                "robocopy \"%SRC_DIR%\" \"%DST_DIR%\" /E /R:2 /W:1 >nul",
                 "exit /b 0",
                 "",
                 ":CopyFile",
