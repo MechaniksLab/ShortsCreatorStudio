@@ -198,6 +198,27 @@ class VideoTranslateBootstrap:
             pyannote_ok = True
         except Exception:
             pyannote_ok = False
+
+        # fallback: проверяем pyannote в runtime/python.exe (актуально для frozen main-process)
+        if not pyannote_ok:
+            try:
+                runtime_py = PROJECT_ROOT / "runtime" / "python.exe"
+                if runtime_py.exists():
+                    p = subprocess.run(
+                        [str(runtime_py), "-c", "import pyannote.audio; print('ok')"],
+                        capture_output=True,
+                        text=True,
+                        encoding="utf-8",
+                        errors="replace",
+                        timeout=35,
+                        creationflags=(
+                            subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                        ),
+                    )
+                    if p.returncode == 0:
+                        pyannote_ok = True
+            except Exception:
+                pass
         checks.append(
             {
                 "name": "pyannote-diarization",

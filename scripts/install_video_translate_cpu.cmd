@@ -1,15 +1,16 @@
 @echo off
 setlocal
 
-set RUNTIME_PYTHON=e:\Neyro\ShortsCreatorStudio\runtime\python.exe
+set "SCRIPT_DIR=%~dp0"
+set "RUNTIME_PYTHON=%SCRIPT_DIR%..\runtime\python.exe"
 
 if not exist "%RUNTIME_PYTHON%" (
   echo [ERROR] Runtime python not found: %RUNTIME_PYTHON%
   exit /b 2
 )
 
-"%RUNTIME_PYTHON%" "%~dp0setup_video_translate_runtime.py" --runtime-python "%RUNTIME_PYTHON%" --profile cpu --upgrade-pip
+"%RUNTIME_PYTHON%" "%SCRIPT_DIR%setup_video_translate_runtime.py" --runtime-python "%RUNTIME_PYTHON%" --profile cpu --upgrade-pip
 if errorlevel 1 exit /b %errorlevel%
 
-"%RUNTIME_PYTHON%" "%~dp0check_video_translate_env.py" --runtime-python "%RUNTIME_PYTHON%"
+"%RUNTIME_PYTHON%" "%SCRIPT_DIR%check_video_translate_env.py" --runtime-python "%RUNTIME_PYTHON%"
 exit /b %errorlevel%

@@ -312,6 +312,19 @@ class OpenAITranslator(BaseTranslator):
             else:
                 result = {k: f"{v}" for k, v in result.items()}
 
+            # Пост-проверка качества: иногда batch-ответ может частично вернуть исходный текст.
+            # Для ru->en это проявляется как русский/кириллица в переводе.
+            result = self._enforce_target_language(subtitle_chunk, result)
+
+            # Обновим кэш уже скорректированным результатом, чтобы не повторять проблему.
+            if self.use_cache:
+                self.cache_manager.set_llm_result(
+                    cache_key,
+                    json.dumps(result, ensure_ascii=False),
+                    self.model,
+                    **cache_params,
+                )
+
             return result
         except Exception as e:
             try:
@@ -339,8 +352,139 @@ class OpenAITranslator(BaseTranslator):
                 result[k] = str(src or "")
         return result
 
+    @staticmethod
+    def _script_regex(script: str) -> str:
+        m = {
+            "latin": r"[A-Za-z]",
+            "cyrillic": r"[\u0400-\u04FF]",
+            "han": r"[\u4E00-\u9FFF]",
+            "hiragana_katakana": r"[\u3040-\u30FF]",
+            "hangul": r"[\uAC00-\uD7AF]",
+            "arabic": r"[\u0600-\u06FF]",
+            "hebrew": r"[\u0590-\u05FF]",
+            "greek": r"[\u0370-\u03FF]",
+            "devanagari": r"[\u0900-\u097F]",
+            "thai": r"[\u0E00-\u0E7F]",
+        }
+        return m.get(script, r"")
+
+    def _target_script(self) -> str:
+        t = str(self.target_language or "").strip().lower()
+        # Chinese
+        if t in {"简体中文", "繁体中文", "中文", "chinese", "zh", "zh-cn", "zh-hans", "zh-hant"}:
+            return "han"
+        # Japanese
+        if t in {"日本語", "japanese", "ja"}:
+            return "hiragana_katakana"
+        # Korean
+        if t in {"韩语", "korean", "ko"}:
+            return "hangul"
+        # Russian and close cyrillic languages
+        if t in {"俄语", "russian", "ru", "ukrainian", "uk", "belarusian", "be", "bulgarian", "bg", "serbian", "sr"}:
+            return "cyrillic"
+        if t in {"arabic", "ar", "urdu", "ur", "persian", "fa", "pashto", "ps"}:
+            return "arabic"
+        if t in {"hebrew", "he", "yiddish", "yi"}:
+            return "hebrew"
+        if t in {"hindi", "hi", "marathi", "mr", "nepali", "ne", "sanskrit", "sa"}:
+            return "devanagari"
+        if t in {"thai", "th"}:
+            return "thai"
+        if t in {"greek", "el"}:
+            return "greek"
+        # Default for EN/ES/FR/DE/PT/... => latin
+        return "latin"
+
+    def _script_ratio(self, text: str, script: str) -> float:
+        s = str(text or "")
+        if not s:
+            return 0.0
+        all_letters = re.findall(r"\w", s, flags=re.UNICODE)
+        if not all_letters:
+            return 0.0
+        rgx = self._script_regex(script)
+        if not rgx:
+            return 0.0
+        script_letters = re.findall(rgx, s)
+        return len(script_letters) / max(1, len(all_letters))
+
+    def _target_is_english(self) -> bool:
+        t = str(self.target_language or "").strip().lower()
+        return t in {"english", "en", "英语"}
+
+    def _looks_untranslated(self, source: str, translated: str) -> bool:
+        s = str(source or "").strip()
+        t = str(translated or "").strip()
+        if not t:
+            return True
+        if t.upper() == "ERROR":
+            return True
+        if s and t == s:
+            return True
+
+        # Для ru->en/any->en: ни одного кириллического символа в финальном переводе.
+        if self._target_is_english() and re.search(r"[\u0400-\u04FF]", t):
+            return True
+
+        target_script = self._target_script()
+        trg_ratio = self._script_ratio(t, target_script)
+        src_ratio = self._script_ratio(s, target_script)
+
+        # Если выход по скрипту слишком похож на источник и почти не содержит скрипт цели — подозрительно.
+        if src_ratio > 0.25 and trg_ratio < 0.15:
+            return True
+
+        # Для не-latin языков ожидаем хотя бы немного символов скрипта цели.
+        if target_script != "latin" and len(re.findall(r"\w", t, flags=re.UNICODE)) >= 4 and trg_ratio < 0.10:
+            return True
+
+        # Для latin-целей не допускаем доминирование кириллицы/хана/арабицы в выходе.
+        if target_script == "latin":
+            bad_scripts = ["cyrillic", "han", "arabic", "devanagari", "thai", "hangul", "hiragana_katakana"]
+            for bad in bad_scripts:
+                if self._script_ratio(t, bad) > 0.30:
+                    return True
+        return False
+
+    def _translate_text_strict(self, source_text: str) -> str:
+        target_lang = str(self.target_language or "English")
+        extra = ""
+        if self._target_is_english():
+            extra = " If target is English, use only English words and alphabet (no Cyrillic)."
+        strict_prompt = (
+            f"You are a professional translator. Translate into {target_lang}. "
+            f"Return ONLY translated text in {target_lang}. "
+            "Do not return source text, notes, explanations, or JSON. "
+            "Use script/orthography natural for target language."
+            + extra
+        )
+        resp = self._call_api(strict_prompt, str(source_text or ""))
+        translated = str(resp.choices[0].message.content or "").strip()
+        translated = re.sub(r"<think>.*?</think>", "", translated, flags=re.DOTALL).strip()
+        return translated
+
+    def _enforce_target_language(
+        self,
+        source_chunk: Dict[str, str],
+        translated_chunk: Dict[str, str],
+    ) -> Dict[str, str]:
+        fixed = dict(translated_chunk or {})
+        for k, src in source_chunk.items():
+            cur = str(fixed.get(k, "") or "")
+            if not self._looks_untranslated(str(src or ""), cur):
+                continue
+            try:
+                repaired = self._translate_text_strict(str(src or ""))
+                if self._looks_untranslated(str(src or ""), repaired):
+                    # Последний fallback — обычный single перевод
+                    repaired = self._translate_chunk_single({k: str(src or "")}).get(k, cur)
+                fixed[k] = str(repaired or cur)
+            except Exception:
+                fixed[k] = cur if cur else str(src or "")
+        return fixed
+
     def translate_subtitle(self, subtitle_data: Union[str, ASRData]) -> ASRData:
-        """短视频优先单批次翻译，减少 LLM 请求数。"""
+        """Всегда переводим одним LLM-запросом весь набор сегментов."""
         try:
             if isinstance(subtitle_data, str):
                 asr_data = ASRData.from_subtitle_file(subtitle_data)
@@ -353,17 +497,12 @@ class OpenAITranslator(BaseTranslator):
 
             total_items = len(subtitle_dict)
             total_chars = sum(len(v or "") for v in subtitle_dict.values())
-            force_single_batch = total_items <= 40 and total_chars <= 9000
-
-            if force_single_batch and total_items > 0:
-                logger.info(
-                    "Short-form detected: use single LLM batch (items=%s, chars=%s)",
-                    total_items,
-                    total_chars,
-                )
-                chunks = [subtitle_dict]
-            else:
-                chunks = self._split_chunks(subtitle_dict)
+            logger.info(
+                "Use single-batch translation (items=%s, chars=%s)",
+                total_items,
+                total_chars,
+            )
+            chunks = [subtitle_dict] if total_items > 0 else []
 
             translated_dict = self._parallel_translate(chunks)
             new_segments = self._create_segments(asr_data.segments, translated_dict)

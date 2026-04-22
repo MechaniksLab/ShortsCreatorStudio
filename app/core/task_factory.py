@@ -478,6 +478,9 @@ class TaskFactory:
         transcribe_task.transcribe_config.use_asr_cache = bool(
             cfg.video_translate_use_asr_cache.value
         )
+        transcribe_task.transcribe_config.transcribe_language = LANGUAGES[
+            cfg.video_translate_source_language.value.value
+        ]
         base_asr_tag = str(transcribe_task.transcribe_config.asr_cache_tag or "default")
         transcribe_task.transcribe_config.asr_cache_tag = f"video_translate:{base_asr_tag}"
 
@@ -549,6 +552,7 @@ class TaskFactory:
         )
 
         vt_cfg = VideoTranslateConfig(
+            source_language=cfg.video_translate_source_language.value.value,
             target_language=cfg.video_translate_target_language.value.value,
             translator_service=cfg.translator_service.value,
             llm_base_url=base_url,
@@ -576,6 +580,15 @@ class TaskFactory:
             auto_download_models=cfg.video_translate_auto_download_models.value,
             tts_parallel_workers=cfg.video_translate_tts_parallel_workers.value,
             use_translation_cache=cfg.video_translate_use_translation_cache.value,
+            allow_speaker_overlap=cfg.video_translate_allow_speaker_overlap.value,
+            overlap_aware_mix=cfg.video_translate_overlap_aware_mix.value,
+            segment_qa_enabled=cfg.video_translate_segment_qa_enabled.value,
+            segment_qa_retry_count=cfg.video_translate_segment_qa_retry_count.value,
+            segment_min_duration_ms=cfg.video_translate_segment_min_duration_ms.value,
+            segment_min_size_bytes=cfg.video_translate_segment_min_size_bytes.value,
+            segment_min_mean_db=cfg.video_translate_segment_min_mean_db.value,
+            segment_max_peak_db=cfg.video_translate_segment_max_peak_db.value,
+            enable_background_ducking=cfg.video_translate_enable_background_ducking.value,
         )
 
         # Для автономного режима форсируем локальный ASR-маршрут

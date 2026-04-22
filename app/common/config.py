@@ -427,6 +427,13 @@ class Config(QConfig):
     )
 
     # ------------------- Video Translate -------------------
+    video_translate_source_language = OptionsConfigItem(
+        "VideoTranslate",
+        "SourceLanguage",
+        TranscribeLanguageEnum.ENGLISH,
+        OptionsValidator(TranscribeLanguageEnum),
+        EnumSerializer(TranscribeLanguageEnum),
+    )
     video_translate_target_language = OptionsConfigItem(
         "VideoTranslate",
         "TargetLanguage",
@@ -496,6 +503,33 @@ class Config(QConfig):
     )
     video_translate_use_translation_cache = ConfigItem(
         "VideoTranslate", "UseTranslationCache", True, BoolValidator()
+    )
+    video_translate_allow_speaker_overlap = ConfigItem(
+        "VideoTranslate", "AllowSpeakerOverlap", True, BoolValidator()
+    )
+    video_translate_overlap_aware_mix = ConfigItem(
+        "VideoTranslate", "OverlapAwareMix", True, BoolValidator()
+    )
+    video_translate_segment_qa_enabled = ConfigItem(
+        "VideoTranslate", "SegmentQAEnabled", True, BoolValidator()
+    )
+    video_translate_segment_qa_retry_count = RangeConfigItem(
+        "VideoTranslate", "SegmentQARetryCount", 1, RangeValidator(0, 4)
+    )
+    video_translate_segment_min_duration_ms = RangeConfigItem(
+        "VideoTranslate", "SegmentMinDurationMs", 180, RangeValidator(80, 1000)
+    )
+    video_translate_segment_min_size_bytes = RangeConfigItem(
+        "VideoTranslate", "SegmentMinSizeBytes", 2500, RangeValidator(200, 20000)
+    )
+    video_translate_segment_min_mean_db = RangeConfigItem(
+        "VideoTranslate", "SegmentMinMeanDb", -43.0, RangeValidator(-70.0, -10.0)
+    )
+    video_translate_segment_max_peak_db = RangeConfigItem(
+        "VideoTranslate", "SegmentMaxPeakDb", -0.2, RangeValidator(-3.0, 0.0)
+    )
+    video_translate_enable_background_ducking = ConfigItem(
+        "VideoTranslate", "EnableBackgroundDucking", True, BoolValidator()
     )
     video_translate_elevenlabs_api_key = ConfigItem(
         "VideoTranslate", "ElevenLabsApiKey", ""

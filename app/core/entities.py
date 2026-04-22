@@ -759,6 +759,7 @@ class SynthesisConfig:
 class VideoTranslateConfig:
     """Конфигурация модуля перевода видео с клонированием голосов."""
 
+    source_language: str = ""
     target_language: str = "英语"
     translator_service: Optional[TranslatorServiceEnum] = None
     llm_base_url: str = ""
@@ -794,6 +795,18 @@ class VideoTranslateConfig:
     auto_download_models: bool = True
     tts_parallel_workers: int = 3
     use_translation_cache: bool = True
+
+    # Advanced quality controls
+    allow_speaker_overlap: bool = True
+    overlap_aware_mix: bool = True
+    segment_qa_enabled: bool = True
+    segment_qa_retry_count: int = 1
+    segment_min_duration_ms: int = 180
+    segment_min_size_bytes: int = 2500
+    segment_min_mean_db: float = -43.0
+    segment_max_peak_db: float = -0.2
+    enable_background_ducking: bool = True
+    manual_translation_json: str = ""
 
 
 @dataclass

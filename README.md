@@ -167,18 +167,33 @@
 Без настроенной LLM-модели качество/работа автоматического отбора моментов для шортсов будет ограничена.
 
 ### Важно для модуля «Перевод видео» (voice clone)
-
 В проект добавлен production-подход для установки зависимостей video translate под разные ПК:
 
-- `scripts\install_video_translate_cpu.cmd` — стабильный CPU-профиль (работает почти везде);
-- `scripts\install_video_translate_gpu_cu124.cmd` — GPU-профиль (NVIDIA + CUDA-совместимый драйвер);
-- `scripts\check_video_translate_env.py` — диагностика готовности окружения.
+- `scripts\\install_video_translate_cpu.cmd` — стабильный CPU-профиль (работает почти везде);
+- `scripts\\install_video_translate_gpu_auto.cmd` — авто-выбор GPU профиля (пытается cu128 → cu124 → fallback на CPU);
+- `scripts\\install_video_translate_gpu_cu124.cmd` — принудительный GPU-профиль CUDA 12.4;
+- `scripts\\install_video_translate_gpu_cu128.cmd` — принудительный GPU-профиль CUDA 12.8;
+- `scripts\\install_video_translate_deps_only.cmd` — установка/обновление core-пакетов (XTTS/faster-whisper/pyannote/demucs) без переустановки torch;
+- `scripts\\install_video_translate_studio_addons.cmd` — безопасные studio-дополнения для улучшения микса/шумоподавления (pyloudnorm, noisereduce, pedalboard);
+- `scripts\\install_video_translate_experimental_addons.cmd` — экспериментальные дополнения (WhisperX/Resemblyzer/WebRTCVAD) в best-effort режиме + авто-восстановление production core-версий;
+- `scripts\\check_video_translate_env.py` — диагностика готовности окружения.
 
 Рекомендуемый порядок:
 
-1. Запустите `scripts\install_video_translate_cpu.cmd`.
-2. Проверьте отчёт диагностики в консоли.
-3. Если есть NVIDIA GPU и нужен максимум скорости — запустите `scripts\install_video_translate_gpu_cu124.cmd`.
+1. Для большинства пользователей NVIDIA: `scripts\\install_video_translate_gpu_auto.cmd`.
+2. Если знаете свою совместимость точнее — используйте `...gpu_cu124.cmd` или `...gpu_cu128.cmd`.
+3. Если GPU не нужен/нет — `scripts\\install_video_translate_cpu.cmd`.
+4. Для обновления только voice/ASR/diarization/separation-стека — `scripts\\install_video_translate_deps_only.cmd`.
+5. Для «студийного» качества микса/очистки — `scripts\\install_video_translate_studio_addons.cmd`.
+6. Экспериментально (опционально): `scripts\\install_video_translate_experimental_addons.cmd`.
+7. Проверяйте состояние через `scripts\\check_video_translate_env.py`.
+
+Важно по experimental-пакетам:
+
+- `WhisperX` может тянуть другие версии `faster-whisper/pyannote` и потенциально конфликтовать с production-пином;
+- `Resemblyzer` иногда подтягивает `webrtcvad` со сборкой C-extension на Windows;
+- поэтому experimental-установка сделана как best-effort (ошибки отдельных пакетов не блокируют весь сценарий);
+- после experimental-установки скрипт автоматически возвращает production-пины (`faster-whisper==1.2.1`, `pyannote.audio==4.0.4`), чтобы не деградировал основной пайплайн.
 
 Технически модуль поддерживает fallback-режимы:
 

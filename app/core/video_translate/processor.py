@@ -1,5 +1,7 @@
 import datetime
 import json
+import re
+import shutil
 import subprocess
 import tempfile
 import time
@@ -31,9 +33,9 @@ logger = setup_logger("video_translate_processor")
 
 def _safe_run(cmd: List[str]):
     logger.info("CMD: %s", subprocess.list2cmdline(cmd))
-    subprocess.run(
+    p = subprocess.run(
         cmd,
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -42,6 +44,12 @@ def _safe_run(cmd: List[str]):
             subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
         ),
     )
+    if p.returncode != 0:
+        err = (p.stderr or p.stdout or "").strip()
+        tail = err[-1800:] if err else "no stderr"
+        raise RuntimeError(
+            f"Command failed (rc={p.returncode}): {subprocess.list2cmdline(cmd)}\n{tail}"
+        )
 
 
 def _probe_audio_duration_ms(path: Path) -> int:
@@ -72,6 +80,110 @@ def _probe_audio_duration_ms(path: Path) -> int:
     except Exception:
         pass
     return 0
+
+
+def _build_atempo_filter(speed: float) -> str:
+    """Собирает безопасную цепочку atempo для произвольного коэффициента скорости."""
+    # ffmpeg atempo поддерживает 0.5..2.0 на один фильтр.
+    speed = max(0.35, min(3.2, float(speed)))
+    parts: List[str] = []
+    cur = speed
+    while cur > 2.0:
+        parts.append("atempo=2.0")
+        cur /= 2.0
+    while cur < 0.5:
+        parts.append("atempo=0.5")
+        cur /= 0.5
+    parts.append(f"atempo={cur:.5f}")
+    return ",".join(parts)
+
+
+def _runtime_python() -> Optional[Path]:
+    p = PROJECT_ROOT / "runtime" / "python.exe"
+    return p if p.exists() else None
+
+
+def _find_demucs_stem(demucs_out: Path, model_name: str, track_name: str, stem_name: str) -> Optional[Path]:
+    p = demucs_out / model_name / track_name / stem_name
+    if p.exists() and p.stat().st_size > 0:
+        return p
+    return None
+
+
+def _try_demucs_split(source_audio: Path, work_dir: Path) -> tuple[Optional[Path], Optional[Path]]:
+    """Пытается получить stems (vocals, no_vocals/accompaniment) через demucs (локально)."""
+    py = _runtime_python()
+    if py is None:
+        return None, None
+
+    # Проверяем наличие demucs в runtime.
+    try:
+        chk = subprocess.run(
+            [str(py), "-c", "import demucs,separate; print('ok')"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=25,
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+            ),
+        )
+        if chk.returncode != 0:
+            # Иногда пакет доступен как entrypoint demucs, а импорт в frozen окружениях ломается.
+            # Продолжаем и пробуем CLI ниже.
+            pass
+    except Exception:
+        pass
+
+    demucs_out = work_dir / "demucs"
+    demucs_out.mkdir(parents=True, exist_ok=True)
+    track_name = source_audio.stem
+    model_name = "htdemucs"
+
+    demucs_cli = shutil.which("demucs")
+    if demucs_cli:
+        cmd = [
+            demucs_cli,
+            "--two-stems",
+            "vocals",
+            "-n",
+            model_name,
+            "-o",
+            str(demucs_out),
+            str(source_audio),
+        ]
+    else:
+        cmd = [
+            str(py),
+            "-m",
+            "demucs.separate",
+            "--two-stems",
+            "vocals",
+            "-n",
+            model_name,
+            "-o",
+            str(demucs_out),
+            str(source_audio),
+        ]
+
+    try:
+        _safe_run(cmd)
+    except Exception as e:
+        logger.warning("Demucs separation failed: %s", e)
+        return None, None
+
+    vocals = _find_demucs_stem(demucs_out, model_name, track_name, "vocals.wav")
+    no_vocals = _find_demucs_stem(demucs_out, model_name, track_name, "no_vocals.wav")
+    if no_vocals is None:
+        # Некоторые сборки именуют стем как accompaniment.wav
+        no_vocals = _find_demucs_stem(demucs_out, model_name, track_name, "accompaniment.wav")
+
+    if vocals is not None:
+        logger.info("Demucs vocals stem: %s", vocals)
+    if no_vocals is not None:
+        logger.info("Demucs no_vocals/accompaniment stem: %s", no_vocals)
+    return vocals, no_vocals
 
 
 @dataclass
@@ -152,6 +264,83 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
 
         raise RuntimeError(f"Local TTS endpoint error: {last_err}")
 
+    @staticmethod
+    def _probe_volumedetect(path: Path) -> Dict[str, float]:
+        """Снимает базовые аудио-метрики через ffmpeg volumedetect."""
+        result: Dict[str, float] = {}
+        try:
+            p = subprocess.run(
+                [
+                    "ffmpeg",
+                    "-hide_banner",
+                    "-i",
+                    str(path),
+                    "-af",
+                    "volumedetect",
+                    "-f",
+                    "null",
+                    "NUL",
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+                ),
+            )
+            text = (p.stdout or "") + "\n" + (p.stderr or "")
+            m_mean = re.search(r"mean_volume:\s*(-?[\d\.]+)\s*dB", text)
+            m_max = re.search(r"max_volume:\s*(-?[\d\.]+)\s*dB", text)
+            if m_mean:
+                result["mean_db"] = float(m_mean.group(1))
+            if m_max:
+                result["max_db"] = float(m_max.group(1))
+        except Exception:
+            pass
+        return result
+
+    @classmethod
+    def _segment_qa_check(
+        cls,
+        wav_path: Path,
+        target_ms: int,
+        cfg,
+        quality: str,
+    ) -> tuple[bool, str]:
+        if not wav_path.exists():
+            return False, "missing-file"
+
+        min_size = int(getattr(cfg, "segment_min_size_bytes", 2500) or 2500)
+        if wav_path.stat().st_size < min_size:
+            return False, f"too-small:{wav_path.stat().st_size}"
+
+        dur_ms = _probe_audio_duration_ms(wav_path)
+        min_dur = int(getattr(cfg, "segment_min_duration_ms", 180) or 180)
+        if dur_ms <= min_dur:
+            return False, f"too-short:{dur_ms}"
+
+        # Слишком короткая реплика относительно окна — индикатор «схлопнувшегося» синтеза.
+        if target_ms > 0:
+            ratio = dur_ms / float(target_ms)
+            min_ratio = 0.42 if quality in {"studio", "high"} else 0.30
+            if ratio < min_ratio:
+                return False, f"bad-ratio:{ratio:.2f}"
+
+        stats = cls._probe_volumedetect(wav_path)
+        mean_db = stats.get("mean_db")
+        max_db = stats.get("max_db")
+
+        min_mean_db = float(getattr(cfg, "segment_min_mean_db", -43.0) or -43.0)
+        max_peak_db = float(getattr(cfg, "segment_max_peak_db", -0.2) or -0.2)
+
+        if mean_db is not None and mean_db < min_mean_db:
+            return False, f"too-quiet:{mean_db:.2f}dB"
+        if max_db is not None and max_db > max_peak_db:
+            return False, f"clipping-risk:{max_db:.2f}dB"
+
+        return True, "ok"
+
     def synthesize(
         self,
         segments: List[VoiceSegment],
@@ -165,6 +354,8 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             raise RuntimeError("Не задан local TTS endpoint")
 
         quality = str(getattr(cfg, "voice_clone_quality", "balanced") or "balanced").strip().lower()
+        qa_enabled = bool(getattr(cfg, "segment_qa_enabled", quality in {"high", "studio"}))
+        qa_retry_count = max(0, int(getattr(cfg, "segment_qa_retry_count", 1) or 1))
         if quality == "fast":
             strict_xtts = False
             prefer_xtts = False
@@ -178,13 +369,11 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             max_retries = 2
             req_timeout = 90
         elif quality == "studio":
-            # Для реального продакшна важнее стабильный качественный вывод,
-            # чем fail-fast в strict режиме.
-            strict_xtts = False
+            strict_xtts = True
             prefer_xtts = True
-            allow_non_strict_fallback = True
-            max_retries = 2
-            req_timeout = 90
+            allow_non_strict_fallback = False
+            max_retries = 3
+            req_timeout = 120
         else:  # balanced
             strict_xtts = False
             prefer_xtts = False
@@ -212,7 +401,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         for seg in segments:
             by_speaker.setdefault(seg.speaker_id, []).append(seg)
 
-        target_ref_total = 12.0 if quality == "studio" else (8.0 if quality == "high" else 5.0)
+        target_ref_total = 18.0 if quality == "studio" else (10.0 if quality == "high" else 5.0)
         for spk, spk_segs in by_speaker.items():
             ref_wav = work_dir / f"ref_{spk}.wav"
             # Берём самые длинные реплики как более стабильный voiceprint.
@@ -306,37 +495,110 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         def _job(i_seg):
             i, seg = i_seg
             wav_path = tts_dir / f"seg_{i:04d}.wav"
-            self._synthesize_one(
-                endpoint=endpoint,
-                text=seg.text,
-                speaker_wav=speaker_refs.get(seg.speaker_id, source_audio),
-                lang=lang,
-                out_path=wav_path,
-                require_xtts=strict_xtts,
-                prefer_xtts=prefer_xtts,
-                allow_non_strict_fallback=allow_non_strict_fallback,
-                max_retries=max_retries,
-                req_timeout=req_timeout,
-            )
-            if quality == "studio":
-                # XTTS обычно уже даёт mono/24k. Пропускаем лишний ffmpeg per-segment,
-                # чтобы не тратить CPU и ускорить pipeline.
-                fixed_wav = wav_path
-            else:
-                fixed_wav = tts_dir / f"seg_{i:04d}_fixed.wav"
+            fixed_wav = tts_dir / f"seg_{i:04d}_fixed.wav"
+            target_ms = max(220, int(seg.end_ms - seg.start_ms))
+            attempts = max(1, qa_retry_count + 1)
+            last_reason = ""
+
+            for attempt in range(1, attempts + 1):
+                # На повторных попытках делаем синтез мягче/стабильнее.
+                soft_pass = attempt > 1
+                self._synthesize_one(
+                    endpoint=endpoint,
+                    text=seg.text,
+                    speaker_wav=speaker_refs.get(seg.speaker_id, source_audio),
+                    lang=lang,
+                    out_path=wav_path,
+                    require_xtts=(strict_xtts if quality == "studio" else (strict_xtts and not soft_pass)),
+                    prefer_xtts=(prefer_xtts or quality in {"high", "studio"}),
+                    allow_non_strict_fallback=allow_non_strict_fallback,
+                    max_retries=max_retries,
+                    req_timeout=req_timeout + (12 if soft_pass else 0),
+                )
+
+                if quality == "studio":
+                    # XTTS обычно уже даёт mono/24k. Пропускаем лишний ffmpeg per-segment,
+                    # чтобы не тратить CPU и ускорить pipeline.
+                    fixed_wav = wav_path
+                else:
+                    fixed_wav = tts_dir / f"seg_{i:04d}_fixed.wav"
+                    _safe_run(
+                        [
+                            "ffmpeg",
+                            "-y",
+                            "-i",
+                            str(wav_path),
+                            "-ac",
+                            "1",
+                            "-ar",
+                            "24000",
+                            str(fixed_wav),
+                        ]
+                    )
+
+                # Тайминг-матч: мягко подгоняем длительность реплики к окну оригинала,
+                # чтобы перевод лучше «ложился в рот/фразу».
+                cur_ms = _probe_audio_duration_ms(fixed_wav)
+                if cur_ms > 0:
+                    ratio = cur_ms / float(target_ms)
+                    # Только мягкая коррекция (без «ускоренного бурундука»).
+                    if ratio > 1.08 or ratio < 0.92:
+                        speed = max(0.78, min(1.33, ratio))
+                        timefit_wav = tts_dir / f"seg_{i:04d}_timefit.wav"
+                        atempo = _build_atempo_filter(speed)
+                        _safe_run(
+                            [
+                                "ffmpeg",
+                                "-y",
+                                "-i",
+                                str(fixed_wav),
+                                "-af",
+                                atempo,
+                                str(timefit_wav),
+                            ]
+                        )
+                        fixed_wav = timefit_wav
+
+                # Финальная подрезка/добивка тишиной до целевого окна.
+                align_wav = tts_dir / f"seg_{i:04d}_align.wav"
                 _safe_run(
                     [
                         "ffmpeg",
                         "-y",
                         "-i",
-                        str(wav_path),
-                        "-ac",
-                        "1",
-                        "-ar",
-                        "24000",
                         str(fixed_wav),
+                        "-af",
+                        "apad",
+                        "-t",
+                        f"{target_ms/1000.0:.3f}",
+                        str(align_wav),
                     ]
                 )
+                fixed_wav = align_wav
+
+                if not qa_enabled:
+                    break
+
+                ok, reason = self._segment_qa_check(
+                    fixed_wav,
+                    target_ms=target_ms,
+                    cfg=cfg,
+                    quality=quality,
+                )
+                if ok:
+                    break
+                last_reason = reason
+                logger.warning(
+                    "Segment QA failed (seg=%s, spk=%s, attempt=%s/%s, reason=%s)",
+                    i,
+                    seg.speaker_id,
+                    attempt,
+                    attempts,
+                    reason,
+                )
+
+            if qa_enabled and last_reason:
+                logger.warning("Segment %s accepted with last QA warning: %s", i, last_reason)
             return i, fixed_wav
 
         if max_workers > 1:
@@ -379,24 +641,45 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         for p in wav_segments:
             cmd += ["-i", str(p)]
 
-        # Жёстко устраняем наложения между сегментами по фактической длительности синтеза.
-        adjusted_starts: List[int] = []
-        min_gap_ms = 120
-        prev_end = 0
-        for i, seg in enumerate(segments, start=1):
-            wav_dur = _probe_audio_duration_ms(wav_segments[i - 1])
-            if wav_dur <= 0:
-                wav_dur = max(220, seg.end_ms - seg.start_ms)
-            start_ms = max(int(seg.start_ms), prev_end + min_gap_ms)
-            adjusted_starts.append(start_ms)
-            prev_end = start_ms + wav_dur
+        # Для точного совпадения с артикуляцией/сценой используем исходные тайминги начала.
+        # Реплики уже заранее time-fit под свою длительность, поэтому сильный сдвиг больше не нужен.
+        adjusted_starts: List[int] = [max(0, int(seg.start_ms)) for seg in segments]
 
         filters = []
         for i, start_ms in enumerate(adjusted_starts, start=1):
             filters.append(f"[{i}:a]adelay={start_ms}|{start_ms}[a{i}]")
 
-        inputs = "[0:a]" + "".join(f"[a{i}]" for i in range(1, len(segments) + 1))
-        filters.append(f"{inputs}amix=inputs={len(segments)+1}:normalize=0[out]")
+        overlap_aware = bool(getattr(cfg, "overlap_aware_mix", quality in {"high", "studio"}))
+        speaker_map: Dict[str, List[int]] = {}
+        if overlap_aware:
+            for idx, seg in enumerate(segments, start=1):
+                speaker_map.setdefault(seg.speaker_id, []).append(idx)
+
+        if overlap_aware and len(speaker_map) > 1:
+            bus_names: List[str] = []
+            for bus_idx, (speaker_id, inds) in enumerate(speaker_map.items(), start=1):
+                bus = f"spk{bus_idx}"
+                bus_names.append(f"[{bus}]")
+                if len(inds) == 1:
+                    filters.append(f"[a{inds[0]}]anull[{bus}]")
+                else:
+                    ins = "".join(f"[a{n}]" for n in inds)
+                    filters.append(
+                        f"{ins}amix=inputs={len(inds)}:normalize=0,alimiter=limit=0.96[{bus}]"
+                    )
+
+                # Мягкая стабилизация отдельных speaker-bus.
+                filters.append(f"[{bus}]dynaudnorm=f=75:g=7[{bus}n]")
+                bus_names[-1] = f"[{bus}n]"
+                logger.debug("Speaker bus created: %s -> %s segments", speaker_id, len(inds))
+
+            inputs = "[0:a]" + "".join(bus_names)
+            filters.append(
+                f"{inputs}amix=inputs={1 + len(bus_names)}:normalize=0,alimiter=limit=0.98[out]"
+            )
+        else:
+            inputs = "[0:a]" + "".join(f"[a{i}]" for i in range(1, len(segments) + 1))
+            filters.append(f"{inputs}amix=inputs={len(segments)+1}:normalize=0[out]")
 
         cmd += ["-filter_complex", ";".join(filters), "-map", "[out]", str(mixed)]
         _safe_run(cmd)
@@ -670,6 +953,25 @@ class VideoTranslationProcessor:
         )
         return translator.translate_subtitle(asr_data)
 
+    @staticmethod
+    def _apply_manual_translation_json(asr_data: ASRData, json_path: str) -> ASRData:
+        p = Path(str(json_path or "").strip())
+        if not p.exists():
+            return asr_data
+        try:
+            data = json.loads(p.read_text(encoding="utf-8", errors="ignore") or "[]")
+        except Exception:
+            return asr_data
+        rows = data if isinstance(data, list) else []
+        for i, row in enumerate(rows):
+            if i >= len(asr_data.segments):
+                break
+            seg = asr_data.segments[i]
+            tr = str((row or {}).get("translated") or "").strip()
+            if tr:
+                seg.translated_text = tr
+        return asr_data
+
     def _build_segments(self, asr_data: ASRData) -> List[VoiceSegment]:
         result: List[VoiceSegment] = []
         for i, seg in enumerate(asr_data.segments, start=1):
@@ -720,7 +1022,7 @@ class VideoTranslationProcessor:
                     best_overlap = overlap
                     best_spk = t.speaker_id
             seg.speaker_id = best_spk
-        return self._enforce_non_overlap(segments)
+        return sorted(segments, key=lambda s: (s.start_ms, s.end_ms))
 
     def _select_provider(self, task: VideoTranslateTask) -> BaseVoiceCloneProvider:
         provider = (task.video_translate_config.voice_clone_provider or "auto").strip().lower()
@@ -738,13 +1040,97 @@ class VideoTranslationProcessor:
             "Выбранный voice provider пока не реализован в текущей сборке. Используйте xtts/auto (локально) или elevenlabs."
         )
 
-    def _mux_video(self, task: VideoTranslateTask, source_audio: Path, dubbed_audio: Path, output_path: str):
+    def _prepare_audio_stems(
+        self,
+        task: VideoTranslateTask,
+        source_audio: Path,
+        work_dir: Path,
+    ) -> tuple[Path, Path]:
+        """Готовит speech/bg дорожки:
+        - speech_audio: очищенная дорожка для ASR/diarization/voice-reference
+        - background_audio: фон без оригинального голоса для финального микса
+        """
+        cfg = task.video_translate_config
+        if not bool(getattr(cfg, "enable_source_separation", True)):
+            return source_audio, source_audio
+
+        vocals, no_vocals = _try_demucs_split(source_audio, work_dir)
+        if vocals is not None and no_vocals is not None:
+            return vocals, no_vocals
+        if vocals is not None:
+            return vocals, source_audio
+        if no_vocals is not None:
+            return source_audio, no_vocals
+
+        # Fallback: ослабление центрального канала (где часто находится голос).
+        pseudo_bg = work_dir / "bg_pseudo_no_vocals.wav"
+        try:
+            _safe_run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    str(source_audio),
+                    "-af",
+                    "stereotools=mlev=-0.9,highpass=f=120,lowpass=f=9000,volume=0.78",
+                    str(pseudo_bg),
+                ]
+            )
+            if pseudo_bg.exists() and pseudo_bg.stat().st_size > 0:
+                return source_audio, pseudo_bg
+        except Exception as e:
+            logger.warning("Pseudo source-separation fallback failed: %s", e)
+
+        return source_audio, source_audio
+
+    def _mux_video(self, task: VideoTranslateTask, background_audio: Path, dubbed_audio: Path, output_path: str):
         keep_bg = bool(getattr(task.video_translate_config, "keep_background_music", True))
-        suppress_vocals = bool(getattr(task.video_translate_config, "enable_source_separation", True))
+        bg_ducking = bool(getattr(task.video_translate_config, "enable_background_ducking", True))
         if keep_bg:
-            if suppress_vocals:
-                # Псевдо-vocal removal без внешних моделей: ослабляем mid-channel (центр),
-                # где обычно находится основной голос. Музыка/стерео остаются заметнее.
+            filter_chain = (
+                "[1:a]loudnorm=I=-23:TP=-2:LRA=12,volume=0.95[bg];"
+                "[2:a]loudnorm=I=-16:TP=-1.5:LRA=11[dub];"
+            )
+            if bg_ducking:
+                filter_chain += (
+                    "[bg][dub]sidechaincompress=threshold=0.03:ratio=8:attack=18:release=280[bgduck];"
+                    "[bgduck][dub]amix=inputs=2:weights='1.0 1.6':normalize=0,alimiter=limit=0.98[mix]"
+                )
+            else:
+                filter_chain += "[bg][dub]amix=inputs=2:weights='0.95 1.55':normalize=0[mix]"
+
+            cmd = [
+                "ffmpeg",
+                "-y",
+                "-i",
+                task.video_path,
+                "-i",
+                str(background_audio),
+                "-i",
+                str(dubbed_audio),
+                "-filter_complex",
+                filter_chain,
+                "-map",
+                "0:v:0",
+                "-map",
+                "[mix]",
+                "-c:v",
+                "copy",
+                "-c:a",
+                "aac",
+                "-shortest",
+                output_path,
+            ]
+            try:
+                _safe_run(cmd)
+            except Exception as e:
+                # Некоторые сборки ffmpeg не содержат sidechaincompress или лимитер.
+                logger.warning("Advanced bg/dub mix failed, fallback to simple amix: %s", e)
+                fallback_chain = (
+                    "[1:a]loudnorm=I=-23:TP=-2:LRA=12,volume=0.95[bg];"
+                    "[2:a]loudnorm=I=-16:TP=-1.5:LRA=11[dub];"
+                    "[bg][dub]amix=inputs=2:weights='0.95 1.55':normalize=0[mix]"
+                )
                 _safe_run(
                     [
                         "ffmpeg",
@@ -752,13 +1138,11 @@ class VideoTranslationProcessor:
                         "-i",
                         task.video_path,
                         "-i",
-                        str(source_audio),
+                        str(background_audio),
                         "-i",
                         str(dubbed_audio),
                         "-filter_complex",
-                        "[1:a]pan=stereo|c0=0.35*c0-0.65*c1|c1=0.35*c1-0.65*c0,highpass=f=140,lowpass=f=9000,volume=0.55[bg];"
-                        "[2:a]loudnorm=I=-16:TP=-1.5:LRA=11[dub];"
-                        "[bg][dub]amix=inputs=2:weights='0.35 1.65':normalize=0[mix]",
+                        fallback_chain,
                         "-map",
                         "0:v:0",
                         "-map",
@@ -771,33 +1155,6 @@ class VideoTranslationProcessor:
                         output_path,
                     ]
                 )
-                return
-
-            _safe_run(
-                [
-                    "ffmpeg",
-                    "-y",
-                    "-i",
-                    task.video_path,
-                    "-i",
-                    str(source_audio),
-                    "-i",
-                    str(dubbed_audio),
-                    "-filter_complex",
-                    "[1:a]volume=0.22[bg];[2:a]loudnorm=I=-16:TP=-1.5:LRA=11[dub];"
-                    "[bg][dub]amix=inputs=2:weights='0.7 1.3':normalize=0[mix]",
-                    "-map",
-                    "0:v:0",
-                    "-map",
-                    "[mix]",
-                    "-c:v",
-                    "copy",
-                    "-c:a",
-                    "aac",
-                    "-shortest",
-                    output_path,
-                ]
-            )
             return
 
         _safe_run(
@@ -869,6 +1226,9 @@ class VideoTranslationProcessor:
         if not video2audio(task.video_path, str(audio_path)):
             raise RuntimeError("Не удалось извлечь аудио из видео")
 
+        # Подготовка дорожек: speech для ASR/clone + фон без речи для финального микса.
+        speech_audio, bg_audio = self._prepare_audio_stems(task, audio_path, work_dir)
+
         # Автовыбор ASR device: не даём падать, если CUDA недоступна
         current_device = getattr(task.transcribe_config, "faster_whisper_device", "cuda")
         resolved_device = self._detect_torch_device(current_device)
@@ -878,7 +1238,7 @@ class VideoTranslationProcessor:
 
         self._emit(progress_cb, 12, "Распознавание речи")
         try:
-            asr_data = transcribe(str(audio_path), task.transcribe_config)
+            asr_data = transcribe(str(speech_audio), task.transcribe_config)
         except Exception as e:
             msg = str(e)
             fw_cli_missing = (
@@ -892,7 +1252,7 @@ class VideoTranslationProcessor:
                 reason = "CLI не найден" if fw_cli_missing else "CLI compute_type не подходит для CPU"
                 self._emit(progress_cb, 14, f"Faster-Whisper {reason}, fallback на python-пакет")
                 asr_data = self._python_faster_whisper_fallback(
-                    str(audio_path),
+                    str(speech_audio),
                     task,
                     progress_cb=progress_cb,
                 )
@@ -900,7 +1260,12 @@ class VideoTranslationProcessor:
                 raise
 
         self._emit(progress_cb, 35, "Перевод текста")
-        asr_data = self._translate_asr(asr_data, task)
+        manual_tr_json = str(getattr(task.video_translate_config, "manual_translation_json", "") or "").strip()
+        if manual_tr_json and Path(manual_tr_json).exists():
+            asr_data = self._apply_manual_translation_json(asr_data, manual_tr_json)
+            self._emit(progress_cb, 38, "Применён подтверждённый перевод из предпросмотра")
+        else:
+            asr_data = self._translate_asr(asr_data, task)
 
         if task.output_subtitle_path:
             asr_data.to_srt(task.output_subtitle_path)
@@ -909,7 +1274,6 @@ class VideoTranslationProcessor:
         segments = self._build_segments(asr_data)
         if not segments:
             raise RuntimeError("После перевода не найдено сегментов для озвучки")
-        segments = self._enforce_non_overlap(segments)
 
         # Speaker-aware assign
         if getattr(task.video_translate_config, "enable_diarization", False):
@@ -918,7 +1282,7 @@ class VideoTranslationProcessor:
                 diar_started = time.time()
                 diarizer = DiarizerFactory.create_preferred()
                 turns = diarizer.diarize(
-                    str(audio_path),
+                    str(speech_audio),
                     asr_data,
                     expected_speaker_count=int(
                         getattr(task.video_translate_config, "expected_speaker_count", 0) or 0
@@ -933,10 +1297,23 @@ class VideoTranslationProcessor:
             except Exception as e:
                 logger.warning("Diarization failed, fallback to heuristic: %s", e)
                 try:
-                    turns = HeuristicPauseDiarizer().diarize(str(audio_path), asr_data)
+                    turns = HeuristicPauseDiarizer().diarize(str(speech_audio), asr_data)
                     segments = self._apply_speaker_turns(segments, turns)
                 except Exception:
                     pass
+
+        # Управление overlap-сценариями: для studio/high оставляем оригинальные пересечения,
+        # для fast/balanced можно включать строгую раздвижку сегментов.
+        quality = str(
+            getattr(task.video_translate_config, "voice_clone_quality", "high") or "high"
+        ).strip().lower()
+        allow_overlap = bool(
+            getattr(task.video_translate_config, "allow_speaker_overlap", quality in {"high", "studio"})
+        )
+        if not allow_overlap:
+            segments = self._enforce_non_overlap(segments)
+        else:
+            segments = sorted(segments, key=lambda s: (s.start_ms, s.end_ms))
 
         provider = self._select_provider(task)
         dubbed_audio = provider.synthesize(
@@ -947,7 +1324,7 @@ class VideoTranslationProcessor:
         )
 
         self._emit(progress_cb, 85, "Сборка итогового видео")
-        self._mux_video(task, audio_path, dubbed_audio, task.output_path)
+        self._mux_video(task, bg_audio, dubbed_audio, task.output_path)
 
         task.completed_at = datetime.datetime.now()
         self._emit(progress_cb, 100, "Перевод видео завершён")
