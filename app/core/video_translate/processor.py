@@ -749,11 +749,28 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         # - без перевода: сразу RVC по оригинальному speech stem
         # - с переводом: XTTS -> RVC
         rvc_passthrough_mode = bool(not translation_enabled)
+        diarization_enabled = bool(getattr(cfg, "enable_diarization", False))
         if rvc_passthrough_mode:
             # В RVC-only режиме overlap даёт эффект «двойных слов» на стыках сегментов.
             allow_overlap_cfg = False
             qa_enabled = False
-            segments = self._merge_segments_for_rvc_passthrough(segments)
+            if not diarization_enabled:
+                # Без diarization — один цельный кусок голосовой дорожки одной RVC моделью.
+                _speech = work_dir / "speech_audio.wav"
+                _source = work_dir / "source_audio.wav"
+                _full_src = _speech if _speech.exists() else _source
+                full_ms = max(1, _probe_audio_duration_ms(_full_src))
+                segments = [
+                    VoiceSegment(
+                        idx=1,
+                        start_ms=0,
+                        end_ms=full_ms,
+                        text="_",
+                        speaker_id="spk_0",
+                    )
+                ]
+            else:
+                segments = self._merge_segments_for_rvc_passthrough(segments)
         manual_map_raw = str(getattr(cfg, "manual_voice_map_json", "") or "").strip()
         speaker_slot_map: Dict[str, str] = {}
         if manual_map_raw:
@@ -763,6 +780,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     speaker_slot_map = {str(k): str(v) for k, v in parsed.items() if v is not None}
             except Exception:
                 speaker_slot_map = {}
+        single_voice_mode = str(speaker_slot_map.get("__single_voice__", "")).strip().lower() in {"1", "true", "yes", "on"}
 
         rvc_models_by_slot = {}
         model_root_raw = str(getattr(cfg, "rvc_model_dir", "") or "").strip()
@@ -784,6 +802,12 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             if not default_slot:
                 default_slot = sorted(rvc_models_by_slot.keys())[0]
             speaker_slot_map["default"] = default_slot
+
+        if single_voice_mode and str(speaker_slot_map.get("default", "")).strip():
+            # Принудительно одним голосом для всех спикеров.
+            default_slot = str(speaker_slot_map.get("default", "")).strip()
+            for seg in segments:
+                speaker_slot_map[str(seg.speaker_id)] = default_slot
 
         if progress_cb:
             progress_cb(
@@ -949,16 +973,10 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         lang = str(cfg.target_language or "英语")
         configured_workers = int(getattr(cfg, "tts_parallel_workers", 3) or 3)
         configured_workers = max(1, min(8, configured_workers))
-        max_workers = configured_workers if quality == "studio" else 1
-        if gpu_pref and quality in {"high", "studio"}:
-            # В GPU-режиме избегаем тяжёлой CPU-постобработки каждого сегмента,
-            # чтобы Local TTS меньше упирался в процессор.
+        # Уважаем настройку UI "Параллельных TTS задач".
+        max_workers = configured_workers
+        if gpu_pref:
             qa_enabled = False
-            max_workers = configured_workers
-        if rvc_passthrough_mode:
-            # Чтобы не забивать CPU множеством ffmpeg-процессов в параллель,
-            # делаем последовательный RVC-only конвейер.
-            max_workers = 1
 
         def _job(i_seg):
             i, seg = i_seg
@@ -1917,8 +1935,21 @@ class VideoTranslationProcessor:
         if not segments:
             raise RuntimeError("После перевода не найдено сегментов для озвучки")
 
+        # Если выбран режим «один голос для всех», diarization не нужен:
+        # он только замедляет пайплайн, а итоговое назначение голоса всё равно единое.
+        manual_map_raw = str(getattr(task.video_translate_config, "manual_voice_map_json", "") or "").strip()
+        single_voice_mode = False
+        if manual_map_raw:
+            try:
+                manual_map = json.loads(manual_map_raw)
+                if isinstance(manual_map, dict):
+                    single_voice_mode = str(manual_map.get("__single_voice__", "")).strip().lower() in {"1", "true", "yes", "on"}
+            except Exception:
+                single_voice_mode = False
+
         # Speaker-aware assign
-        if getattr(task.video_translate_config, "enable_diarization", False):
+        diarization_enabled = bool(getattr(task.video_translate_config, "enable_diarization", False))
+        if diarization_enabled and not single_voice_mode:
             try:
                 self._emit(progress_cb, 52, "Diarization спикеров")
                 diar_started = time.time()
@@ -1954,6 +1985,8 @@ class VideoTranslationProcessor:
                 except Exception:
                     pass
         else:
+            if diarization_enabled and single_voice_mode:
+                self._emit(progress_cb, 52, "Diarization пропущен: режим одного голоса")
             self._save_speaker_analysis_cache(segments, None)
 
         # Управление overlap-сценариями: для studio/high оставляем оригинальные пересечения,

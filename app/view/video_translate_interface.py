@@ -37,6 +37,7 @@ from qfluentwidgets import (
     PrimaryPushButton,
     ProgressBar,
     PushButton,
+    isDarkTheme,
 )
 
 from app.core.entities import (
@@ -554,7 +555,34 @@ class VideoTranslateInterface(QWidget):
         self.asr_cache_combo.setCurrentIndex(0 if use_asr_cache else 1)
         row7.addWidget(self.asr_cache_label)
         row7.addWidget(self.asr_cache_combo, 1)
+
         row7.addStretch(1)
+
+        # Отдельная строка для preflight-настроек,
+        # чтобы UI не разъезжался по ширине.
+        row7b = QHBoxLayout()
+        row7b.setSpacing(10)
+
+        self.autonomous_mode_label = BodyLabel("Preflight проверка моделей", self)
+        self.autonomous_mode_label.setMinimumWidth(form_label_w)
+        self.autonomous_mode_combo = ComboBox(self)
+        self.autonomous_mode_combo.setMinimumWidth(form_field_min_w)
+        self.autonomous_mode_combo.addItems(["Да", "Нет"])
+        autonomous_mode = bool(getattr(cfg.video_translate_autonomous_mode, "value", True))
+        self.autonomous_mode_combo.setCurrentIndex(0 if autonomous_mode else 1)
+        row7b.addWidget(self.autonomous_mode_label)
+        row7b.addWidget(self.autonomous_mode_combo, 1)
+
+        self.auto_download_models_label = BodyLabel("Автодокачка моделей", self)
+        self.auto_download_models_label.setMinimumWidth(form_label_w)
+        self.auto_download_models_combo = ComboBox(self)
+        self.auto_download_models_combo.setMinimumWidth(form_field_min_w)
+        self.auto_download_models_combo.addItems(["Да", "Нет"])
+        auto_download_models = bool(getattr(cfg.video_translate_auto_download_models, "value", True))
+        self.auto_download_models_combo.setCurrentIndex(0 if auto_download_models else 1)
+        row7b.addWidget(self.auto_download_models_label)
+        row7b.addWidget(self.auto_download_models_combo, 1)
+        row7b.addStretch(1)
 
         # ------------------------------
         # Этап 1: отделение голоса
@@ -589,6 +617,7 @@ class VideoTranslateInterface(QWidget):
         stage2_layout.addWidget(BodyLabel("Этап 2: Распознавание речи", self))
         stage2_layout.addLayout(row1)
         stage2_layout.addLayout(row7)
+        stage2_layout.addLayout(row7b)
         self.stage2_button = PushButton("Запустить этап 2", self)
         self.stage2_check_button = PushButton("Проверка: открыть распознавание (JSON)", self)
         stage2_btns = QHBoxLayout()
@@ -722,6 +751,8 @@ class VideoTranslateInterface(QWidget):
         self.workers_combo.currentIndexChanged.connect(self._on_workers_changed)
         self.cache_combo.currentIndexChanged.connect(self._on_cache_changed)
         self.asr_cache_combo.currentIndexChanged.connect(self._on_asr_cache_changed)
+        self.autonomous_mode_combo.currentIndexChanged.connect(self._on_autonomous_mode_changed)
+        self.auto_download_models_combo.currentIndexChanged.connect(self._on_auto_download_models_changed)
         self.translation_mode_combo.currentIndexChanged.connect(self._on_translation_mode_changed)
         self.source_lang_combo.currentIndexChanged.connect(self._on_source_language_changed)
         self.target_lang_combo.currentIndexChanged.connect(self._on_target_language_changed)
@@ -843,6 +874,9 @@ class VideoTranslateInterface(QWidget):
             default_slot = str(data.get("default", "")).strip()
             if not default_slot:
                 return False
+            single_voice_mode = str(data.get("__single_voice__", "")).strip().lower() in {"1", "true", "yes", "on"}
+            if single_voice_mode:
+                return True
             speaker_ids = self._load_recent_speaker_ids()
             for spk in speaker_ids:
                 if not str(data.get(spk, "")).strip():
@@ -909,6 +943,15 @@ class VideoTranslateInterface(QWidget):
 
     def _on_asr_cache_changed(self):
         cfg.set(cfg.video_translate_use_asr_cache, self.asr_cache_combo.currentIndex() == 0)
+
+    def _on_autonomous_mode_changed(self):
+        cfg.set(cfg.video_translate_autonomous_mode, self.autonomous_mode_combo.currentIndex() == 0)
+
+    def _on_auto_download_models_changed(self):
+        cfg.set(
+            cfg.video_translate_auto_download_models,
+            self.auto_download_models_combo.currentIndex() == 0,
+        )
 
     def _on_source_language_changed(self):
         idx = self.source_lang_combo.currentIndex()
@@ -1388,7 +1431,6 @@ class VideoTranslateInterface(QWidget):
             return False
 
         speaker_ids = self._load_recent_speaker_ids()
-        speaker_count = len(speaker_ids)
 
         # load existing map
         existing_raw = str(getattr(cfg.video_translate_manual_voice_map_json, "value", "") or "").strip()
@@ -1402,6 +1444,15 @@ class VideoTranslateInterface(QWidget):
         dlg = QDialog(self)
         dlg.setWindowTitle("Голоса спикеров (RVC)")
         dlg.resize(740, 520)
+        if isDarkTheme():
+            dlg.setStyleSheet(
+                """
+                QDialog { background-color: #202020; color: #f1f1f1; }
+                QTableWidget { background-color: #1b1b1b; color: #f1f1f1; gridline-color: #333333; }
+                QHeaderView::section { background-color: #2a2a2a; color: #f1f1f1; border: 0px; padding: 6px; }
+                QTableCornerButton::section { background-color: #2a2a2a; border: 0px; }
+                """
+            )
         lay = QVBoxLayout(dlg)
 
         hint = BodyLabel(
@@ -1411,68 +1462,129 @@ class VideoTranslateInterface(QWidget):
         hint.setWordWrap(True)
         lay.addWidget(hint)
 
-        table = QTableWidget(speaker_count, 4, dlg)
+        # Позволяем вручную увеличить число строк спикеров прямо в этом окне.
+        count_row = QHBoxLayout()
+        count_row.addWidget(BodyLabel("Количество спикеров:", dlg))
+        speaker_count_combo = ComboBox(dlg)
+        speaker_count_combo.addItems([str(i) for i in range(1, 25)])
+        try:
+            expected_cfg = int(getattr(cfg.video_translate_expected_speaker_count, "value", 0) or 0)
+        except Exception:
+            expected_cfg = 0
+        initial_count = max(len(speaker_ids), expected_cfg, 4)
+        initial_count = max(1, min(24, initial_count))
+        speaker_count_combo.setCurrentText(str(initial_count))
+        count_row.addWidget(speaker_count_combo)
+        count_row.addStretch(1)
+        lay.addLayout(count_row)
+
+        mode_row = QHBoxLayout()
+        mode_row.addWidget(BodyLabel("Режим назначений:", dlg))
+        assign_mode_combo = ComboBox(dlg)
+        assign_mode_combo.addItems([
+            "Разные голоса по спикерам",
+            "Один голос для всех спикеров",
+        ])
+        existing_single = str(existing.get("__single_voice__", "")).strip().lower() in {"1", "true", "yes", "on"}
+        assign_mode_combo.setCurrentIndex(1 if existing_single else 0)
+        mode_row.addWidget(assign_mode_combo)
+        mode_row.addStretch(1)
+        lay.addLayout(mode_row)
+
+        table = QTableWidget(0, 4, dlg)
         table.setHorizontalHeaderLabels(["Спикер", "Модель RVC", "Тональность", "Пример голоса"])
         table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
 
-        combos = []
-        for i, spk in enumerate(speaker_ids):
-            table.setItem(i, 0, QTableWidgetItem(spk))
-            table.item(i, 0).setFlags(table.item(i, 0).flags() & ~Qt.ItemIsEditable)
+        base_detected_ids = list(speaker_ids)
+        state = {
+            "speaker_ids": [],
+            "combos": [],
+        }
 
-            combo = ComboBox(dlg)
-            combo.addItem("(по умолчанию)")
-            for label, _m in items:
-                combo.addItem(label)
-            saved_slot = str(existing.get(spk, "")).strip()
-            if saved_slot:
-                for idx, (_label, m) in enumerate(items, start=1):
-                    if saved_slot == str(m.slot):
-                        combo.setCurrentIndex(idx)
-                        break
-            table.setCellWidget(i, 1, combo)
-            combos.append(combo)
+        def _build_speaker_ids(target_count: int) -> list[str]:
+            target_count = max(1, min(24, int(target_count)))
+            ids = list(base_detected_ids)
+            # Добавляем недостающие spk_N, чтобы можно было назначить больше голосов вручную.
+            while len(ids) < target_count:
+                ids.append(f"spk_{len(ids)}")
+            return ids[:target_count]
 
-            tune = "0"
-            if combo.currentIndex() > 0:
-                tune = str(items[combo.currentIndex() - 1][1].default_tune)
-            table.setItem(i, 2, QTableWidgetItem(tune))
-            table.item(i, 2).setFlags(table.item(i, 2).flags() & ~Qt.ItemIsEditable)
+        def _populate_table(target_ids: list[str]):
+            table.setRowCount(len(target_ids))
+            combos = []
+            for i, spk in enumerate(target_ids):
+                table.setItem(i, 0, QTableWidgetItem(spk))
+                table.item(i, 0).setFlags(table.item(i, 0).flags() & ~Qt.ItemIsEditable)
 
-            preview_btn = PushButton("▶ Пример", dlg)
+                combo = ComboBox(dlg)
+                combo.addItem("(по умолчанию)")
+                for label, _m in items:
+                    combo.addItem(label)
+                saved_slot = str(existing.get(spk, "")).strip()
+                if saved_slot:
+                    for idx, (_label, m) in enumerate(items, start=1):
+                        if saved_slot == str(m.slot):
+                            combo.setCurrentIndex(idx)
+                            break
+                table.setCellWidget(i, 1, combo)
+                combos.append(combo)
 
-            def _bind_preview(c=combo):
-                def _on_preview():
-                    if c.currentIndex() <= 0:
-                        InfoBar.warning(
-                            "Не выбрана модель",
-                            "Сначала выберите RVC-модель для этого спикера",
-                            duration=2000,
-                            parent=dlg,
-                        )
-                        return
-                    model = items[c.currentIndex() - 1][1]
-                    self._start_rvc_preview_async(model=model, owner_dialog=dlg, trigger_button=preview_btn)
+                tune = "0"
+                if combo.currentIndex() > 0:
+                    tune = str(items[combo.currentIndex() - 1][1].default_tune)
+                table.setItem(i, 2, QTableWidgetItem(tune))
+                table.item(i, 2).setFlags(table.item(i, 2).flags() & ~Qt.ItemIsEditable)
 
-                return _on_preview
+                preview_btn = PushButton("▶ Пример", dlg)
 
-            preview_btn.clicked.connect(_bind_preview())
-            table.setCellWidget(i, 3, preview_btn)
+                def _bind_preview(c=combo, btn=preview_btn):
+                    def _on_preview():
+                        if c.currentIndex() <= 0:
+                            InfoBar.warning(
+                                "Не выбрана модель",
+                                "Сначала выберите RVC-модель для этого спикера",
+                                duration=2000,
+                                parent=dlg,
+                            )
+                            return
+                        model = items[c.currentIndex() - 1][1]
+                        self._start_rvc_preview_async(model=model, owner_dialog=dlg, trigger_button=btn)
 
-            def _bind_update(row=i, c=combo):
-                def _on_changed(_):
-                    t = "0"
-                    if c.currentIndex() > 0:
-                        t = str(items[c.currentIndex() - 1][1].default_tune)
-                    table.setItem(row, 2, QTableWidgetItem(t))
-                    table.item(row, 2).setFlags(table.item(row, 2).flags() & ~Qt.ItemIsEditable)
+                    return _on_preview
 
-                return _on_changed
+                preview_btn.clicked.connect(_bind_preview())
+                table.setCellWidget(i, 3, preview_btn)
 
-            combo.currentIndexChanged.connect(_bind_update())
+                def _bind_update(row=i, c=combo):
+                    def _on_changed(_):
+                        t = "0"
+                        if c.currentIndex() > 0:
+                            t = str(items[c.currentIndex() - 1][1].default_tune)
+                        table.setItem(row, 2, QTableWidgetItem(t))
+                        table.item(row, 2).setFlags(table.item(row, 2).flags() & ~Qt.ItemIsEditable)
+
+                    return _on_changed
+
+                combo.currentIndexChanged.connect(_bind_update())
+
+            state["speaker_ids"] = list(target_ids)
+            state["combos"] = combos
+
+        _populate_table(_build_speaker_ids(initial_count))
+
+        def _on_count_changed(_):
+            try:
+                target = int(speaker_count_combo.currentText())
+            except Exception:
+                target = initial_count
+            target = max(1, min(24, target))
+            cfg.set(cfg.video_translate_expected_speaker_count, target)
+            _populate_table(_build_speaker_ids(target))
+
+        speaker_count_combo.currentIndexChanged.connect(_on_count_changed)
 
         lay.addWidget(table)
 
@@ -1488,6 +1600,35 @@ class VideoTranslateInterface(QWidget):
 
         def _save_map():
             out = {}
+            single_mode = assign_mode_combo.currentIndex() == 1
+            combos = list(state.get("combos", []))
+            current_speakers = list(state.get("speaker_ids", []))
+
+            if single_mode:
+                if not combos or combos[0].currentIndex() <= 0:
+                    InfoBar.warning(
+                        "Нужно выбрать голос",
+                        "Для режима одного голоса выберите RVC-модель (первая строка)",
+                        duration=2600,
+                        parent=dlg,
+                    )
+                    return
+                single_slot = str(items[combos[0].currentIndex() - 1][1].slot)
+                out["default"] = single_slot
+                out["__single_voice__"] = "1"
+                for spk in current_speakers:
+                    out[str(spk)] = single_slot
+                cfg.set(cfg.video_translate_manual_voice_map_json, json.dumps(out, ensure_ascii=False))
+                saved_ok["ok"] = True
+                InfoBar.success(
+                    "Сохранено",
+                    "Режим одного голоса для всех спикеров сохранён",
+                    duration=2500,
+                    parent=self,
+                )
+                dlg.accept()
+                return
+
             for i, combo in enumerate(combos):
                 if combo.currentIndex() <= 0:
                     InfoBar.warning(
@@ -1498,10 +1639,11 @@ class VideoTranslateInterface(QWidget):
                     )
                     return
                 model = items[combo.currentIndex() - 1][1]
-                spk = speaker_ids[i]
+                spk = current_speakers[i]
                 out[spk] = str(model.slot)
 
             out["default"] = str(items[combos[0].currentIndex() - 1][1].slot)
+            out["__single_voice__"] = "0"
             cfg.set(cfg.video_translate_manual_voice_map_json, json.dumps(out, ensure_ascii=False))
             saved_ok["ok"] = True
             InfoBar.success(
@@ -1723,6 +1865,8 @@ class VideoTranslateInterface(QWidget):
         selected_workers = max(1, min(8, selected_workers))
         selected_cache = self.cache_combo.currentIndex() == 0
         selected_asr_cache = self.asr_cache_combo.currentIndex() == 0
+        selected_autonomous_mode = self.autonomous_mode_combo.currentIndex() == 0
+        selected_auto_download_models = self.auto_download_models_combo.currentIndex() == 0
         sel_src_lang = self._source_lang_options[self.source_lang_combo.currentIndex()]
         sel_lang = self._target_lang_options[self.target_lang_combo.currentIndex()]
         sel_translator = self._translator_options[self.translator_combo.currentIndex()]
@@ -1756,6 +1900,8 @@ class VideoTranslateInterface(QWidget):
         }.get(self.sep_combo.currentIndex(), "demucs_plus_uvr")
         self.task.video_translate_config.tts_parallel_workers = selected_workers
         self.task.video_translate_config.use_translation_cache = selected_cache
+        self.task.video_translate_config.autonomous_mode = selected_autonomous_mode
+        self.task.video_translate_config.auto_download_models = selected_auto_download_models
         self.task.video_translate_config.allow_speaker_overlap = self.overlap_combo.currentIndex() == 0
         self.task.video_translate_config.overlap_aware_mix = self.mix_combo.currentIndex() == 0
         self.task.video_translate_config.segment_qa_enabled = self.qa_combo.currentIndex() == 0
@@ -1826,6 +1972,8 @@ class VideoTranslateInterface(QWidget):
         selected_workers = max(1, min(8, selected_workers))
         selected_cache = self.cache_combo.currentIndex() == 0
         selected_asr_cache = self.asr_cache_combo.currentIndex() == 0
+        selected_autonomous_mode = self.autonomous_mode_combo.currentIndex() == 0
+        selected_auto_download_models = self.auto_download_models_combo.currentIndex() == 0
         sel_src_lang = self._source_lang_options[self.source_lang_combo.currentIndex()]
         sel_lang = self._target_lang_options[self.target_lang_combo.currentIndex()]
         sel_translator = self._translator_options[self.translator_combo.currentIndex()]
@@ -1841,6 +1989,8 @@ class VideoTranslateInterface(QWidget):
         }.get(self.sep_combo.currentIndex(), "demucs_plus_uvr")
         task.video_translate_config.tts_parallel_workers = selected_workers
         task.video_translate_config.use_translation_cache = selected_cache
+        task.video_translate_config.autonomous_mode = selected_autonomous_mode
+        task.video_translate_config.auto_download_models = selected_auto_download_models
         task.video_translate_config.allow_speaker_overlap = self.overlap_combo.currentIndex() == 0
         task.video_translate_config.overlap_aware_mix = self.mix_combo.currentIndex() == 0
         task.video_translate_config.segment_qa_enabled = self.qa_combo.currentIndex() == 0
@@ -2108,18 +2258,26 @@ class VideoTranslateInterface(QWidget):
                         ids = [
                             str(k).strip()
                             for k in data.keys()
-                            if str(k).strip() and str(k).strip().lower() != "default"
+                            if str(k).strip()
+                            and str(k).strip().lower() not in {"default", "__single_voice__"}
                         ]
                 except Exception:
                     ids = []
 
+        # Уважаем ожидаемое число спикеров из настроек: если пользователь указал больше,
+        # расширяем список автоматически, чтобы в диалоге можно было назначить все голоса.
+        try:
+            expected = int(getattr(cfg.video_translate_expected_speaker_count, "value", 0) or 0)
+        except Exception:
+            expected = 0
+        if expected > 0:
+            target = max(1, min(24, expected))
+            while len(ids) < target:
+                ids.append(f"spk_{len(ids)}")
+
         if not ids:
-            try:
-                expected = int(getattr(cfg.video_translate_expected_speaker_count, "value", 0) or 0)
-            except Exception:
-                expected = 0
-            speaker_count = max(2, expected if expected > 0 else 2)
-            speaker_count = min(12, speaker_count)
+            speaker_count = max(1, expected if expected > 0 else 4)
+            speaker_count = min(24, speaker_count)
             ids = [f"spk_{i}" for i in range(speaker_count)]
 
         # Стабильный порядок: spk_0, spk_1, ... затем прочие
