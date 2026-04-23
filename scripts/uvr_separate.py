@@ -48,8 +48,20 @@ def _normalize_wav(src: Path, dst: Path) -> None:
 def _separate_with_audio_separator(input_wav: Path, output_dir: Path, model_file: Path) -> list[Path]:
     from audio_separator.separator import Separator  # type: ignore
 
-    sep = Separator(output_dir=str(output_dir), output_format="WAV")
-    sep.load_model(model_filename=str(model_file))
+    # Для кастомных UVR ONNX-моделей важно передавать model_file_dir,
+    # иначе audio-separator ищет только во внутреннем /tmp-каталоге моделей.
+    sep = Separator(
+        output_dir=str(output_dir),
+        output_format="WAV",
+        model_file_dir=str(model_file.parent),
+    )
+
+    # В большинстве версий библиотека ожидает имя файла, а не абсолютный путь.
+    # Оставляем fallback на абсолютный путь для совместимости со старыми релизами.
+    try:
+        sep.load_model(model_filename=str(model_file.name))
+    except Exception:
+        sep.load_model(model_filename=str(model_file))
 
     before = {p.resolve() for p in output_dir.glob("*.wav")}
     res = sep.separate(str(input_wav))
@@ -72,13 +84,36 @@ def _separate_with_audio_separator(input_wav: Path, output_dir: Path, model_file
 def _pick_stem(paths: list[Path], want_vocals: bool) -> Path | None:
     if not paths:
         return None
-    keys = ["voc", "voice", "kim"] if want_vocals else ["inst", "no_voc", "accompan", "karaoke"]
-    for p in paths:
-        name = p.name.lower()
-        if any(k in name for k in keys):
-            return p
-    # fallback: самый большой файл
-    return sorted(paths, key=lambda x: x.stat().st_size if x.exists() else 0, reverse=True)[0]
+
+    def _score(p: Path) -> int:
+        n = p.name.lower()
+        s = 0
+
+        # Точные признаки stem-типа (приоритетнее всего)
+        if "(vocals)" in n or "_vocals" in n or " vocals" in n:
+            s += 100 if want_vocals else -120
+        if "(instrumental)" in n or "_instrumental" in n or " instrumental" in n:
+            s += 100 if not want_vocals else -120
+        if "no_voc" in n or "accompan" in n or "karaoke" in n:
+            s += 90 if not want_vocals else -80
+
+        # Более слабые эвристики
+        if "voice" in n:
+            s += 25 if want_vocals else -20
+        if "inst" in n:
+            # ВАЖНО: "inst" часто встречается в ИМЕНИ МОДЕЛИ (Inst_HQ_3),
+            # поэтому это только слабый сигнал.
+            s += 8 if not want_vocals else -6
+
+        # Небольшой бонус за размер (обычно основной stem не пустой).
+        try:
+            s += min(20, int(p.stat().st_size / 1_000_000))
+        except Exception:
+            pass
+        return s
+
+    ranked = sorted(paths, key=_score, reverse=True)
+    return ranked[0] if ranked else None
 
 
 def _derive_vocals_from_inst(mix_wav: Path, inst_wav: Path, out_vocals: Path) -> None:
@@ -145,12 +180,16 @@ def main() -> int:
         if vocal_model.exists():
             _safe_print(f"[INFO] vocal model: {vocal_model.name}")
             model_out = out_dir / "vocal_model"
+            if model_out.exists():
+                shutil.rmtree(model_out, ignore_errors=True)
             model_out.mkdir(parents=True, exist_ok=True)
             vocal_outputs = _separate_with_audio_separator(normalized, model_out, vocal_model)
             all_outputs += vocal_outputs
         if inst_model.exists():
             _safe_print(f"[INFO] inst model: {inst_model.name}")
             model_out = out_dir / "inst_model"
+            if model_out.exists():
+                shutil.rmtree(model_out, ignore_errors=True)
             model_out.mkdir(parents=True, exist_ok=True)
             inst_outputs = _separate_with_audio_separator(normalized, model_out, inst_model)
             all_outputs += inst_outputs
@@ -166,8 +205,20 @@ def main() -> int:
         seen.add(rp)
         uniq.append(rp)
 
-    vocals = _pick_stem(vocal_outputs, want_vocals=True) or _pick_stem(uniq, want_vocals=True)
-    no_vocals = _pick_stem(inst_outputs, want_vocals=False) or _pick_stem(uniq, want_vocals=False)
+    # Жёсткая стратегия выбора stem'ов:
+    # - vocals сначала из vocal-model output,
+    # - no_vocals сначала из inst-model output (Instrumental).
+    # Это убирает перепутывание каналов при эвристиках.
+    vocals = (
+        _pick_stem(vocal_outputs, want_vocals=True)
+        or _pick_stem(inst_outputs, want_vocals=True)
+        or _pick_stem(uniq, want_vocals=True)
+    )
+    no_vocals = (
+        _pick_stem(inst_outputs, want_vocals=False)
+        or _pick_stem(vocal_outputs, want_vocals=False)
+        or _pick_stem(uniq, want_vocals=False)
+    )
 
     out_vocals = out_dir / "vocals.wav"
     out_bg = out_dir / "no_vocals.wav"
@@ -176,6 +227,9 @@ def main() -> int:
         shutil.copy2(vocals, out_vocals)
     if no_vocals and no_vocals.exists():
         shutil.copy2(no_vocals, out_bg)
+
+    _safe_print(f"[DEBUG] selected_vocals={vocals}")
+    _safe_print(f"[DEBUG] selected_no_vocals={no_vocals}")
 
     # Приоритет для MDX Inst_HQ_3: строим вокал как разницу mix - instrumental.
     # Это обычно даёт более «чистый» голос (меньше музыки/SFX), чем прямой vocal stem.

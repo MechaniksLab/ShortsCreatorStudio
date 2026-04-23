@@ -130,7 +130,7 @@
         "UseASRCache": true
     },
     "VideoTranslate": {
-        "AggressiveVocalSuppression": true,
+        "AggressiveVocalSuppression": false,
         "AllowSpeakerOverlap": true,
         "AutoDownloadModels": true,
         "AutonomousMode": true,
@@ -146,7 +146,7 @@
         "FishSpeechModelPath": "E:\\Neyro\\ShortsCreatorStudio\\AppData\\models\\fish_speech",
         "KeepBackgroundMusic": true,
         "LocalTTSEndpoint": "http://127.0.0.1:8020",
-        "ManualVoiceMapJson": "{\"spk_0\": \"10\", \"spk_1\": \"11\", \"default\": \"10\"}",
+        "ManualVoiceMapJson": "{\"spk_0\": \"11\", \"spk_1\": \"16\", \"default\": \"11\"}",
         "OpenVoiceModelPath": "E:\\Neyro\\ShortsCreatorStudio\\AppData\\models\\openvoice_v2",
         "OverlapAwareMix": true,
         "PreserveBackgroundLoudness": true,
@@ -173,7 +173,7 @@
         "SourceSeparationMode": "uvr_mdx_kim",
         "TargetLanguage": "英语",
         "TTSParallelWorkers": 5,
-        "UseASRCache": false,
+        "UseASRCache": true,
         "UseTranslationCache": false,
         "UVRInstHQ3ModelName": "UVR-MDX-NET-Inst_HQ_3.onnx",
         "UVRKimVocalModelName": "Kim_Vocal_2.onnx",

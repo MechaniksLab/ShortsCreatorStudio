@@ -62,7 +62,7 @@ class HomeInterface(QWidget):
         self.addSubInterface(
             self.video_translate_interface,
             "VideoTranslateInterface",
-            "Перевод видео",
+            "Переозвучка/Перевод видео",
         )
         self.vBoxLayout.addWidget(self.pivot)
         self.vBoxLayout.addWidget(self.stackedWidget)

@@ -174,6 +174,21 @@ class _StageSeparationThread(QThread):
             if bg_audio.exists() and bg_audio != bg_out:
                 bg_out.write_bytes(bg_audio.read_bytes())
 
+            # Единый набор файлов для быстрой проверки качества этапа 1.
+            # В одной папке: исходник, только голос, только фон.
+            try:
+                src_stage = _STAGE_CACHE_DIR / "source_audio.wav"
+                voice_only = _STAGE_CACHE_DIR / "voice_only.wav"
+                bg_only = _STAGE_CACHE_DIR / "background_only.wav"
+                if src_stage.exists():
+                    (_STAGE_CACHE_DIR / "original_source.wav").write_bytes(src_stage.read_bytes())
+                if speech_out.exists():
+                    voice_only.write_bytes(speech_out.read_bytes())
+                if bg_out.exists():
+                    bg_only.write_bytes(bg_out.read_bytes())
+            except Exception:
+                pass
+
             self.finished_paths.emit(str(speech_out), str(bg_out))
         except Exception as e:
             self.failed.emit(str(e))
@@ -244,7 +259,7 @@ class VideoTranslateInterface(QWidget):
         self.command_bar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         top_layout.addWidget(self.command_bar, 1)
 
-        self.start_button = PrimaryPushButton("Начать перевод видео", self, icon=FIF.PLAY)
+        self.start_button = PrimaryPushButton("Запустить полный пайплайн", self, icon=FIF.PLAY)
         self.start_button.setFixedHeight(34)
         top_layout.addWidget(self.start_button)
         self.main_layout.addLayout(top_layout)
@@ -261,6 +276,8 @@ class VideoTranslateInterface(QWidget):
         self.command_bar.addAction(check_translate_action)
         open_translate_action = Action(FIF.DOCUMENT, "Открыть перевод (srt)", triggered=self.open_translation_file)
         self.command_bar.addAction(open_translate_action)
+        open_stage_action = Action(FIF.FOLDER, "Открыть папку этапа 1", triggered=self.open_stage_cache_folder)
+        self.command_bar.addAction(open_stage_action)
         edit_last_translate_action = Action(
             FIF.EDIT,
             "Редактировать последний перевод",
@@ -298,10 +315,6 @@ class VideoTranslateInterface(QWidget):
         hint.setWordWrap(True)
         config_layout.addWidget(hint)
 
-        # Компактная сетка настроек (в несколько колонок)
-        settings_grid = QVBoxLayout()
-        settings_grid.setSpacing(8)
-
         # Единая ширина label/combo, чтобы второй столбец не "плавал".
         form_label_w = 220
         form_field_min_w = 210
@@ -328,11 +341,10 @@ class VideoTranslateInterface(QWidget):
         self.quality_combo.setCurrentIndex(quality_to_idx.get(current_quality, 1))
         row1.addWidget(self.quality_label)
         row1.addWidget(self.quality_combo, 1)
-        settings_grid.addLayout(row1)
 
         row2 = QHBoxLayout()
         row2.setSpacing(10)
-        self.overlap_label = BodyLabel("Разрешить overlap реплик", self)
+        self.overlap_label = BodyLabel("Разрешить overlap реплик (актуально при 2+ спикерах)", self)
         self.overlap_label.setMinimumWidth(form_label_w)
         self.overlap_combo = ComboBox(self)
         self.overlap_combo.setMinimumWidth(form_field_min_w)
@@ -343,7 +355,7 @@ class VideoTranslateInterface(QWidget):
         row2.addWidget(self.overlap_label)
         row2.addWidget(self.overlap_combo, 1)
 
-        self.mix_label = BodyLabel("Overlap-aware микс по спикерам", self)
+        self.mix_label = BodyLabel("Overlap-aware микс по спикерам (актуально при overlap)", self)
         self.mix_label.setMinimumWidth(form_label_w)
         self.mix_combo = ComboBox(self)
         self.mix_combo.setMinimumWidth(form_field_min_w)
@@ -353,11 +365,10 @@ class VideoTranslateInterface(QWidget):
         )
         row2.addWidget(self.mix_label)
         row2.addWidget(self.mix_combo, 1)
-        settings_grid.addLayout(row2)
 
         row3 = QHBoxLayout()
         row3.setSpacing(10)
-        self.qa_label = BodyLabel("QA проверка TTS-сегментов", self)
+        self.qa_label = BodyLabel("QA проверка TTS-сегментов (дольше, но чище)", self)
         self.qa_label.setMinimumWidth(form_label_w)
         self.qa_combo = ComboBox(self)
         self.qa_combo.setMinimumWidth(form_field_min_w)
@@ -377,11 +388,10 @@ class VideoTranslateInterface(QWidget):
         self.qa_retry_combo.setCurrentText(str(max(0, min(4, cur_qa_retry))))
         row3.addWidget(self.qa_retry_label)
         row3.addWidget(self.qa_retry_combo, 1)
-        settings_grid.addLayout(row3)
 
         row4 = QHBoxLayout()
         row4.setSpacing(10)
-        self.duck_label = BodyLabel("Ducking фона под речь", self)
+        self.duck_label = BodyLabel("Ducking фона под речь (не действует в режиме 1:1 фона)", self)
         self.duck_label.setMinimumWidth(form_label_w)
         self.duck_combo = ComboBox(self)
         self.duck_combo.setMinimumWidth(form_field_min_w)
@@ -392,7 +402,7 @@ class VideoTranslateInterface(QWidget):
         row4.addWidget(self.duck_label)
         row4.addWidget(self.duck_combo, 1)
 
-        self.preserve_bg_label = BodyLabel("Сохранить громкость музыки/SFX 1:1", self)
+        self.preserve_bg_label = BodyLabel("Сохранить громкость музыки/SFX 1:1 (без loudnorm/ducking)", self)
         self.preserve_bg_label.setMinimumWidth(form_label_w)
         self.preserve_bg_combo = ComboBox(self)
         self.preserve_bg_combo.setMinimumWidth(form_field_min_w)
@@ -417,7 +427,6 @@ class VideoTranslateInterface(QWidget):
         self.provider_combo.setCurrentIndex(provider_to_idx.get(current_provider, 0))
         row4.addWidget(self.provider_label)
         row4.addWidget(self.provider_combo, 1)
-        settings_grid.addLayout(row4)
 
         row4b = QHBoxLayout()
         row4b.setSpacing(10)
@@ -436,7 +445,7 @@ class VideoTranslateInterface(QWidget):
         self.sep_combo.setCurrentIndex(sep_to_idx.get(sep_mode, 0))
         row4b.addWidget(self.sep_label)
         row4b.addWidget(self.sep_combo, 1)
-        self.vocal_kill_label = BodyLabel("Агрессивно убрать оригинальный голос", self)
+        self.vocal_kill_label = BodyLabel("Агрессивно убрать остатки оригинального голоса", self)
         self.vocal_kill_label.setMinimumWidth(form_label_w)
         self.vocal_kill_combo = ComboBox(self)
         self.vocal_kill_combo.setMinimumWidth(form_field_min_w)
@@ -446,7 +455,6 @@ class VideoTranslateInterface(QWidget):
         )
         row4b.addWidget(self.vocal_kill_label)
         row4b.addWidget(self.vocal_kill_combo, 1)
-        settings_grid.addLayout(row4b)
 
         row4c = QHBoxLayout()
         row4c.setSpacing(10)
@@ -462,7 +470,6 @@ class VideoTranslateInterface(QWidget):
         row4c.addWidget(self.translation_mode_label)
         row4c.addWidget(self.translation_mode_combo, 1)
         row4c.addStretch(1)
-        settings_grid.addLayout(row4c)
 
         row5 = QHBoxLayout()
         row5.setSpacing(10)
@@ -508,14 +515,13 @@ class VideoTranslateInterface(QWidget):
             if str(opt.value) == cur_translator:
                 self.translator_combo.setCurrentIndex(i)
                 break
-        settings_grid.addLayout(row5)
 
         row6 = QHBoxLayout()
         row6.setSpacing(10)
         row6.addWidget(self.translator_label)
         row6.addWidget(self.translator_combo, 1)
 
-        self.workers_label = BodyLabel("Параллельных TTS задач", self)
+        self.workers_label = BodyLabel("Параллельных TTS задач (ускорение этапа озвучки)", self)
         self.workers_label.setMinimumWidth(form_label_w)
         self.workers_combo = ComboBox(self)
         self.workers_combo.setMinimumWidth(form_field_min_w)
@@ -526,7 +532,6 @@ class VideoTranslateInterface(QWidget):
         row6.addWidget(self.workers_label)
         row6.addWidget(self.workers_combo, 1)
 
-        settings_grid.addLayout(row6)
 
         row7 = QHBoxLayout()
         row7.setSpacing(10)
@@ -550,9 +555,125 @@ class VideoTranslateInterface(QWidget):
         row7.addWidget(self.asr_cache_label)
         row7.addWidget(self.asr_cache_combo, 1)
         row7.addStretch(1)
-        settings_grid.addLayout(row7)
 
-        config_layout.addLayout(settings_grid)
+        # ------------------------------
+        # Этап 1: отделение голоса
+        # ------------------------------
+        stage1_card = CardWidget(self)
+        stage1_layout = QVBoxLayout(stage1_card)
+        stage1_layout.setContentsMargins(12, 12, 12, 12)
+        stage1_layout.setSpacing(8)
+        stage1_layout.addWidget(BodyLabel("Этап 1: Отделение голоса / фона", self))
+        stage1_layout.addLayout(row4b)
+        self.stage1_button = PrimaryPushButton("Запустить этап 1", self)
+        self.stage1_check_button = PushButton("Проверка: открыть папку этапа 1", self)
+        stage1_btns = QHBoxLayout()
+        stage1_btns.addWidget(self.stage1_button)
+        stage1_btns.addWidget(self.stage1_check_button)
+        stage1_btns.addStretch(1)
+        stage1_layout.addLayout(stage1_btns)
+        self.stage1_progress = ProgressBar(self)
+        self.stage1_progress.setValue(0)
+        self.stage1_status = BodyLabel("Ожидание", self)
+        stage1_layout.addWidget(self.stage1_progress)
+        stage1_layout.addWidget(self.stage1_status)
+        config_layout.addWidget(stage1_card)
+
+        # ------------------------------
+        # Этап 2: ASR
+        # ------------------------------
+        stage2_card = CardWidget(self)
+        stage2_layout = QVBoxLayout(stage2_card)
+        stage2_layout.setContentsMargins(12, 12, 12, 12)
+        stage2_layout.setSpacing(8)
+        stage2_layout.addWidget(BodyLabel("Этап 2: Распознавание речи", self))
+        stage2_layout.addLayout(row1)
+        stage2_layout.addLayout(row7)
+        self.stage2_button = PushButton("Запустить этап 2", self)
+        self.stage2_check_button = PushButton("Проверка: открыть распознавание (JSON)", self)
+        stage2_btns = QHBoxLayout()
+        stage2_btns.addWidget(self.stage2_button)
+        stage2_btns.addWidget(self.stage2_check_button)
+        stage2_btns.addStretch(1)
+        stage2_layout.addLayout(stage2_btns)
+        self.stage2_progress = ProgressBar(self)
+        self.stage2_progress.setValue(0)
+        self.stage2_status = BodyLabel("Ожидание", self)
+        stage2_layout.addWidget(self.stage2_progress)
+        stage2_layout.addWidget(self.stage2_status)
+        config_layout.addWidget(stage2_card)
+
+        # ------------------------------
+        # Этап 3: перевод/правка
+        # ------------------------------
+        stage3_card = CardWidget(self)
+        stage3_layout = QVBoxLayout(stage3_card)
+        stage3_layout.setContentsMargins(12, 12, 12, 12)
+        stage3_layout.setSpacing(8)
+        stage3_layout.addWidget(BodyLabel("Этап 3: Перевод и ручная правка", self))
+        stage3_layout.addLayout(row4c)
+        stage3_layout.addLayout(row5)
+        self.stage3_button = PushButton("Запустить этап 3 (предпросмотр)", self)
+        self.stage3_check_button = PushButton("Проверка: открыть перевод", self)
+        stage3_btns = QHBoxLayout()
+        stage3_btns.addWidget(self.stage3_button)
+        stage3_btns.addWidget(self.stage3_check_button)
+        stage3_btns.addStretch(1)
+        stage3_layout.addLayout(stage3_btns)
+        self.stage3_progress = ProgressBar(self)
+        self.stage3_progress.setValue(0)
+        self.stage3_status = BodyLabel("Ожидание", self)
+        stage3_layout.addWidget(self.stage3_progress)
+        stage3_layout.addWidget(self.stage3_status)
+        config_layout.addWidget(stage3_card)
+
+        # ------------------------------
+        # Этап 4: голоса/спикеры
+        # ------------------------------
+        stage4_card = CardWidget(self)
+        stage4_layout = QVBoxLayout(stage4_card)
+        stage4_layout.setContentsMargins(12, 12, 12, 12)
+        stage4_layout.setSpacing(8)
+        stage4_layout.addWidget(BodyLabel("Этап 4: Голоса спикеров и RVC", self))
+        stage4_layout.addLayout(row6)
+        self.stage4_button = PushButton("Запустить этап 4 (назначение голосов)", self)
+        self.stage4_check_button = PushButton("Проверка: менеджер RVC моделей", self)
+        stage4_btns = QHBoxLayout()
+        stage4_btns.addWidget(self.stage4_button)
+        stage4_btns.addWidget(self.stage4_check_button)
+        stage4_btns.addStretch(1)
+        stage4_layout.addLayout(stage4_btns)
+        self.stage4_progress = ProgressBar(self)
+        self.stage4_progress.setValue(0)
+        self.stage4_status = BodyLabel("Ожидание", self)
+        stage4_layout.addWidget(self.stage4_progress)
+        stage4_layout.addWidget(self.stage4_status)
+        config_layout.addWidget(stage4_card)
+
+        # ------------------------------
+        # Этап 5-6: сборка
+        # ------------------------------
+        stage56_card = CardWidget(self)
+        stage56_layout = QVBoxLayout(stage56_card)
+        stage56_layout.setContentsMargins(12, 12, 12, 12)
+        stage56_layout.setSpacing(8)
+        stage56_layout.addWidget(BodyLabel("Этап 5-6: Озвучка, микс и рендер", self))
+        stage56_layout.addLayout(row2)
+        stage56_layout.addLayout(row3)
+        stage56_layout.addLayout(row4)
+        self.stage56_button = PrimaryPushButton("Запустить этап 5-6 (финальный рендер)", self)
+        self.stage56_check_button = PushButton("Проверка: открыть папку результата", self)
+        stage56_btns = QHBoxLayout()
+        stage56_btns.addWidget(self.stage56_button)
+        stage56_btns.addWidget(self.stage56_check_button)
+        stage56_btns.addStretch(1)
+        stage56_layout.addLayout(stage56_btns)
+        self.stage56_progress = ProgressBar(self)
+        self.stage56_progress.setValue(0)
+        self.stage56_status = BodyLabel("Ожидание", self)
+        stage56_layout.addWidget(self.stage56_progress)
+        stage56_layout.addWidget(self.stage56_status)
+        config_layout.addWidget(stage56_card)
 
         self.diag_label = BodyLabel("Диагностика: не выполнялась", self)
         self.diag_label.setWordWrap(True)
@@ -564,38 +685,15 @@ class VideoTranslateInterface(QWidget):
         diag_btn_row.addStretch(1)
         config_layout.addLayout(diag_btn_row)
 
-        self.scroll_area.setWidget(self.config_card)
-        self.main_layout.addWidget(self.scroll_area, 1)
-
-        stages_card = CardWidget(self)
-        stages_layout = QVBoxLayout(stages_card)
-        stages_layout.setContentsMargins(12, 12, 12, 12)
-        stages_layout.setSpacing(8)
-        stages_layout.addWidget(BodyLabel("Пошаговый режим", self))
-
-        stage_row1 = QHBoxLayout()
-        self.stage1_button = PushButton("Этап 1: Отделить голос", self)
-        self.stage2_button = PushButton("Этап 2: Распознать речь", self)
-        self.stage3_button = PushButton("Этап 3: Перевод / правка", self)
-        stage_row1.addWidget(self.stage1_button)
-        stage_row1.addWidget(self.stage2_button)
-        stage_row1.addWidget(self.stage3_button)
-        stages_layout.addLayout(stage_row1)
-
-        stage_row2 = QHBoxLayout()
-        self.stage4_button = PushButton("Этап 4: Голоса и предпрослушка", self)
-        self.stage56_button = PrimaryPushButton("Этап 5-6: Сборка и рендер", self)
-        stage_row2.addWidget(self.stage4_button)
-        stage_row2.addWidget(self.stage56_button)
-        stages_layout.addLayout(stage_row2)
-
         self.stage_hint_label = BodyLabel(
-            "Каждый этап можно запускать отдельно. Фильтры применяются в своём этапе.",
+            "Запускайте этапы сверху вниз. Для каждого этапа есть отдельная кнопка проверки.",
             self,
         )
         self.stage_hint_label.setWordWrap(True)
-        stages_layout.addWidget(self.stage_hint_label)
-        self.main_layout.addWidget(stages_card)
+        config_layout.addWidget(self.stage_hint_label)
+
+        self.scroll_area.setWidget(self.config_card)
+        self.main_layout.addWidget(self.scroll_area, 1)
 
         bottom = QHBoxLayout()
         self.progress_bar = ProgressBar(self)
@@ -610,10 +708,15 @@ class VideoTranslateInterface(QWidget):
         self.video_button.clicked.connect(self.choose_video_file)
         self.start_button.clicked.connect(self.start_translate)
         self.stage1_button.clicked.connect(self.run_stage1_separation)
+        self.stage1_check_button.clicked.connect(self.open_stage_cache_folder)
         self.stage2_button.clicked.connect(self.run_stage2_asr)
+        self.stage2_check_button.clicked.connect(self.open_last_asr_cache_file)
         self.stage3_button.clicked.connect(self.preview_translation)
+        self.stage3_check_button.clicked.connect(self.open_translation_file)
         self.stage4_button.clicked.connect(self.open_speaker_voice_map_dialog)
-        self.stage56_button.clicked.connect(self.start_translate)
+        self.stage4_check_button.clicked.connect(self.open_rvc_model_manager)
+        self.stage56_button.clicked.connect(lambda: self.start_translate(prompt_rvc_map=False))
+        self.stage56_check_button.clicked.connect(self.open_output_folder)
         self.device_combo.currentIndexChanged.connect(self._on_device_changed)
         self.quality_combo.currentIndexChanged.connect(self._on_quality_changed)
         self.workers_combo.currentIndexChanged.connect(self._on_workers_changed)
@@ -634,19 +737,119 @@ class VideoTranslateInterface(QWidget):
         self.vocal_kill_combo.currentIndexChanged.connect(self._on_aggressive_vocal_suppression_changed)
         self.diag_button.clicked.connect(self.run_gpu_diagnostics)
         self._on_translation_mode_changed()
+        self._refresh_filter_applicability_hints()
 
     def _translation_enabled(self) -> bool:
         return self.translation_mode_combo.currentIndex() == 0
+
+    def _set_stage_progress(self, stage: int, value: int, status: str):
+        value = max(0, min(100, int(value)))
+        mapping = {
+            1: (self.stage1_progress, self.stage1_status),
+            2: (self.stage2_progress, self.stage2_status),
+            3: (self.stage3_progress, self.stage3_status),
+            4: (self.stage4_progress, self.stage4_status),
+            56: (self.stage56_progress, self.stage56_status),
+        }
+        pair = mapping.get(stage)
+        if not pair:
+            return
+        pb, lbl = pair
+        pb.setValue(value)
+        lbl.setText(status or "Выполняется")
+
+    def _reset_all_stage_progress(self):
+        self._set_stage_progress(1, 0, "Ожидание")
+        self._set_stage_progress(2, 0, "Ожидание")
+        self._set_stage_progress(3, 0, "Ожидание")
+        self._set_stage_progress(4, 0, "Ожидание")
+        self._set_stage_progress(56, 0, "Ожидание")
+
+    def _route_full_pipeline_progress(self, value: int, status: str):
+        # Маршрутизируем общий прогресс в прогресс-блоки этапов.
+        if not self._translation_enabled():
+            if value <= 11:
+                self._set_stage_progress(1, int(value / 11 * 100) if value > 0 else 0, status)
+                self._set_stage_progress(3, 0, "Не используется (без перевода)")
+                return
+            if value <= 34:
+                self._set_stage_progress(1, 100, "Готово")
+                self._set_stage_progress(2, int((value - 12) / 22 * 100), status)
+                self._set_stage_progress(3, 0, "Не используется (без перевода)")
+                return
+            if value <= 84:
+                self._set_stage_progress(1, 100, "Готово")
+                self._set_stage_progress(2, 100, "Готово")
+                self._set_stage_progress(3, 0, "Не используется (без перевода)")
+                self._set_stage_progress(4, int((value - 35) / 49 * 100), status)
+                return
+            self._set_stage_progress(1, 100, "Готово")
+            self._set_stage_progress(2, 100, "Готово")
+            self._set_stage_progress(3, 0, "Не используется (без перевода)")
+            self._set_stage_progress(4, 100, "Готово")
+            self._set_stage_progress(56, int((value - 85) / 15 * 100), status)
+            return
+
+        if value <= 11:
+            self._set_stage_progress(1, int(value / 11 * 100) if value > 0 else 0, status)
+            return
+        if value <= 34:
+            self._set_stage_progress(1, 100, "Готово")
+            self._set_stage_progress(2, int((value - 12) / 22 * 100), status)
+            return
+        if value <= 49:
+            self._set_stage_progress(1, 100, "Готово")
+            self._set_stage_progress(2, 100, "Готово")
+            self._set_stage_progress(3, int((value - 35) / 14 * 100), status)
+            return
+        if value <= 84:
+            self._set_stage_progress(1, 100, "Готово")
+            self._set_stage_progress(2, 100, "Готово")
+            self._set_stage_progress(3, 100, "Готово")
+            self._set_stage_progress(4, int((value - 50) / 34 * 100), status)
+            return
+        self._set_stage_progress(1, 100, "Готово")
+        self._set_stage_progress(2, 100, "Готово")
+        self._set_stage_progress(3, 100, "Готово")
+        self._set_stage_progress(4, 100, "Готово")
+        self._set_stage_progress(56, int((value - 85) / 15 * 100), status)
 
     def _on_translation_mode_changed(self):
         enabled = self._translation_enabled()
         self.source_lang_combo.setEnabled(enabled)
         self.target_lang_combo.setEnabled(enabled)
         self.translator_combo.setEnabled(enabled)
+        # Этап 3 нужен только когда включён перевод.
+        self.stage3_button.setEnabled(enabled)
+        self.stage3_check_button.setEnabled(enabled)
+        self.stage3_progress.setEnabled(enabled)
+        if not enabled:
+            self._set_stage_progress(3, 0, "Не используется (без перевода)")
+        else:
+            self._set_stage_progress(3, 0, "Ожидание")
         if enabled:
             self.diag_label.setText("Режим: перевод + переозвучка")
         else:
             self.diag_label.setText("Режим: без перевода (переозвучка по оригинальному тексту)")
+
+    def _has_complete_speaker_voice_map(self) -> bool:
+        try:
+            raw = str(getattr(cfg.video_translate_manual_voice_map_json, "value", "") or "").strip()
+            if not raw:
+                return False
+            data = json.loads(raw)
+            if not isinstance(data, dict):
+                return False
+            default_slot = str(data.get("default", "")).strip()
+            if not default_slot:
+                return False
+            speaker_ids = self._load_recent_speaker_ids()
+            for spk in speaker_ids:
+                if not str(data.get(spk, "")).strip():
+                    return False
+            return True
+        except Exception:
+            return False
 
     def run_gpu_diagnostics(self):
         if self.diag_thread and self.diag_thread.isRunning():
@@ -734,6 +937,7 @@ class VideoTranslateInterface(QWidget):
             3: "auto",
         }.get(self.sep_combo.currentIndex(), "demucs_plus_uvr")
         cfg.set(cfg.video_translate_source_separation_mode, mode)
+        self._refresh_filter_applicability_hints()
 
     def _on_overlap_changed(self):
         cfg.set(cfg.video_translate_allow_speaker_overlap, self.overlap_combo.currentIndex() == 0)
@@ -759,12 +963,42 @@ class VideoTranslateInterface(QWidget):
             cfg.video_translate_preserve_background_loudness,
             self.preserve_bg_combo.currentIndex() == 0,
         )
+        self._refresh_filter_applicability_hints()
 
     def _on_aggressive_vocal_suppression_changed(self):
         cfg.set(
             cfg.video_translate_aggressive_vocal_suppression,
             self.vocal_kill_combo.currentIndex() == 0,
         )
+        self._refresh_filter_applicability_hints()
+
+    def _refresh_filter_applicability_hints(self):
+        mode = {
+            0: "demucs_plus_uvr",
+            1: "demucs",
+            2: "uvr_mdx_kim",
+            3: "auto",
+        }.get(self.sep_combo.currentIndex(), "demucs_plus_uvr")
+
+        # Для UVR MDX/Kim отдельный "агрессивный" cleanup обычно не нужен.
+        if mode == "uvr_mdx_kim":
+            self.vocal_kill_label.setText("Агрессивно убрать остатки оригинального голоса (обычно не нужно для UVR MDX/Kim)")
+            self.vocal_kill_combo.setCurrentIndex(1)
+            self.vocal_kill_combo.setEnabled(False)
+        else:
+            self.vocal_kill_label.setText("Агрессивно убрать остатки оригинального голоса (актуально для Demucs/Demucs+UVR)")
+            self.vocal_kill_combo.setEnabled(True)
+
+        preserve_bg = self.preserve_bg_combo.currentIndex() == 0
+        aggressive = self.vocal_kill_combo.currentIndex() == 0 and self.vocal_kill_combo.isEnabled()
+        ducking_effective = not preserve_bg and not aggressive
+        self.duck_combo.setEnabled(ducking_effective)
+        if preserve_bg:
+            self.duck_label.setText("Ducking фона под речь (выключен: выбран режим 1:1 фона)")
+        elif aggressive:
+            self.duck_label.setText("Ducking фона под речь (выключен: включено агрессивное подавление вокала)")
+        else:
+            self.duck_label.setText("Ducking фона под речь (не действует в режиме 1:1 фона)")
 
     def _model_display_items(self):
         self._refresh_rvc_models()
@@ -1335,6 +1569,7 @@ class VideoTranslateInterface(QWidget):
         cfg.set(cfg.video_translate_source_separation_mode, "uvr_mdx_kim")
         task = self._build_task_from_ui(video_path)
         self.stage_hint_label.setText("Этап 1: разделение (UVR MDX/Kim), подождите...")
+        self._set_stage_progress(1, 5, "Этап 1: запуск")
         self.stage1_button.setEnabled(False)
         self.stage_sep_thread = _StageSeparationThread(video_path=video_path, task=task)
 
@@ -1344,8 +1579,10 @@ class VideoTranslateInterface(QWidget):
             speech_out = Path(speech_path)
             bg_out = Path(bg_path)
             self.stage_hint_label.setText(
-                f"Этап 1 завершён (UVR MDX/Kim). Голос: {speech_out.name}, Фон: {bg_out.name}."
+                f"Этап 1 завершён (UVR MDX/Kim). Голос: {speech_out.name}, Фон: {bg_out.name}. "
+                f"Папка: {_STAGE_CACHE_DIR}"
             )
+            self._set_stage_progress(1, 100, "Этап 1 завершён")
             if speech_out.exists() and sys.platform == "win32":
                 os.startfile(str(speech_out))
             InfoBar.success("Этап 1", "Готово: можно прослушать чистый голос", duration=2600, parent=self)
@@ -1353,6 +1590,7 @@ class VideoTranslateInterface(QWidget):
         def _fail(err: str):
             self.stage1_button.setEnabled(True)
             self.stage_sep_thread = None
+            self._set_stage_progress(1, 100, f"Ошибка этапа 1")
             self._show_copyable_error(
                 title="Ошибка этапа 1",
                 message=str(err),
@@ -1373,6 +1611,7 @@ class VideoTranslateInterface(QWidget):
             return
         task = self._build_task_from_ui(video_path)
         self.stage_hint_label.setText("Этап 2: распознавание речи, подождите...")
+        self._set_stage_progress(2, 5, "Этап 2: запуск")
         self.stage2_button.setEnabled(False)
         self.stage_asr_thread = _StageAsrThread(video_path=video_path, task=task)
 
@@ -1381,12 +1620,15 @@ class VideoTranslateInterface(QWidget):
             self.stage_asr_thread = None
             _LAST_ASR_CACHE.parent.mkdir(parents=True, exist_ok=True)
             _LAST_ASR_CACHE.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.manual_transcription_json_path = str(_LAST_ASR_CACHE)
             self._open_asr_editor(rows)
             self.stage_hint_label.setText("Этап 2 завершён. Распознавание сохранено и доступно для правки.")
+            self._set_stage_progress(2, 100, "Этап 2 завершён")
 
         def _fail(err: str):
             self.stage2_button.setEnabled(True)
             self.stage_asr_thread = None
+            self._set_stage_progress(2, 100, "Ошибка этапа 2")
             self._show_copyable_error(
                 title="Ошибка этапа 2",
                 message=str(err),
@@ -1446,7 +1688,7 @@ class VideoTranslateInterface(QWidget):
         cancel_btn.clicked.connect(dlg.reject)
         dlg.exec_()
 
-    def start_translate(self):
+    def start_translate(self, *, prompt_rvc_map: bool = True):
         video_path = (self.video_input.text() or "").strip()
         if not video_path:
             InfoBar.warning(
@@ -1488,7 +1730,7 @@ class VideoTranslateInterface(QWidget):
             self.provider_combo.currentIndex(), "auto"
         )
 
-        if sel_provider == "rvc":
+        if sel_provider == "rvc" and prompt_rvc_map and not self._has_complete_speaker_voice_map():
             ok = self.open_speaker_voice_map_dialog()
             if not ok:
                 InfoBar.warning(
@@ -1498,6 +1740,10 @@ class VideoTranslateInterface(QWidget):
                     parent=self,
                 )
                 return
+
+        # Если этап 2 уже выполнялся — используем готовый ASR JSON и не делаем повторный ASR в этапе 5-6.
+        if (not self.manual_transcription_json_path) and _LAST_ASR_CACHE.exists():
+            self.manual_transcription_json_path = str(_LAST_ASR_CACHE)
 
         self.task.video_translate_config.voice_clone_quality = selected_quality
         self.task.video_translate_config.translation_enabled = self._translation_enabled()
@@ -1541,19 +1787,23 @@ class VideoTranslateInterface(QWidget):
         self.translate_thread.finished.connect(self.on_finished)
         self.translate_thread.error.connect(self.on_error)
 
+        self._reset_all_stage_progress()
         self.progress_bar.setValue(0)
         self.status_label.setText("Запуск...")
+        self._set_stage_progress(1, 1, "Запуск полного пайплайна")
         self.start_button.setEnabled(False)
         self.translate_thread.start()
 
     def on_progress(self, value: int, status: str):
         self.progress_bar.setValue(int(value))
         self.status_label.setText(status or "В обработке")
+        self._route_full_pipeline_progress(int(value), status or "В обработке")
 
     def on_finished(self, task: VideoTranslateTask):
         self.start_button.setEnabled(True)
         self.progress_bar.setValue(100)
         self.status_label.setText("Готово")
+        self._set_stage_progress(56, 100, "Этап 5-6 завершён")
         InfoBar.success(
             "Перевод завершён",
             f"Видео: {task.output_path}\nПеревод (srt): {task.output_subtitle_path}",
@@ -1598,7 +1848,10 @@ class VideoTranslateInterface(QWidget):
         task.video_translate_config.enable_background_ducking = self.duck_combo.currentIndex() == 0
         task.video_translate_config.preserve_background_loudness = self.preserve_bg_combo.currentIndex() == 0
         task.video_translate_config.aggressive_vocal_suppression = self.vocal_kill_combo.currentIndex() == 0
-        task.video_translate_config.manual_transcription_json = str(self.manual_transcription_json_path or "")
+        manual_tx_path = str(self.manual_transcription_json_path or "").strip()
+        if not manual_tx_path and _LAST_ASR_CACHE.exists():
+            manual_tx_path = str(_LAST_ASR_CACHE)
+        task.video_translate_config.manual_transcription_json = manual_tx_path
         task.video_translate_config.manual_translation_json = str(self.manual_translation_json_path or "")
         task.video_translate_config.source_language = sel_src_lang.value
         task.transcribe_config.use_asr_cache = selected_asr_cache
@@ -1612,12 +1865,21 @@ class VideoTranslateInterface(QWidget):
         return task
 
     def preview_translation(self):
+        if not self._translation_enabled():
+            InfoBar.warning(
+                "Этап 3 отключён",
+                "В режиме без перевода этап 3 не используется",
+                duration=2200,
+                parent=self,
+            )
+            return
         video_path = (self.video_input.text() or "").strip()
         if not video_path or not Path(video_path).exists():
             InfoBar.warning("Внимание", "Сначала выберите видео", duration=2000, parent=self)
             return
         if self.preview_thread and self.preview_thread.isRunning():
             return
+        self._set_stage_progress(3, 5, "Этап 3: подготовка предпросмотра")
         self.diag_label.setText(
             "Проверка перевода: ASR + перевод..." if self._translation_enabled() else "Проверка режима без перевода: ASR + исходный текст"
         )
@@ -1629,6 +1891,7 @@ class VideoTranslateInterface(QWidget):
 
     def _on_preview_finished(self, rows: list):
         self.preview_thread = None
+        self._set_stage_progress(3, 100, "Этап 3: предпросмотр готов")
         dlg = QDialog(self)
         dlg.setWindowTitle("Проверка перевода перед озвучкой")
         dlg.resize(1100, 700)
@@ -1680,6 +1943,7 @@ class VideoTranslateInterface(QWidget):
 
     def _on_preview_failed(self, err: str):
         self.preview_thread = None
+        self._set_stage_progress(3, 100, "Ошибка этапа 3")
         self.diag_label.setText(f"Проверка перевода: ошибка ({err})")
         self._show_copyable_error(
             title="Ошибка проверки перевода",
@@ -1697,6 +1961,22 @@ class VideoTranslateInterface(QWidget):
             target = Path(self.manual_translation_json_path)
         if not target:
             InfoBar.warning("Нет файла", "Сначала выполните проверку/перевод", duration=2000, parent=self)
+            return
+        if sys.platform == "win32":
+            os.startfile(str(target))
+        elif sys.platform == "darwin":
+            subprocess.run(["open", str(target)])
+        else:
+            subprocess.run(["xdg-open", str(target)])
+
+    def open_last_asr_cache_file(self):
+        target = None
+        if _LAST_ASR_CACHE.exists():
+            target = _LAST_ASR_CACHE
+        elif self.manual_transcription_json_path and Path(self.manual_transcription_json_path).exists():
+            target = Path(self.manual_transcription_json_path)
+        if not target:
+            InfoBar.warning("Нет файла", "Сначала выполните этап 2 (распознавание)", duration=2200, parent=self)
             return
         if sys.platform == "win32":
             os.startfile(str(target))
@@ -1794,6 +2074,7 @@ class VideoTranslateInterface(QWidget):
     def on_error(self, message: str):
         self.start_button.setEnabled(True)
         self.status_label.setText("Ошибка")
+        self._set_stage_progress(56, 100, "Ошибка на этапе 5-6")
         self.diag_label.setText(f"Ошибка: {message}")
 
         # Продлеваем показ ошибки, чтобы пользователь успел прочитать детали strict/XTTS фейла.
@@ -1858,6 +2139,16 @@ class VideoTranslateInterface(QWidget):
         if not self.task or not self.task.output_path:
             return
         target_dir = str(Path(self.task.output_path).parent)
+        if sys.platform == "win32":
+            os.startfile(target_dir)
+        elif sys.platform == "darwin":
+            subprocess.run(["open", target_dir])
+        else:
+            subprocess.run(["xdg-open", target_dir])
+
+    def open_stage_cache_folder(self):
+        _STAGE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        target_dir = str(_STAGE_CACHE_DIR)
         if sys.platform == "win32":
             os.startfile(target_dir)
         elif sys.platform == "darwin":
