@@ -1,4 +1,5 @@
 import os
+import re
 
 import psutil
 from PyQt5.QtCore import QSize, QThread, QUrl, pyqtSignal
@@ -27,6 +28,10 @@ from app.view.subtitle_style_interface import SubtitleStyleInterface
 
 LOGO_PATH = APP_ICON_PATH
 APP_WINDOW_TITLE_RU = "Лаборатория Механика - Студия создания шортсов"
+
+
+def _contains_cjk_text(text: str) -> bool:
+    return bool(re.search(r"[\u4e00-\u9fff]", str(text or "")))
 
 
 class MainWindow(FluentWindow):
@@ -144,7 +149,10 @@ class MainWindow(FluentWindow):
     def onNewVersion(self, version, force_update, update_info, download_url):
         """新版本提示"""
         title = "Доступна новая версия" if not force_update else "Текущая версия отключена"
-        content = f"Найдена новая версия {version}\n\n{update_info}"
+        info_text = str(update_info or "").strip()
+        if _contains_cjk_text(info_text):
+            info_text = "Описание обновления недоступно на выбранном языке."
+        content = f"Найдена новая версия {version}\n\n{info_text}"
         w = MessageBox(title, content, self)
         w.yesButton.setText("Обновить сейчас")
         w.cancelButton.setText("Позже" if not force_update else "Выйти из программы")
@@ -155,6 +163,9 @@ class MainWindow(FluentWindow):
 
     def onAnnouncement(self, content):
         """显示公告"""
+        if _contains_cjk_text(str(content or "")):
+            # Скрываем объявления на неподдерживаемом языке, чтобы не пугать пользователя.
+            return
         w = MessageBox("Объявление", content, self)
         w.yesButton.setText("Понятно")
         w.cancelButton.hide()

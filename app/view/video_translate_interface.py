@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shutil
 import subprocess
 import sys
 import json
 import tempfile
+from types import SimpleNamespace
 from pathlib import Path
 
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
@@ -20,6 +22,7 @@ from PyQt5.QtWidgets import (
     QTableWidgetItem,
     QVBoxLayout,
     QWidget,
+    QTextEdit,
 )
 from qfluentwidgets import (
     Action,
@@ -55,6 +58,12 @@ from app.core.video_translate.rvc_model_registry import (
 from app.thread.video_translate_thread import VideoTranslateThread
 from app.common.config import cfg
 from app.config import PROJECT_ROOT
+
+
+_SPEAKER_ANALYSIS_CACHE = PROJECT_ROOT / "AppData" / "cache" / "video_translate_last_speakers.json"
+_LAST_TRANSLATION_CACHE = PROJECT_ROOT / "AppData" / "cache" / "video_translate_last_translation.json"
+_LAST_ASR_CACHE = PROJECT_ROOT / "AppData" / "cache" / "video_translate_last_asr.json"
+_STAGE_CACHE_DIR = PROJECT_ROOT / "AppData" / "cache" / "video_translate_stage"
 
 
 class _DiagnosticsThread(QThread):
@@ -94,7 +103,12 @@ class _PreviewTranslationThread(QThread):
                 raise RuntimeError("Не удалось извлечь аудио")
 
             asr_data = transcribe(str(src_audio), self.task.transcribe_config)
-            asr_data = VideoTranslationProcessor()._translate_asr(asr_data, self.task)
+            translation_enabled = bool(getattr(self.task.video_translate_config, "translation_enabled", True))
+            if translation_enabled:
+                asr_data = VideoTranslationProcessor()._translate_asr(asr_data, self.task)
+            else:
+                for seg in asr_data.segments:
+                    seg.translated_text = str(seg.text or "")
 
             rows = []
             for seg in asr_data.segments:
@@ -111,6 +125,94 @@ class _PreviewTranslationThread(QThread):
             self.failed.emit(str(e))
 
 
+class _RvcPreviewThread(QThread):
+    finished_file = pyqtSignal(str)
+    failed = pyqtSignal(str)
+
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+
+    def run(self):
+        try:
+            out = VideoTranslateInterface._render_rvc_preview_blocking(self.model)
+            self.finished_file.emit(str(out))
+        except Exception as e:
+            self.failed.emit(str(e))
+
+
+class _StageSeparationThread(QThread):
+    finished_paths = pyqtSignal(str, str)
+    failed = pyqtSignal(str)
+
+    def __init__(self, video_path: str, task: VideoTranslateTask):
+        super().__init__()
+        self.video_path = video_path
+        self.task = task
+
+    def run(self):
+        try:
+            self.task.video_translate_config.source_separation_mode = "uvr_mdx_kim"
+            try:
+                if _STAGE_CACHE_DIR.exists():
+                    shutil.rmtree(_STAGE_CACHE_DIR)
+            except Exception:
+                pass
+            _STAGE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+            src_audio = _STAGE_CACHE_DIR / "source_audio.wav"
+            if not video2audio(self.video_path, str(src_audio)):
+                raise RuntimeError("Не удалось извлечь аудио из видео")
+
+            processor = VideoTranslationProcessor()
+            speech_audio, bg_audio = processor._prepare_audio_stems(self.task, src_audio, _STAGE_CACHE_DIR)
+
+            speech_out = _STAGE_CACHE_DIR / "speech_audio.wav"
+            bg_out = _STAGE_CACHE_DIR / "background_audio.wav"
+            if speech_audio.exists() and speech_audio != speech_out:
+                speech_out.write_bytes(speech_audio.read_bytes())
+            if bg_audio.exists() and bg_audio != bg_out:
+                bg_out.write_bytes(bg_audio.read_bytes())
+
+            self.finished_paths.emit(str(speech_out), str(bg_out))
+        except Exception as e:
+            self.failed.emit(str(e))
+
+
+class _StageAsrThread(QThread):
+    finished_rows = pyqtSignal(list)
+    failed = pyqtSignal(str)
+
+    def __init__(self, video_path: str, task: VideoTranslateTask):
+        super().__init__()
+        self.video_path = video_path
+        self.task = task
+
+    def run(self):
+        try:
+            _STAGE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            speech_audio = _STAGE_CACHE_DIR / "speech_audio.wav"
+            if not speech_audio.exists():
+                src_audio = _STAGE_CACHE_DIR / "source_audio.wav"
+                if not video2audio(self.video_path, str(src_audio)):
+                    raise RuntimeError("Не удалось извлечь аудио из видео")
+                speech_audio, _ = VideoTranslationProcessor()._prepare_audio_stems(self.task, src_audio, _STAGE_CACHE_DIR)
+
+            asr_data = transcribe(str(speech_audio), self.task.transcribe_config)
+            rows = []
+            for seg in asr_data.segments:
+                rows.append(
+                    {
+                        "start_ms": int(seg.start_time),
+                        "end_ms": int(seg.end_time),
+                        "text": str(seg.text or ""),
+                    }
+                )
+            self.finished_rows.emit(rows)
+        except Exception as e:
+            self.failed.emit(str(e))
+
+
 class VideoTranslateInterface(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -118,8 +220,12 @@ class VideoTranslateInterface(QWidget):
         self.task: VideoTranslateTask | None = None
         self.translate_thread: VideoTranslateThread | None = None
         self.preview_thread: _PreviewTranslationThread | None = None
+        self.rvc_preview_thread: _RvcPreviewThread | None = None
         self.diag_thread: _DiagnosticsThread | None = None
+        self.stage_sep_thread: _StageSeparationThread | None = None
+        self.stage_asr_thread: _StageAsrThread | None = None
         self.manual_translation_json_path: str = ""
+        self.manual_transcription_json_path: str = ""
         self._rvc_models = []
         self._refresh_rvc_models()
         self._build_ui()
@@ -155,6 +261,12 @@ class VideoTranslateInterface(QWidget):
         self.command_bar.addAction(check_translate_action)
         open_translate_action = Action(FIF.DOCUMENT, "Открыть перевод (srt)", triggered=self.open_translation_file)
         self.command_bar.addAction(open_translate_action)
+        edit_last_translate_action = Action(
+            FIF.EDIT,
+            "Редактировать последний перевод",
+            triggered=self.edit_last_translation_and_prepare_redub,
+        )
+        self.command_bar.addAction(edit_last_translate_action)
         run_diag_action = Action(FIF.DEVELOPER_TOOLS, "GPU-диагностика", triggered=self.run_gpu_diagnostics)
         self.command_bar.addAction(run_diag_action)
 
@@ -280,6 +392,17 @@ class VideoTranslateInterface(QWidget):
         row4.addWidget(self.duck_label)
         row4.addWidget(self.duck_combo, 1)
 
+        self.preserve_bg_label = BodyLabel("Сохранить громкость музыки/SFX 1:1", self)
+        self.preserve_bg_label.setMinimumWidth(form_label_w)
+        self.preserve_bg_combo = ComboBox(self)
+        self.preserve_bg_combo.setMinimumWidth(form_field_min_w)
+        self.preserve_bg_combo.addItems(["Да", "Нет"])
+        self.preserve_bg_combo.setCurrentIndex(
+            0 if bool(getattr(cfg.video_translate_preserve_background_loudness, "value", False)) else 1
+        )
+        row4.addWidget(self.preserve_bg_label)
+        row4.addWidget(self.preserve_bg_combo, 1)
+
         self.provider_label = BodyLabel("Клонирование голоса", self)
         self.provider_label.setMinimumWidth(form_label_w)
         self.provider_combo = ComboBox(self)
@@ -303,9 +426,9 @@ class VideoTranslateInterface(QWidget):
         self.sep_combo = ComboBox(self)
         self.sep_combo.setMinimumWidth(form_field_min_w)
         self.sep_combo.addItems([
-            "Demucs + UVR (рекомендуется)",
+            "Demucs + UVR",
             "Demucs",
-            "UVR MDX/Kim",
+            "UVR MDX/Kim (рекомендуется)",
             "Auto",
         ])
         sep_mode = str(getattr(cfg.video_translate_source_separation_mode, "value", "demucs_plus_uvr") or "demucs_plus_uvr").strip().lower()
@@ -325,23 +448,24 @@ class VideoTranslateInterface(QWidget):
         row4b.addWidget(self.vocal_kill_combo, 1)
         settings_grid.addLayout(row4b)
 
+        row4c = QHBoxLayout()
+        row4c.setSpacing(10)
+        self.translation_mode_label = BodyLabel("Режим текста", self)
+        self.translation_mode_label.setMinimumWidth(form_label_w)
+        self.translation_mode_combo = ComboBox(self)
+        self.translation_mode_combo.setMinimumWidth(form_field_min_w)
+        self.translation_mode_combo.addItems([
+            "Перевод + переозвучка",
+            "Без перевода (только переозвучка)",
+        ])
+        self.translation_mode_combo.setCurrentIndex(0)
+        row4c.addWidget(self.translation_mode_label)
+        row4c.addWidget(self.translation_mode_combo, 1)
+        row4c.addStretch(1)
+        settings_grid.addLayout(row4c)
+
         row5 = QHBoxLayout()
         row5.setSpacing(10)
-        self.target_lang_label = BodyLabel("Язык перевода", self)
-        self.target_lang_label.setMinimumWidth(form_label_w)
-        self.target_lang_combo = ComboBox(self)
-        self.target_lang_combo.setMinimumWidth(form_field_min_w)
-        self._target_lang_options = list(cfg.video_translate_target_language.validator.options)
-        for opt in self._target_lang_options:
-            self.target_lang_combo.addItem(language_value_to_ru(opt.value))
-        cur_target = str(cfg.video_translate_target_language.value.value)
-        for i, opt in enumerate(self._target_lang_options):
-            if str(opt.value) == cur_target:
-                self.target_lang_combo.setCurrentIndex(i)
-                break
-        row5.addWidget(self.target_lang_label)
-        row5.addWidget(self.target_lang_combo, 1)
-
         self.source_lang_label = BodyLabel("Исходный язык", self)
         self.source_lang_label.setMinimumWidth(form_label_w)
         self.source_lang_combo = ComboBox(self)
@@ -356,6 +480,21 @@ class VideoTranslateInterface(QWidget):
                 break
         row5.addWidget(self.source_lang_label)
         row5.addWidget(self.source_lang_combo, 1)
+
+        self.target_lang_label = BodyLabel("Целевой язык", self)
+        self.target_lang_label.setMinimumWidth(form_label_w)
+        self.target_lang_combo = ComboBox(self)
+        self.target_lang_combo.setMinimumWidth(form_field_min_w)
+        self._target_lang_options = list(cfg.video_translate_target_language.validator.options)
+        for opt in self._target_lang_options:
+            self.target_lang_combo.addItem(language_value_to_ru(opt.value))
+        cur_target = str(cfg.video_translate_target_language.value.value)
+        for i, opt in enumerate(self._target_lang_options):
+            if str(opt.value) == cur_target:
+                self.target_lang_combo.setCurrentIndex(i)
+                break
+        row5.addWidget(self.target_lang_label)
+        row5.addWidget(self.target_lang_combo, 1)
 
         self.translator_label = BodyLabel("Сервис перевода", self)
         self.translator_label.setMinimumWidth(form_label_w)
@@ -428,6 +567,36 @@ class VideoTranslateInterface(QWidget):
         self.scroll_area.setWidget(self.config_card)
         self.main_layout.addWidget(self.scroll_area, 1)
 
+        stages_card = CardWidget(self)
+        stages_layout = QVBoxLayout(stages_card)
+        stages_layout.setContentsMargins(12, 12, 12, 12)
+        stages_layout.setSpacing(8)
+        stages_layout.addWidget(BodyLabel("Пошаговый режим", self))
+
+        stage_row1 = QHBoxLayout()
+        self.stage1_button = PushButton("Этап 1: Отделить голос", self)
+        self.stage2_button = PushButton("Этап 2: Распознать речь", self)
+        self.stage3_button = PushButton("Этап 3: Перевод / правка", self)
+        stage_row1.addWidget(self.stage1_button)
+        stage_row1.addWidget(self.stage2_button)
+        stage_row1.addWidget(self.stage3_button)
+        stages_layout.addLayout(stage_row1)
+
+        stage_row2 = QHBoxLayout()
+        self.stage4_button = PushButton("Этап 4: Голоса и предпрослушка", self)
+        self.stage56_button = PrimaryPushButton("Этап 5-6: Сборка и рендер", self)
+        stage_row2.addWidget(self.stage4_button)
+        stage_row2.addWidget(self.stage56_button)
+        stages_layout.addLayout(stage_row2)
+
+        self.stage_hint_label = BodyLabel(
+            "Каждый этап можно запускать отдельно. Фильтры применяются в своём этапе.",
+            self,
+        )
+        self.stage_hint_label.setWordWrap(True)
+        stages_layout.addWidget(self.stage_hint_label)
+        self.main_layout.addWidget(stages_card)
+
         bottom = QHBoxLayout()
         self.progress_bar = ProgressBar(self)
         self.status_label = BodyLabel("Готово", self)
@@ -440,11 +609,17 @@ class VideoTranslateInterface(QWidget):
     def _connect_signals(self):
         self.video_button.clicked.connect(self.choose_video_file)
         self.start_button.clicked.connect(self.start_translate)
+        self.stage1_button.clicked.connect(self.run_stage1_separation)
+        self.stage2_button.clicked.connect(self.run_stage2_asr)
+        self.stage3_button.clicked.connect(self.preview_translation)
+        self.stage4_button.clicked.connect(self.open_speaker_voice_map_dialog)
+        self.stage56_button.clicked.connect(self.start_translate)
         self.device_combo.currentIndexChanged.connect(self._on_device_changed)
         self.quality_combo.currentIndexChanged.connect(self._on_quality_changed)
         self.workers_combo.currentIndexChanged.connect(self._on_workers_changed)
         self.cache_combo.currentIndexChanged.connect(self._on_cache_changed)
         self.asr_cache_combo.currentIndexChanged.connect(self._on_asr_cache_changed)
+        self.translation_mode_combo.currentIndexChanged.connect(self._on_translation_mode_changed)
         self.source_lang_combo.currentIndexChanged.connect(self._on_source_language_changed)
         self.target_lang_combo.currentIndexChanged.connect(self._on_target_language_changed)
         self.translator_combo.currentIndexChanged.connect(self._on_translator_changed)
@@ -455,8 +630,23 @@ class VideoTranslateInterface(QWidget):
         self.qa_combo.currentIndexChanged.connect(self._on_qa_changed)
         self.qa_retry_combo.currentIndexChanged.connect(self._on_qa_retry_changed)
         self.duck_combo.currentIndexChanged.connect(self._on_ducking_changed)
+        self.preserve_bg_combo.currentIndexChanged.connect(self._on_preserve_bg_changed)
         self.vocal_kill_combo.currentIndexChanged.connect(self._on_aggressive_vocal_suppression_changed)
         self.diag_button.clicked.connect(self.run_gpu_diagnostics)
+        self._on_translation_mode_changed()
+
+    def _translation_enabled(self) -> bool:
+        return self.translation_mode_combo.currentIndex() == 0
+
+    def _on_translation_mode_changed(self):
+        enabled = self._translation_enabled()
+        self.source_lang_combo.setEnabled(enabled)
+        self.target_lang_combo.setEnabled(enabled)
+        self.translator_combo.setEnabled(enabled)
+        if enabled:
+            self.diag_label.setText("Режим: перевод + переозвучка")
+        else:
+            self.diag_label.setText("Режим: без перевода (переозвучка по оригинальному тексту)")
 
     def run_gpu_diagnostics(self):
         if self.diag_thread and self.diag_thread.isRunning():
@@ -564,6 +754,12 @@ class VideoTranslateInterface(QWidget):
     def _on_ducking_changed(self):
         cfg.set(cfg.video_translate_enable_background_ducking, self.duck_combo.currentIndex() == 0)
 
+    def _on_preserve_bg_changed(self):
+        cfg.set(
+            cfg.video_translate_preserve_background_loudness,
+            self.preserve_bg_combo.currentIndex() == 0,
+        )
+
     def _on_aggressive_vocal_suppression_changed(self):
         cfg.set(
             cfg.video_translate_aggressive_vocal_suppression,
@@ -578,6 +774,232 @@ class VideoTranslateInterface(QWidget):
             items.append((label, m))
         return items
 
+    @staticmethod
+    def _find_model_preview_audio(model) -> Path | None:
+        try:
+            slot_dir = Path(getattr(model, "slot_dir", ""))
+            if not slot_dir.exists():
+                return None
+            for ext in ("*.wav", "*.mp3", "*.ogg", "*.flac", "*.m4a"):
+                files = sorted(slot_dir.glob(ext))
+                if files:
+                    return files[0]
+        except Exception:
+            return None
+        return None
+
+    @staticmethod
+    def _resolve_rvc_runtime_python() -> Path | None:
+        candidates = [
+            PROJECT_ROOT / "runtime_rvc" / "Scripts" / "python.exe",
+            PROJECT_ROOT / "runtime" / "python.exe",
+        ]
+        for p in candidates:
+            if p.exists() and p.is_file():
+                return p
+        return None
+
+    @staticmethod
+    def _global_rvc_preview_audio() -> Path | None:
+        root = PROJECT_ROOT / "AppData" / "models" / "rvc"
+        if not root.exists():
+            return None
+        for ext in ("*.wav", "*.mp3", "*.ogg", "*.flac", "*.m4a"):
+            files = sorted(root.glob(ext))
+            if files:
+                return files[0]
+        return None
+
+    @staticmethod
+    def _render_rvc_preview_blocking(model) -> Path:
+        preview_src = VideoTranslateInterface._global_rvc_preview_audio()
+        if not preview_src:
+            raise RuntimeError(
+                "Не найден единый пример аудио в AppData/models/rvc. "
+                "Положите туда 1 файл (например preview.wav)."
+            )
+
+        runtime_py = VideoTranslateInterface._resolve_rvc_runtime_python()
+        if not runtime_py:
+            raise RuntimeError("Не найден runtime Python для RVC (runtime_rvc/runtime)")
+
+        script = PROJECT_ROOT / "scripts" / "rvc_native_infer.py"
+        if not script.exists():
+            raise RuntimeError(f"Не найден скрипт RVC: {script}")
+
+        model_pth = Path(model.slot_dir) / str(model.model_file)
+        idx_file = str(getattr(model, "index_file", "") or "").strip()
+        idx_path = (Path(model.slot_dir) / idx_file) if idx_file else None
+
+        out_wav = Path(tempfile.gettempdir()) / f"rvc_preview_{model.slot}.wav"
+        cmd = [
+            str(runtime_py),
+            str(script),
+            "--input", str(preview_src),
+            "--output", str(out_wav),
+            "--model", str(model_pth),
+            "--f0-up-key", str(int(getattr(model, "default_tune", 0) or 0)),
+            "--index-rate", f"{float(getattr(model, 'default_index_ratio', 0.0) or 0.0):.4f}",
+            "--protect", f"{float(getattr(model, 'default_protect', 0.5) or 0.5):.4f}",
+            "--filter-radius", "3",
+            "--device", "cuda",
+        ]
+        if idx_path and idx_path.exists():
+            cmd += ["--index", str(idx_path)]
+
+        try:
+            p = subprocess.run(
+                cmd,
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=120,
+                creationflags=(subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0),
+            )
+        except subprocess.TimeoutExpired:
+            raise RuntimeError("RVC preview timeout: генерация примера заняла слишком много времени (>120с)")
+        if p.returncode != 0 or not out_wav.exists() or out_wav.stat().st_size <= 0:
+            err = ((p.stderr or "") + "\n" + (p.stdout or "")).strip()
+            raise RuntimeError(err[-1200:] if err else "RVC preview failed")
+        return out_wav
+
+    def _render_rvc_preview(self, model) -> Path:
+        return self._render_rvc_preview_blocking(model)
+
+    def _start_rvc_preview_async(self, *, model, owner_dialog: QDialog, trigger_button: PushButton):
+        if self.rvc_preview_thread and self.rvc_preview_thread.isRunning():
+            InfoBar.warning(
+                "Подождите",
+                "Уже идёт генерация примера голоса",
+                duration=2200,
+                parent=owner_dialog,
+            )
+            return
+
+        old_text = trigger_button.text()
+        try:
+            trigger_button.setEnabled(False)
+            trigger_button.setText("⏳ Генерация...")
+        except Exception:
+            pass
+        self.diag_label.setText(f"Предпрослушка RVC: генерируем пример для модели '{getattr(model, 'name', getattr(model, 'slot', ''))}'...")
+
+        th = _RvcPreviewThread(model=model)
+        self.rvc_preview_thread = th
+
+        def _restore_btn():
+            try:
+                trigger_button.setEnabled(True)
+                trigger_button.setText(old_text)
+            except Exception:
+                pass
+
+        def _on_finished(path: str):
+            _restore_btn()
+            self.rvc_preview_thread = None
+            self.diag_label.setText("Предпрослушка RVC: готово")
+            p = str(path or "").strip()
+            if not p:
+                return
+            if sys.platform == "win32":
+                os.startfile(p)
+            elif sys.platform == "darwin":
+                subprocess.run(["open", p])
+            else:
+                subprocess.run(["xdg-open", p])
+
+        def _on_failed(err: str):
+            _restore_btn()
+            self.rvc_preview_thread = None
+            self.diag_label.setText(f"Предпрослушка RVC: ошибка ({err})")
+            self._show_copyable_error(
+                title="Не удалось прослушать",
+                message=str(err),
+                log_file_name="rvc_preview_last_error.txt",
+                parent_widget=owner_dialog,
+                duration=12000,
+            )
+
+        th.finished_file.connect(_on_finished)
+        th.failed.connect(_on_failed)
+        th.start()
+
+    def _show_copyable_error(
+        self,
+        *,
+        title: str,
+        message: str,
+        log_file_name: str = "video_translate_last_error.txt",
+        parent_widget=None,
+        duration: int = 9000,
+    ):
+        msg = str(message or "").strip() or "Неизвестная ошибка"
+        parent_ref = parent_widget or self
+
+        # Clipboard
+        try:
+            QApplication.clipboard().setText(msg)
+        except Exception:
+            pass
+
+        # Persist log
+        err_file = PROJECT_ROOT / "AppData" / "logs" / str(log_file_name)
+        try:
+            err_file.parent.mkdir(parents=True, exist_ok=True)
+            err_file.write_text(msg, encoding="utf-8")
+        except Exception:
+            pass
+
+        InfoBar.error(
+            title,
+            f"{msg}\n(подробно: {err_file.as_posix()}, текст скопирован в буфер)",
+            duration=duration,
+            position=InfoBarPosition.TOP,
+            parent=parent_ref,
+        )
+
+        # Copyable dialog
+        try:
+            dlg = QDialog(parent_ref)
+            dlg.setWindowTitle(title)
+            dlg.resize(980, 520)
+            lay = QVBoxLayout(dlg)
+            txt = QTextEdit(dlg)
+            txt.setReadOnly(True)
+            txt.setPlainText(msg)
+            lay.addWidget(txt)
+            btns = QHBoxLayout()
+            copy_btn = PrimaryPushButton("Скопировать ошибку", dlg)
+            open_log_btn = PushButton("Открыть лог", dlg)
+            close_btn = PushButton("Закрыть", dlg)
+            btns.addWidget(copy_btn)
+            btns.addWidget(open_log_btn)
+            btns.addWidget(close_btn)
+            btns.addStretch(1)
+            lay.addLayout(btns)
+
+            def _copy_err():
+                QApplication.clipboard().setText(txt.toPlainText())
+                InfoBar.success("Скопировано", "Текст ошибки скопирован в буфер", duration=1800, parent=dlg)
+
+            def _open_log():
+                if err_file.exists():
+                    if sys.platform == "win32":
+                        os.startfile(str(err_file))
+                    elif sys.platform == "darwin":
+                        subprocess.run(["open", str(err_file)])
+                    else:
+                        subprocess.run(["xdg-open", str(err_file)])
+
+            copy_btn.clicked.connect(_copy_err)
+            open_log_btn.clicked.connect(_open_log)
+            close_btn.clicked.connect(dlg.accept)
+            dlg.exec_()
+        except Exception:
+            pass
+
     def open_rvc_model_manager(self):
         items = self._model_display_items()
         if not items:
@@ -590,33 +1012,35 @@ class VideoTranslateInterface(QWidget):
             return
 
         dlg = QDialog(self)
-        dlg.setWindowTitle("Менеджер RVC моделей (params.json)")
+        dlg.setWindowTitle("Менеджер моделей RVC")
         dlg.resize(980, 620)
         lay = QVBoxLayout(dlg)
 
-        table = QTableWidget(len(items), 10, dlg)
+        table = QTableWidget(len(items), 11, dlg)
         table.setHorizontalHeaderLabels([
-            "Slot",
-            "Name",
-            "Model",
-            "Index",
-            "Preview",
-            "Icon",
-            "Tune",
-            "IndexRatio",
-            "Protect",
-            "Params",
+            "Слот",
+            "Имя",
+            "Модель (.pth)",
+            "Индекс (.index)",
+            "Иконка",
+            "Пример",
+            "Путь к иконке",
+            "Тональность",
+            "Сила индекса",
+            "Защита",
+            "Файл параметров",
         ])
         table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
         table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
-        table.horizontalHeader().setSectionResizeMode(5, QHeaderView.Stretch)
-        table.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(6, QHeaderView.Stretch)
         table.horizontalHeader().setSectionResizeMode(7, QHeaderView.ResizeToContents)
         table.horizontalHeader().setSectionResizeMode(8, QHeaderView.ResizeToContents)
-        table.horizontalHeader().setSectionResizeMode(9, QHeaderView.Stretch)
+        table.horizontalHeader().setSectionResizeMode(9, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(10, QHeaderView.Stretch)
 
         for i, (_, m) in enumerate(items):
             table.setItem(i, 0, QTableWidgetItem(str(m.slot)))
@@ -628,23 +1052,60 @@ class VideoTranslateInterface(QWidget):
             if icon_path_text and Path(icon_path_text).exists():
                 pix = QPixmap(icon_path_text)
                 if not pix.isNull():
-                    preview_item.setIcon(QIcon(pix.scaled(56, 56, Qt.KeepAspectRatio, Qt.SmoothTransformation)))
+                    preview_item.setIcon(QIcon(pix.scaled(120, 120, Qt.KeepAspectRatio, Qt.SmoothTransformation)))
             table.setItem(i, 4, preview_item)
-            table.setItem(i, 5, QTableWidgetItem(icon_path_text))
-            table.setItem(i, 6, QTableWidgetItem(str(m.default_tune)))
-            table.setItem(i, 7, QTableWidgetItem(f"{m.default_index_ratio:.3f}"))
-            table.setItem(i, 8, QTableWidgetItem(f"{m.default_protect:.3f}"))
-            table.setItem(i, 9, QTableWidgetItem(str(m.params_path)))
+
+            preview_btn = PushButton("▶ Пример", dlg)
+
+            def _bind_preview(row=i, model_ref=m):
+                def _on_preview():
+                    # Берём актуальные значения прямо из таблицы (даже если ещё не нажали "Сохранить").
+                    try:
+                        tune_val = int(float(table.item(row, 7).text() if table.item(row, 7) else getattr(model_ref, "default_tune", 0)))
+                    except Exception:
+                        tune_val = int(getattr(model_ref, "default_tune", 0) or 0)
+                    try:
+                        index_ratio_val = float(table.item(row, 8).text() if table.item(row, 8) else getattr(model_ref, "default_index_ratio", 0.0))
+                    except Exception:
+                        index_ratio_val = float(getattr(model_ref, "default_index_ratio", 0.0) or 0.0)
+                    try:
+                        protect_val = float(table.item(row, 9).text() if table.item(row, 9) else getattr(model_ref, "default_protect", 0.5))
+                    except Exception:
+                        protect_val = float(getattr(model_ref, "default_protect", 0.5) or 0.5)
+
+                    model_for_preview = SimpleNamespace(
+                        slot=getattr(model_ref, "slot", 0),
+                        name=getattr(model_ref, "name", ""),
+                        slot_dir=getattr(model_ref, "slot_dir", ""),
+                        model_file=getattr(model_ref, "model_file", ""),
+                        index_file=getattr(model_ref, "index_file", ""),
+                        default_tune=tune_val,
+                        default_index_ratio=index_ratio_val,
+                        default_protect=protect_val,
+                    )
+
+                    self._start_rvc_preview_async(model=model_for_preview, owner_dialog=dlg, trigger_button=preview_btn)
+
+                return _on_preview
+
+            preview_btn.clicked.connect(_bind_preview())
+            table.setCellWidget(i, 5, preview_btn)
+
+            table.setItem(i, 6, QTableWidgetItem(icon_path_text))
+            table.setItem(i, 7, QTableWidgetItem(str(m.default_tune)))
+            table.setItem(i, 8, QTableWidgetItem(f"{m.default_index_ratio:.3f}"))
+            table.setItem(i, 9, QTableWidgetItem(f"{m.default_protect:.3f}"))
+            table.setItem(i, 10, QTableWidgetItem(str(m.params_path)))
             # read-only columns
-            for col in (0, 2, 3, 4, 5, 9):
+            for col in (0, 2, 3, 4, 6, 10):
                 item = table.item(i, col)
                 if item:
                     item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-            table.setRowHeight(i, 64)
+            table.setRowHeight(i, 128)
 
         lay.addWidget(table)
         btn_row = QHBoxLayout()
-        save_btn = PrimaryPushButton("Сохранить в params.json", dlg)
+        save_btn = PrimaryPushButton("Сохранить параметры", dlg)
         close_btn = PushButton("Закрыть", dlg)
         btn_row.addWidget(save_btn)
         btn_row.addWidget(close_btn)
@@ -656,9 +1117,9 @@ class VideoTranslateInterface(QWidget):
             for i, (_, m) in enumerate(items):
                 try:
                     name = str(table.item(i, 1).text() if table.item(i, 1) else m.name).strip() or m.name
-                    tune = int(float(table.item(i, 6).text() if table.item(i, 6) else m.default_tune))
-                    idx_ratio = float(table.item(i, 7).text() if table.item(i, 7) else m.default_index_ratio)
-                    protect = float(table.item(i, 8).text() if table.item(i, 8) else m.default_protect)
+                    tune = int(float(table.item(i, 7).text() if table.item(i, 7) else m.default_tune))
+                    idx_ratio = float(table.item(i, 8).text() if table.item(i, 8) else m.default_index_ratio)
+                    protect = float(table.item(i, 9).text() if table.item(i, 9) else m.default_protect)
                     save_rvc_model_params(
                         m,
                         name=name,
@@ -672,7 +1133,7 @@ class VideoTranslateInterface(QWidget):
             self._refresh_rvc_models()
             InfoBar.success(
                 "RVC модели обновлены",
-                f"Сохранено params.json: {ok_count}",
+                f"Сохранено файлов параметров: {ok_count}",
                 duration=3000,
                 parent=self,
             )
@@ -681,7 +1142,7 @@ class VideoTranslateInterface(QWidget):
         close_btn.clicked.connect(dlg.reject)
         dlg.exec_()
 
-    def open_speaker_voice_map_dialog(self):
+    def open_speaker_voice_map_dialog(self) -> bool:
         items = self._model_display_items()
         if not items:
             InfoBar.warning(
@@ -690,14 +1151,10 @@ class VideoTranslateInterface(QWidget):
                 duration=3500,
                 parent=self,
             )
-            return
+            return False
 
-        try:
-            expected = int(getattr(cfg.video_translate_expected_speaker_count, "value", 0) or 0)
-        except Exception:
-            expected = 0
-        speaker_count = max(2, expected if expected > 0 else 2)
-        speaker_count = min(12, speaker_count)
+        speaker_ids = self._load_recent_speaker_ids()
+        speaker_count = len(speaker_ids)
 
         # load existing map
         existing_raw = str(getattr(cfg.video_translate_manual_voice_map_json, "value", "") or "").strip()
@@ -714,21 +1171,21 @@ class VideoTranslateInterface(QWidget):
         lay = QVBoxLayout(dlg)
 
         hint = BodyLabel(
-            "Выберите RVC-голос для каждого спикера. Сохраняется в ManualVoiceMapJson.",
+            "Выберите модель RVC для каждого спикера. Назначения будут сохранены автоматически.",
             dlg,
         )
         hint.setWordWrap(True)
         lay.addWidget(hint)
 
-        table = QTableWidget(speaker_count, 3, dlg)
-        table.setHorizontalHeaderLabels(["Спикер", "RVC модель", "Tune (из params)"])
+        table = QTableWidget(speaker_count, 4, dlg)
+        table.setHorizontalHeaderLabels(["Спикер", "Модель RVC", "Тональность", "Пример голоса"])
         table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
 
         combos = []
-        for i in range(speaker_count):
-            spk = f"spk_{i}"
+        for i, spk in enumerate(speaker_ids):
             table.setItem(i, 0, QTableWidgetItem(spk))
             table.item(i, 0).setFlags(table.item(i, 0).flags() & ~Qt.ItemIsEditable)
 
@@ -750,6 +1207,26 @@ class VideoTranslateInterface(QWidget):
                 tune = str(items[combo.currentIndex() - 1][1].default_tune)
             table.setItem(i, 2, QTableWidgetItem(tune))
             table.item(i, 2).setFlags(table.item(i, 2).flags() & ~Qt.ItemIsEditable)
+
+            preview_btn = PushButton("▶ Пример", dlg)
+
+            def _bind_preview(c=combo):
+                def _on_preview():
+                    if c.currentIndex() <= 0:
+                        InfoBar.warning(
+                            "Не выбрана модель",
+                            "Сначала выберите RVC-модель для этого спикера",
+                            duration=2000,
+                            parent=dlg,
+                        )
+                        return
+                    model = items[c.currentIndex() - 1][1]
+                    self._start_rvc_preview_async(model=model, owner_dialog=dlg, trigger_button=preview_btn)
+
+                return _on_preview
+
+            preview_btn.clicked.connect(_bind_preview())
+            table.setCellWidget(i, 3, preview_btn)
 
             def _bind_update(row=i, c=combo):
                 def _on_changed(_):
@@ -773,47 +1250,56 @@ class VideoTranslateInterface(QWidget):
         btn_row.addStretch(1)
         lay.addLayout(btn_row)
 
+        saved_ok = {"ok": False}
+
         def _save_map():
             out = {}
-            default_slot = ""
             for i, combo in enumerate(combos):
                 if combo.currentIndex() <= 0:
-                    continue
+                    InfoBar.warning(
+                        "Нужно выбрать голоса",
+                        "Назначьте RVC-модель каждому спикеру",
+                        duration=2600,
+                        parent=dlg,
+                    )
+                    return
                 model = items[combo.currentIndex() - 1][1]
-                spk = f"spk_{i}"
+                spk = speaker_ids[i]
                 out[spk] = str(model.slot)
-                if not default_slot:
-                    default_slot = str(model.slot)
-            if default_slot:
-                out["default"] = default_slot
+
+            out["default"] = str(items[combos[0].currentIndex() - 1][1].slot)
             cfg.set(cfg.video_translate_manual_voice_map_json, json.dumps(out, ensure_ascii=False))
+            saved_ok["ok"] = True
             InfoBar.success(
                 "Сохранено",
                 "Назначение голосов спикерам сохранено",
                 duration=2500,
                 parent=self,
             )
+            dlg.accept()
 
         save_btn.clicked.connect(_save_map)
         close_btn.clicked.connect(dlg.reject)
         dlg.exec_()
+        return bool(saved_ok["ok"])
 
     def _apply_quality_preset(self, quality: str):
         q = (quality or "balanced").strip().lower()
         if q == "fast":
-            overlap, mix, qa, qa_retry, duck, vocal_kill = False, False, False, 0, False, False
+            overlap, mix, qa, qa_retry, duck, preserve_bg, vocal_kill = False, False, False, 0, False, False, False
         elif q == "balanced":
-            overlap, mix, qa, qa_retry, duck, vocal_kill = False, True, False, 0, True, False
+            overlap, mix, qa, qa_retry, duck, preserve_bg, vocal_kill = False, True, False, 0, True, False, False
         elif q == "studio":
-            overlap, mix, qa, qa_retry, duck, vocal_kill = True, True, True, 2, True, True
+            overlap, mix, qa, qa_retry, duck, preserve_bg, vocal_kill = True, True, True, 2, True, True, True
         else:  # high
-            overlap, mix, qa, qa_retry, duck, vocal_kill = True, True, True, 1, True, True
+            overlap, mix, qa, qa_retry, duck, preserve_bg, vocal_kill = True, True, True, 1, True, False, True
 
         self.overlap_combo.setCurrentIndex(0 if overlap else 1)
         self.mix_combo.setCurrentIndex(0 if mix else 1)
         self.qa_combo.setCurrentIndex(0 if qa else 1)
         self.qa_retry_combo.setCurrentText(str(qa_retry))
         self.duck_combo.setCurrentIndex(0 if duck else 1)
+        self.preserve_bg_combo.setCurrentIndex(0 if preserve_bg else 1)
         self.vocal_kill_combo.setCurrentIndex(0 if vocal_kill else 1)
 
         cfg.set(cfg.video_translate_allow_speaker_overlap, overlap)
@@ -821,6 +1307,7 @@ class VideoTranslateInterface(QWidget):
         cfg.set(cfg.video_translate_segment_qa_enabled, qa)
         cfg.set(cfg.video_translate_segment_qa_retry_count, qa_retry)
         cfg.set(cfg.video_translate_enable_background_ducking, duck)
+        cfg.set(cfg.video_translate_preserve_background_loudness, preserve_bg)
         cfg.set(cfg.video_translate_aggressive_vocal_suppression, vocal_kill)
 
     def choose_video_file(self):
@@ -829,6 +1316,135 @@ class VideoTranslateInterface(QWidget):
         file_path, _ = QFileDialog.getOpenFileName(self, "Выберите видео", "", filter_str)
         if file_path:
             self.video_input.setText(file_path)
+
+    def _ensure_video_path(self) -> str | None:
+        video_path = (self.video_input.text() or "").strip()
+        if not video_path or not Path(video_path).exists():
+            InfoBar.warning("Внимание", "Сначала выберите видео", duration=2200, parent=self)
+            return None
+        return video_path
+
+    def run_stage1_separation(self):
+        video_path = self._ensure_video_path()
+        if not video_path:
+            return
+        if self.stage_sep_thread and self.stage_sep_thread.isRunning():
+            return
+        # Используем рекомендуемый метод разделения для этапа 1.
+        self.sep_combo.setCurrentIndex(2)  # UVR MDX/Kim
+        cfg.set(cfg.video_translate_source_separation_mode, "uvr_mdx_kim")
+        task = self._build_task_from_ui(video_path)
+        self.stage_hint_label.setText("Этап 1: разделение (UVR MDX/Kim), подождите...")
+        self.stage1_button.setEnabled(False)
+        self.stage_sep_thread = _StageSeparationThread(video_path=video_path, task=task)
+
+        def _ok(speech_path: str, bg_path: str):
+            self.stage1_button.setEnabled(True)
+            self.stage_sep_thread = None
+            speech_out = Path(speech_path)
+            bg_out = Path(bg_path)
+            self.stage_hint_label.setText(
+                f"Этап 1 завершён (UVR MDX/Kim). Голос: {speech_out.name}, Фон: {bg_out.name}."
+            )
+            if speech_out.exists() and sys.platform == "win32":
+                os.startfile(str(speech_out))
+            InfoBar.success("Этап 1", "Готово: можно прослушать чистый голос", duration=2600, parent=self)
+
+        def _fail(err: str):
+            self.stage1_button.setEnabled(True)
+            self.stage_sep_thread = None
+            self._show_copyable_error(
+                title="Ошибка этапа 1",
+                message=str(err),
+                log_file_name="video_translate_stage1_error.txt",
+                parent_widget=self,
+                duration=12000,
+            )
+
+        self.stage_sep_thread.finished_paths.connect(_ok)
+        self.stage_sep_thread.failed.connect(_fail)
+        self.stage_sep_thread.start()
+
+    def run_stage2_asr(self):
+        video_path = self._ensure_video_path()
+        if not video_path:
+            return
+        if self.stage_asr_thread and self.stage_asr_thread.isRunning():
+            return
+        task = self._build_task_from_ui(video_path)
+        self.stage_hint_label.setText("Этап 2: распознавание речи, подождите...")
+        self.stage2_button.setEnabled(False)
+        self.stage_asr_thread = _StageAsrThread(video_path=video_path, task=task)
+
+        def _ok(rows: list):
+            self.stage2_button.setEnabled(True)
+            self.stage_asr_thread = None
+            _LAST_ASR_CACHE.parent.mkdir(parents=True, exist_ok=True)
+            _LAST_ASR_CACHE.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+            self._open_asr_editor(rows)
+            self.stage_hint_label.setText("Этап 2 завершён. Распознавание сохранено и доступно для правки.")
+
+        def _fail(err: str):
+            self.stage2_button.setEnabled(True)
+            self.stage_asr_thread = None
+            self._show_copyable_error(
+                title="Ошибка этапа 2",
+                message=str(err),
+                log_file_name="video_translate_stage2_error.txt",
+                parent_widget=self,
+                duration=12000,
+            )
+
+        self.stage_asr_thread.finished_rows.connect(_ok)
+        self.stage_asr_thread.failed.connect(_fail)
+        self.stage_asr_thread.start()
+
+    def _open_asr_editor(self, rows: list):
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Этап 2: Распознавание речи")
+        dlg.resize(1100, 700)
+        lay = QVBoxLayout(dlg)
+        table = QTableWidget(len(rows), 3, dlg)
+        table.setHorizontalHeaderLabels(["Start", "End", "Текст"])
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        for i, r in enumerate(rows):
+            table.setItem(i, 0, QTableWidgetItem(str(r["start_ms"])))
+            table.setItem(i, 1, QTableWidgetItem(str(r["end_ms"])))
+            table.item(i, 0).setFlags(table.item(i, 0).flags() & ~Qt.ItemIsEditable)
+            table.item(i, 1).setFlags(table.item(i, 1).flags() & ~Qt.ItemIsEditable)
+            table.setItem(i, 2, QTableWidgetItem(r["text"]))
+        lay.addWidget(table)
+
+        btns = QHBoxLayout()
+        apply_btn = PrimaryPushButton("Сохранить распознавание", dlg)
+        cancel_btn = PushButton("Отмена", dlg)
+        btns.addWidget(apply_btn)
+        btns.addWidget(cancel_btn)
+        btns.addStretch(1)
+        lay.addLayout(btns)
+
+        def _apply_and_close():
+            out_rows = []
+            for i, r in enumerate(rows):
+                out_rows.append(
+                    {
+                        "start_ms": int(r["start_ms"]),
+                        "end_ms": int(r["end_ms"]),
+                        "text": str(table.item(i, 2).text() if table.item(i, 2) else r["text"]),
+                    }
+                )
+            out_json = PROJECT_ROOT / "AppData" / "cache" / "video_translate_manual_transcription.json"
+            out_json.parent.mkdir(parents=True, exist_ok=True)
+            out_json.write_text(json.dumps(out_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.manual_transcription_json_path = str(out_json)
+            self.diag_label.setText(f"Этап 2: сохранено распознавание ({len(out_rows)} сегментов)")
+            dlg.accept()
+
+        apply_btn.clicked.connect(_apply_and_close)
+        cancel_btn.clicked.connect(dlg.reject)
+        dlg.exec_()
 
     def start_translate(self):
         video_path = (self.video_input.text() or "").strip()
@@ -871,7 +1487,20 @@ class VideoTranslateInterface(QWidget):
         sel_provider = {0: "auto", 1: "xtts", 2: "rvc"}.get(
             self.provider_combo.currentIndex(), "auto"
         )
+
+        if sel_provider == "rvc":
+            ok = self.open_speaker_voice_map_dialog()
+            if not ok:
+                InfoBar.warning(
+                    "Запуск отменён",
+                    "Для RVC нужно выбрать и сохранить голос для каждого спикера",
+                    duration=3000,
+                    parent=self,
+                )
+                return
+
         self.task.video_translate_config.voice_clone_quality = selected_quality
+        self.task.video_translate_config.translation_enabled = self._translation_enabled()
         self.task.video_translate_config.voice_clone_provider = sel_provider
         self.task.video_translate_config.source_separation_mode = {
             0: "demucs_plus_uvr",
@@ -886,7 +1515,9 @@ class VideoTranslateInterface(QWidget):
         self.task.video_translate_config.segment_qa_enabled = self.qa_combo.currentIndex() == 0
         self.task.video_translate_config.segment_qa_retry_count = int(self.qa_retry_combo.currentText() or 1)
         self.task.video_translate_config.enable_background_ducking = self.duck_combo.currentIndex() == 0
+        self.task.video_translate_config.preserve_background_loudness = self.preserve_bg_combo.currentIndex() == 0
         self.task.video_translate_config.aggressive_vocal_suppression = self.vocal_kill_combo.currentIndex() == 0
+        self.task.video_translate_config.manual_transcription_json = str(self.manual_transcription_json_path or "")
         self.task.video_translate_config.manual_translation_json = str(self.manual_translation_json_path or "")
         self.task.video_translate_config.source_language = sel_src_lang.value
         self.task.transcribe_config.use_asr_cache = selected_asr_cache
@@ -950,6 +1581,7 @@ class VideoTranslateInterface(QWidget):
         sel_translator = self._translator_options[self.translator_combo.currentIndex()]
         sel_provider = {0: "auto", 1: "xtts", 2: "rvc"}.get(self.provider_combo.currentIndex(), "auto")
         task.video_translate_config.voice_clone_quality = selected_quality
+        task.video_translate_config.translation_enabled = self._translation_enabled()
         task.video_translate_config.voice_clone_provider = sel_provider
         task.video_translate_config.source_separation_mode = {
             0: "demucs_plus_uvr",
@@ -964,7 +1596,10 @@ class VideoTranslateInterface(QWidget):
         task.video_translate_config.segment_qa_enabled = self.qa_combo.currentIndex() == 0
         task.video_translate_config.segment_qa_retry_count = int(self.qa_retry_combo.currentText() or 1)
         task.video_translate_config.enable_background_ducking = self.duck_combo.currentIndex() == 0
+        task.video_translate_config.preserve_background_loudness = self.preserve_bg_combo.currentIndex() == 0
         task.video_translate_config.aggressive_vocal_suppression = self.vocal_kill_combo.currentIndex() == 0
+        task.video_translate_config.manual_transcription_json = str(self.manual_transcription_json_path or "")
+        task.video_translate_config.manual_translation_json = str(self.manual_translation_json_path or "")
         task.video_translate_config.source_language = sel_src_lang.value
         task.transcribe_config.use_asr_cache = selected_asr_cache
         from app.core.entities import LANGUAGES
@@ -983,7 +1618,9 @@ class VideoTranslateInterface(QWidget):
             return
         if self.preview_thread and self.preview_thread.isRunning():
             return
-        self.diag_label.setText("Проверка перевода: ASR + перевод...")
+        self.diag_label.setText(
+            "Проверка перевода: ASR + перевод..." if self._translation_enabled() else "Проверка режима без перевода: ASR + исходный текст"
+        )
         task = self._build_task_from_ui(video_path)
         self.preview_thread = _PreviewTranslationThread(video_path=video_path, task=task)
         self.preview_thread.finished_rows.connect(self._on_preview_finished)
@@ -1044,6 +1681,13 @@ class VideoTranslateInterface(QWidget):
     def _on_preview_failed(self, err: str):
         self.preview_thread = None
         self.diag_label.setText(f"Проверка перевода: ошибка ({err})")
+        self._show_copyable_error(
+            title="Ошибка проверки перевода",
+            message=str(err),
+            log_file_name="video_translate_preview_last_error.txt",
+            parent_widget=self,
+            duration=12000,
+        )
 
     def open_translation_file(self):
         target = None
@@ -1061,35 +1705,154 @@ class VideoTranslateInterface(QWidget):
         else:
             subprocess.run(["xdg-open", str(target)])
 
+    def edit_last_translation_and_prepare_redub(self):
+        """Открыть последний кэш перевода, отредактировать и подготовить перезапуск с этапа озвучки."""
+        if not _LAST_TRANSLATION_CACHE.exists():
+            InfoBar.warning(
+                "Нет последнего перевода",
+                "Сначала запустите перевод хотя бы один раз",
+                duration=2500,
+                parent=self,
+            )
+            return
+        try:
+            raw = json.loads(_LAST_TRANSLATION_CACHE.read_text(encoding="utf-8", errors="ignore") or "{}")
+        except Exception:
+            raw = {}
+        rows = raw.get("rows", []) if isinstance(raw, dict) else []
+        if not rows:
+            InfoBar.warning(
+                "Пустой кэш перевода",
+                "Не удалось прочитать сегменты последнего перевода",
+                duration=2500,
+                parent=self,
+            )
+            return
+
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Редактирование последнего перевода")
+        dlg.resize(1160, 720)
+        lay = QVBoxLayout(dlg)
+
+        table = QTableWidget(len(rows), 4, dlg)
+        table.setHorizontalHeaderLabels(["Start", "End", "Оригинал", "Перевод"])
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
+
+        for i, r in enumerate(rows):
+            table.setItem(i, 0, QTableWidgetItem(str(int((r or {}).get("start_ms", 0) or 0))))
+            table.setItem(i, 1, QTableWidgetItem(str(int((r or {}).get("end_ms", 0) or 0))))
+            table.item(i, 0).setFlags(table.item(i, 0).flags() & ~Qt.ItemIsEditable)
+            table.item(i, 1).setFlags(table.item(i, 1).flags() & ~Qt.ItemIsEditable)
+            table.setItem(i, 2, QTableWidgetItem(str((r or {}).get("original", ""))))
+            table.item(i, 2).setFlags(table.item(i, 2).flags() & ~Qt.ItemIsEditable)
+            table.setItem(i, 3, QTableWidgetItem(str((r or {}).get("translated", ""))))
+
+        lay.addWidget(table)
+
+        btns = QHBoxLayout()
+        apply_btn = PrimaryPushButton("Сохранить и использовать в следующем запуске", dlg)
+        close_btn = PushButton("Закрыть", dlg)
+        btns.addWidget(apply_btn)
+        btns.addWidget(close_btn)
+        btns.addStretch(1)
+        lay.addLayout(btns)
+
+        def _save_and_close():
+            out_rows = []
+            for i, r in enumerate(rows):
+                out_rows.append(
+                    {
+                        "start_ms": int((r or {}).get("start_ms", 0) or 0),
+                        "end_ms": int((r or {}).get("end_ms", 0) or 0),
+                        "original": str((r or {}).get("original", "")),
+                        "translated": str(table.item(i, 3).text() if table.item(i, 3) else (r or {}).get("translated", "")),
+                    }
+                )
+
+            out_json = PROJECT_ROOT / "AppData" / "cache" / "video_translate_manual_translation.json"
+            out_json.parent.mkdir(parents=True, exist_ok=True)
+            out_json.write_text(json.dumps(out_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.manual_translation_json_path = str(out_json)
+            self.diag_label.setText(
+                f"Перевод отредактирован: {len(out_rows)} сегментов. Следующий запуск возьмёт этот текст (без нового шага перевода)."
+            )
+            InfoBar.success(
+                "Сохранено",
+                "Исправленный перевод применится в следующем запуске",
+                duration=2800,
+                parent=self,
+            )
+            dlg.accept()
+
+        apply_btn.clicked.connect(_save_and_close)
+        close_btn.clicked.connect(dlg.reject)
+        dlg.exec_()
+
     def on_error(self, message: str):
         self.start_button.setEnabled(True)
         self.status_label.setText("Ошибка")
         self.diag_label.setText(f"Ошибка: {message}")
 
-        # Чтобы ошибку можно было сразу вставить в чат/issue.
-        try:
-            QApplication.clipboard().setText(str(message or ""))
-        except Exception:
-            pass
-
-        # Всегда сохраняем последнюю ошибку в файл, чтобы можно было открыть/скопировать.
-        try:
-            err_file = PROJECT_ROOT / "AppData" / "logs" / "video_translate_last_error.txt"
-            err_file.parent.mkdir(parents=True, exist_ok=True)
-            err_file.write_text(str(message or ""), encoding="utf-8")
-        except Exception:
-            pass
-
         # Продлеваем показ ошибки, чтобы пользователь успел прочитать детали strict/XTTS фейла.
         is_xtts_fail = "xtts" in str(message).lower() or "voice clone" in str(message).lower()
-        err_duration = 15000 if is_xtts_fail else 8000
-        InfoBar.error(
-            "Ошибка перевода видео",
-            f"{message}\n(подробно: AppData/logs/video_translate_last_error.txt, текст скопирован в буфер)",
+        err_duration = 15000 if is_xtts_fail else 9000
+        self._show_copyable_error(
+            title="Ошибка перевода видео",
+            message=str(message),
+            log_file_name="video_translate_last_error.txt",
+            parent_widget=self,
             duration=err_duration,
-            position=InfoBarPosition.TOP,
-            parent=self,
         )
+
+    def _load_recent_speaker_ids(self) -> list[str]:
+        """Берёт список спикеров из последнего анализа, затем из map, затем fallback."""
+        ids: list[str] = []
+        try:
+            if _SPEAKER_ANALYSIS_CACHE.exists():
+                raw = json.loads(_SPEAKER_ANALYSIS_CACHE.read_text(encoding="utf-8", errors="ignore") or "{}")
+                rows = raw.get("speaker_ids", []) if isinstance(raw, dict) else []
+                ids = [str(x).strip() for x in rows if str(x).strip()]
+        except Exception:
+            ids = []
+
+        if not ids:
+            existing_raw = str(getattr(cfg.video_translate_manual_voice_map_json, "value", "") or "").strip()
+            if existing_raw:
+                try:
+                    data = json.loads(existing_raw)
+                    if isinstance(data, dict):
+                        ids = [
+                            str(k).strip()
+                            for k in data.keys()
+                            if str(k).strip() and str(k).strip().lower() != "default"
+                        ]
+                except Exception:
+                    ids = []
+
+        if not ids:
+            try:
+                expected = int(getattr(cfg.video_translate_expected_speaker_count, "value", 0) or 0)
+            except Exception:
+                expected = 0
+            speaker_count = max(2, expected if expected > 0 else 2)
+            speaker_count = min(12, speaker_count)
+            ids = [f"spk_{i}" for i in range(speaker_count)]
+
+        # Стабильный порядок: spk_0, spk_1, ... затем прочие
+        def _sort_key(v: str):
+            t = str(v)
+            if t.startswith("spk_"):
+                try:
+                    return (0, int(t.split("_", 1)[1]))
+                except Exception:
+                    return (1, t)
+            return (2, t)
+
+        ids = sorted(list(dict.fromkeys(ids)), key=_sort_key)
+        return ids[:24]
 
     def open_output_folder(self):
         if not self.task or not self.task.output_path:

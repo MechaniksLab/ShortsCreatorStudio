@@ -760,6 +760,7 @@ class VideoTranslateConfig:
     """Конфигурация модуля перевода видео с клонированием голосов."""
 
     source_language: str = ""
+    translation_enabled: bool = True
     target_language: str = "英语"
     translator_service: Optional[TranslatorServiceEnum] = None
     llm_base_url: str = ""
@@ -817,6 +818,7 @@ class VideoTranslateConfig:
     segment_min_mean_db: float = -43.0
     segment_max_peak_db: float = -0.2
     enable_background_ducking: bool = True
+    preserve_background_loudness: bool = False
     aggressive_vocal_suppression: bool = False
     reference_enhancement_enabled: bool = True
     reference_min_mean_db: float = -48.0
@@ -824,6 +826,7 @@ class VideoTranslateConfig:
     uvr_model_dir: str = ""
     uvr_inst_hq3_model_name: str = "UVR-MDX-NET-Inst_HQ_3.onnx"
     uvr_kim_vocal_model_name: str = "Kim_Vocal_2.onnx"
+    manual_transcription_json: str = ""
     manual_translation_json: str = ""
 
 

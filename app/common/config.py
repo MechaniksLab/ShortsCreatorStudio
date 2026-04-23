@@ -567,6 +567,9 @@ class Config(QConfig):
     video_translate_enable_background_ducking = ConfigItem(
         "VideoTranslate", "EnableBackgroundDucking", True, BoolValidator()
     )
+    video_translate_preserve_background_loudness = ConfigItem(
+        "VideoTranslate", "PreserveBackgroundLoudness", False, BoolValidator()
+    )
     video_translate_aggressive_vocal_suppression = ConfigItem(
         "VideoTranslate", "AggressiveVocalSuppression", False, BoolValidator()
     )

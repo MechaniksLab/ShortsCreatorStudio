@@ -34,6 +34,9 @@ from app.core.video_translate.rvc_model_registry import default_rvc_model_root, 
 
 logger = setup_logger("video_translate_processor")
 
+_SPEAKER_ANALYSIS_CACHE = PROJECT_ROOT / "AppData" / "cache" / "video_translate_last_speakers.json"
+_LAST_TRANSLATION_CACHE = PROJECT_ROOT / "AppData" / "cache" / "video_translate_last_translation.json"
+
 
 def _safe_run(cmd: List[str]):
     logger.info("CMD: %s", subprocess.list2cmdline(cmd))
@@ -84,6 +87,69 @@ def _probe_audio_duration_ms(path: Path) -> int:
     except Exception:
         pass
     return 0
+
+
+def _probe_mean_db_with_filter(path: Path, afilter: str) -> Optional[float]:
+    """Оценка средней громкости (dB) после фильтра ffmpeg volumedetect."""
+    try:
+        p = subprocess.run(
+            [
+                "ffmpeg",
+                "-hide_banner",
+                "-i",
+                str(path),
+                "-af",
+                f"{afilter},volumedetect",
+                "-f",
+                "null",
+                "NUL",
+            ],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+            ),
+        )
+        text = (p.stdout or "") + "\n" + (p.stderr or "")
+        m_mean = re.search(r"mean_volume:\s*(-?[\d\.]+)\s*dB", text)
+        if m_mean:
+            return float(m_mean.group(1))
+    except Exception:
+        return None
+    return None
+
+
+def _estimate_vocal_leak_score(path: Path) -> float:
+    """Грубая оценка остаточного голоса в фоне: чем меньше, тем лучше."""
+    # Диапазон, где обычно много речевой информации.
+    mid = _probe_mean_db_with_filter(path, "highpass=f=150,lowpass=f=3800")
+    full = _probe_mean_db_with_filter(path, "anull")
+    if mid is None and full is None:
+        return 1e9
+    if mid is None:
+        mid = -120.0
+    if full is None:
+        full = -120.0
+    # Если середина относительно общего сигнала громкая -> вероятна утечка вокала.
+    relative_mid = mid - full
+    # Наказываем слишком тихие треки, чтобы не выбрать «почти тишину» как лучший фон.
+    quiet_penalty = 8.0 if full < -48.0 else 0.0
+    return float(mid + 0.65 * relative_mid + quiet_penalty)
+
+
+def _pick_best_background_candidate(candidates: List[Path], source_audio: Path) -> Path:
+    valid = [c for c in candidates if c and c.exists() and c.stat().st_size > 0]
+    if not valid:
+        return source_audio
+    scored: List[tuple[float, Path]] = []
+    for c in valid:
+        score = _estimate_vocal_leak_score(c)
+        scored.append((score, c))
+        logger.info("BG candidate score: %s -> %.3f", c, score)
+    scored.sort(key=lambda x: x[0])
+    return scored[0][1]
 
 
 def _build_atempo_filter(speed: float) -> str:
@@ -219,6 +285,30 @@ def _try_uvr_mdx_kim_split(source_audio: Path, work_dir: Path, cfg) -> tuple[Opt
     """Пытается разделить дорожку через локальный UVR/MDX каскад (Inst HQ3 + Kim Vocal 2)."""
     py = _runtime_python()
     if py is None:
+        return None, None
+
+    # Жёсткая проверка зависимости: без audio_separator UVR-скрипт не сможет реально разделить стемы.
+    try:
+        chk = subprocess.run(
+            [str(py), "-c", "import audio_separator; print('ok')"],
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=20,
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+            ),
+        )
+        if chk.returncode != 0:
+            raise RuntimeError(
+                "В runtime не установлен пакет 'audio_separator' для UVR/MDX. "
+                "Запустите scripts\\install_video_translate_experimental_addons.cmd "
+                "или установите зависимости UVR вручную."
+            )
+    except Exception as e:
+        logger.warning("UVR runtime dependency check failed: %s", e)
         return None, None
 
     uvr_script = PROJECT_ROOT / "scripts" / "uvr_separate.py"
@@ -695,6 +785,11 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             or 18.0
         )
         reference_enhance = bool(getattr(cfg, "reference_enhancement_enabled", quality in {"high", "studio"}))
+        # Быстрый режим подготовки эталонов для GPU-пайплайна: меньше CPU-нагрузки и быстрее старт TTS.
+        fast_ref_mode = bool(gpu_pref and quality in {"high", "studio"})
+        if fast_ref_mode:
+            target_ref_total = min(target_ref_total, 3.2)
+            reference_enhance = False
         # В режиме provider=rvc сам тембр вносится RVC-конвертером,
         # поэтому не тратим лишний CPU на слишком длинные эталоны XTTS.
         if voice_provider == "rvc":
@@ -710,12 +805,15 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             ordered = sorted(spk_segs, key=lambda s: max(0, s.end_ms - s.start_ms), reverse=True)
             parts: List[Path] = []
             acc = 0.0
+            max_ref_parts = 1 if fast_ref_mode else 5
             for n, seg in enumerate(ordered, start=1):
                 if acc >= target_ref_total:
                     break
+                if len(parts) >= max_ref_parts:
+                    break
                 clip = work_dir / f"ref_{spk}_{n:02d}.wav"
                 start_sec = max(0.0, (seg.start_ms / 1000.0) - 0.30)
-                dur_sec = max(1.6, min(6.5, (seg.end_ms - seg.start_ms) / 1000.0 + 0.9))
+                dur_sec = max(1.2, min(2.8 if fast_ref_mode else 6.5, (seg.end_ms - seg.start_ms) / 1000.0 + 0.6))
                 try:
                     _safe_run(
                         [
@@ -735,10 +833,11 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                         ]
                     )
                     if clip.exists() and clip.stat().st_size > 0:
-                        stats = self._probe_volumedetect(clip)
-                        mean_db = stats.get("mean_db", -120.0)
-                        if mean_db < reference_min_mean_db:
-                            continue
+                        if not fast_ref_mode:
+                            stats = self._probe_volumedetect(clip)
+                            mean_db = stats.get("mean_db", -120.0)
+                            if mean_db < reference_min_mean_db:
+                                continue
                         if reference_enhance:
                             clip = self._enhance_reference_clip(
                                 clip,
@@ -928,11 +1027,29 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                         )
                         fixed_wav = rvc_wav
                     except Exception as e:
-                        if voice_provider == "rvc":
-                            raise RuntimeError(
-                                f"Native RVC convert failed for slot={slot} seg={i}: {e}"
+                        # fallback: попытка CPU + без index
+                        try:
+                            self._run_native_rvc_convert(
+                                runtime_python=rvc_runtime_py,
+                                input_wav=fixed_wav,
+                                output_wav=rvc_wav,
+                                model_path=model_pth,
+                                index_path=None,
+                                f0_up_key=model_tune,
+                                index_rate=0.0,
+                                protect=float(getattr(model_meta, "default_protect", 0.5) or 0.5),
+                                filter_radius=int(getattr(cfg, "rvc_filter_radius", 3) or 3),
+                                device="cpu",
                             )
-                        logger.warning("Native RVC skipped for slot=%s seg=%s: %s", slot, i, e)
+                            fixed_wav = rvc_wav
+                        except Exception as e2:
+                            logger.warning(
+                                "Native RVC failed for slot=%s seg=%s (cuda/index), fallback failed too: %s | %s",
+                                slot,
+                                i,
+                                e,
+                                e2,
+                            )
 
                 if not qa_enabled:
                     break
@@ -1298,6 +1415,18 @@ class VideoTranslationProcessor:
         }
         return mapping[service]
 
+    @staticmethod
+    def _contains_cyrillic(text: str) -> bool:
+        return bool(re.search(r"[А-Яа-яЁё]", str(text or "")))
+
+    @staticmethod
+    def _target_prefers_non_cyrillic(target_language: str) -> bool:
+        t = str(target_language or "").strip().lower()
+        # Для русской/кириллической цели не делаем жёсткую проверку.
+        if any(x in t for x in ["рус", "russian", "укра", "ukrain", "белар", "serbian", "bulgarian"]):
+            return False
+        return True
+
     def _translate_asr(self, asr_data: ASRData, task: VideoTranslateTask) -> ASRData:
         sub_cfg = task.subtitle_config
         translator_type = self._translator_type(sub_cfg.translator_service)
@@ -1326,6 +1455,61 @@ class VideoTranslationProcessor:
         )
         return translator.translate_subtitle(asr_data)
 
+    def _retry_untranslated_segments(self, asr_data: ASRData, task: VideoTranslateTask) -> ASRData:
+        """Повторно переводит проблемные сегменты (пусто/идентично/явно кириллица для non-cyr target)."""
+        target = str(getattr(task.subtitle_config, "target_language", "") or "")
+        non_cyr_target = self._target_prefers_non_cyrillic(target)
+
+        bad_idx: List[int] = []
+        for i, seg in enumerate(asr_data.segments):
+            src = str(seg.text or "").strip()
+            tr = str(seg.translated_text or "").strip()
+            if not src:
+                continue
+            same = (not tr) or (tr == src)
+            cyr_bad = non_cyr_target and self._contains_cyrillic(src) and self._contains_cyrillic(tr)
+            if same or cyr_bad:
+                bad_idx.append(i)
+
+        if not bad_idx:
+            return asr_data
+
+        sub_cfg = task.subtitle_config
+        translator_type = self._translator_type(sub_cfg.translator_service)
+        translator = TranslatorFactory.create_translator(
+            translator_type=translator_type,
+            thread_num=1,
+            batch_num=max(1, min(24, len(bad_idx))),
+            target_language=sub_cfg.target_language,
+            model=sub_cfg.llm_model,
+            custom_prompt=sub_cfg.custom_prompt_text or "",
+            is_reflect=True,
+            use_cache=False,
+            openai_base_url=sub_cfg.base_url,
+            openai_api_key=sub_cfg.api_key,
+            deeplx_endpoint=sub_cfg.deeplx_endpoint,
+        )
+
+        subset = ASRData([
+            ASRDataSeg(
+                text=str(asr_data.segments[i].text or ""),
+                start_time=int(asr_data.segments[i].start_time),
+                end_time=int(asr_data.segments[i].end_time),
+                word_timestamps=list(getattr(asr_data.segments[i], "word_timestamps", []) or []),
+            )
+            for i in bad_idx
+        ])
+        translated_subset = translator.translate_subtitle(subset)
+
+        replaced = 0
+        for off, idx in enumerate(bad_idx):
+            new_tr = str(translated_subset.segments[off].translated_text or translated_subset.segments[off].text or "").strip()
+            if new_tr:
+                asr_data.segments[idx].translated_text = new_tr
+                replaced += 1
+        logger.info("Retry translated segments: %s/%s", replaced, len(bad_idx))
+        return asr_data
+
     @staticmethod
     def _apply_manual_translation_json(asr_data: ASRData, json_path: str) -> ASRData:
         p = Path(str(json_path or "").strip())
@@ -1343,6 +1527,25 @@ class VideoTranslationProcessor:
             tr = str((row or {}).get("translated") or "").strip()
             if tr:
                 seg.translated_text = tr
+        return asr_data
+
+    @staticmethod
+    def _apply_manual_transcription_json(asr_data: ASRData, json_path: str) -> ASRData:
+        p = Path(str(json_path or "").strip())
+        if not p.exists():
+            return asr_data
+        try:
+            data = json.loads(p.read_text(encoding="utf-8", errors="ignore") or "[]")
+        except Exception:
+            return asr_data
+        rows = data if isinstance(data, list) else []
+        for i, row in enumerate(rows):
+            if i >= len(asr_data.segments):
+                break
+            seg = asr_data.segments[i]
+            txt = str((row or {}).get("text") or "").strip()
+            if txt:
+                seg.text = txt
         return asr_data
 
     def _build_segments(self, asr_data: ASRData) -> List[VoiceSegment]:
@@ -1443,19 +1646,25 @@ class VideoTranslationProcessor:
 
         if mode == "demucs":
             speech = demucs_vocals or source_audio
-            bg = demucs_bg or source_audio
+            bg = _pick_best_background_candidate([demucs_bg, source_audio], source_audio)
             return _finalize_selected_stems(work_dir, speech, bg)
 
         if mode == "uvr_mdx_kim":
+            if not (uvr_vocals and uvr_vocals.exists() and uvr_vocals.stat().st_size > 0):
+                raise RuntimeError(
+                    "Режим UVR MDX/Kim не смог получить voice stem. "
+                    "Проверьте установку UVR-зависимостей (audio_separator/onnxruntime) "
+                    "и наличие моделей Kim_Vocal_2.onnx + UVR-MDX-NET-Inst_HQ_3.onnx."
+                )
             speech = uvr_vocals or source_audio
-            bg = uvr_bg or source_audio
+            bg = _pick_best_background_candidate([uvr_bg, source_audio], source_audio)
             return _finalize_selected_stems(work_dir, speech, bg)
 
         # demucs_plus_uvr: комбинируем сильные стороны обоих подходов.
         speech = uvr_vocals or demucs_vocals or source_audio
         # Для удаления оригинального голоса в финальном миксе лучше сначала брать UVR background
         # (обычно чище по вокалу), а затем demucs fallback.
-        bg = uvr_bg or demucs_bg or source_audio
+        bg = _pick_best_background_candidate([uvr_bg, demucs_bg, source_audio], source_audio)
         if speech.exists() and bg.exists() and (speech != source_audio or bg != source_audio):
             return _finalize_selected_stems(work_dir, speech, bg)
 
@@ -1483,11 +1692,45 @@ class VideoTranslationProcessor:
     def _mux_video(self, task: VideoTranslateTask, background_audio: Path, dubbed_audio: Path, output_path: str):
         keep_bg = bool(getattr(task.video_translate_config, "keep_background_music", True))
         bg_ducking = bool(getattr(task.video_translate_config, "enable_background_ducking", True))
+        preserve_bg_loudness = bool(getattr(task.video_translate_config, "preserve_background_loudness", False))
         src_sep_on = bool(getattr(task.video_translate_config, "enable_source_separation", True))
         aggressive_vocal_suppress = bool(
             getattr(task.video_translate_config, "aggressive_vocal_suppression", False)
         )
         if keep_bg:
+            if preserve_bg_loudness:
+                # Режим «1:1 фон»: не трогаем loudnorm/ducking для фоновой дорожки.
+                filter_chain = (
+                    "[1:a]anull[bg];"
+                    "[2:a]loudnorm=I=-16:TP=-1.5:LRA=11[dub];"
+                    "[bg][dub]amix=inputs=2:weights='1.0 1.65':normalize=0,alimiter=limit=0.985[mix]"
+                )
+                _safe_run(
+                    [
+                        "ffmpeg",
+                        "-y",
+                        "-i",
+                        task.video_path,
+                        "-i",
+                        str(background_audio),
+                        "-i",
+                        str(dubbed_audio),
+                        "-filter_complex",
+                        filter_chain,
+                        "-map",
+                        "0:v:0",
+                        "-map",
+                        "[mix]",
+                        "-c:v",
+                        "copy",
+                        "-c:a",
+                        "aac",
+                        "-shortest",
+                        output_path,
+                    ]
+                )
+                return
+
             # Агрессивнее чистим фон от остаточного вокала (особенно если stem неидеален).
             if aggressive_vocal_suppress:
                 bg_cleanup = (
@@ -1604,6 +1847,48 @@ class VideoTranslationProcessor:
             ]
         )
 
+    @staticmethod
+    def _save_speaker_analysis_cache(segments: List[VoiceSegment], turns: Optional[List[SpeakerTurn]] = None):
+        try:
+            _SPEAKER_ANALYSIS_CACHE.parent.mkdir(parents=True, exist_ok=True)
+            unique_ids = sorted({str(s.speaker_id) for s in segments if str(s.speaker_id).strip()})
+            payload = {
+                "speaker_ids": unique_ids,
+                "segments_count": len(segments),
+                "turns_count": len(turns or []),
+            }
+            _SPEAKER_ANALYSIS_CACHE.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception as e:
+            logger.warning("Failed to save speaker analysis cache: %s", e)
+
+    @staticmethod
+    def _save_last_translation_cache(asr_data: ASRData, task: VideoTranslateTask):
+        try:
+            _LAST_TRANSLATION_CACHE.parent.mkdir(parents=True, exist_ok=True)
+            rows = []
+            for seg in asr_data.segments:
+                rows.append(
+                    {
+                        "start_ms": int(seg.start_time),
+                        "end_ms": int(seg.end_time),
+                        "original": str(seg.text or ""),
+                        "translated": str(seg.translated_text or seg.text or ""),
+                    }
+                )
+            payload = {
+                "video_path": str(task.video_path or ""),
+                "rows": rows,
+            }
+            _LAST_TRANSLATION_CACHE.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception as e:
+            logger.warning("Failed to save translation cache: %s", e)
+
     def process(
         self,
         task: VideoTranslateTask,
@@ -1654,11 +1939,13 @@ class VideoTranslationProcessor:
         speech_audio, bg_audio = self._prepare_audio_stems(task, audio_path, work_dir)
 
         # Автовыбор ASR device: не даём падать, если CUDA недоступна
-        current_device = getattr(task.transcribe_config, "faster_whisper_device", "cuda")
-        resolved_device = self._detect_torch_device(current_device)
-        task.transcribe_config.faster_whisper_device = resolved_device
-        if resolved_device != str(current_device):
-            self._emit(progress_cb, 10, f"ASR device: {current_device} -> {resolved_device}")
+        current_device = str(getattr(task.transcribe_config, "faster_whisper_device", "cuda") or "cuda").strip().lower()
+        if current_device == "cuda" and not self._runtime_cuda_available():
+            raise RuntimeError(
+                "Выбран режим GPU (CUDA), но CUDA недоступна в runtime. "
+                "Установите/исправьте GPU-окружение, либо вручную выберите CPU в интерфейсе."
+            )
+        task.transcribe_config.faster_whisper_device = current_device
 
         self._emit(progress_cb, 12, "Распознавание речи")
         try:
@@ -1683,13 +1970,27 @@ class VideoTranslationProcessor:
             else:
                 raise
 
-        self._emit(progress_cb, 35, "Перевод текста")
-        manual_tr_json = str(getattr(task.video_translate_config, "manual_translation_json", "") or "").strip()
-        if manual_tr_json and Path(manual_tr_json).exists():
-            asr_data = self._apply_manual_translation_json(asr_data, manual_tr_json)
-            self._emit(progress_cb, 38, "Применён подтверждённый перевод из предпросмотра")
+        manual_tx_json = str(getattr(task.video_translate_config, "manual_transcription_json", "") or "").strip()
+        if manual_tx_json and Path(manual_tx_json).exists():
+            asr_data = self._apply_manual_transcription_json(asr_data, manual_tx_json)
+            self._emit(progress_cb, 30, "Применена ручная правка распознавания")
+
+        translation_enabled = bool(getattr(task.video_translate_config, "translation_enabled", True))
+        self._emit(progress_cb, 35, "Перевод текста" if translation_enabled else "Режим без перевода")
+        if translation_enabled:
+            manual_tr_json = str(getattr(task.video_translate_config, "manual_translation_json", "") or "").strip()
+            if manual_tr_json and Path(manual_tr_json).exists():
+                asr_data = self._apply_manual_translation_json(asr_data, manual_tr_json)
+                self._emit(progress_cb, 38, "Применён подтверждённый перевод из предпросмотра")
+            else:
+                asr_data = self._translate_asr(asr_data, task)
+                asr_data = self._retry_untranslated_segments(asr_data, task)
         else:
-            asr_data = self._translate_asr(asr_data, task)
+            for seg in asr_data.segments:
+                seg.translated_text = str(seg.text or "")
+            self._emit(progress_cb, 38, "Озвучка будет выполнена по оригинальному тексту")
+
+        self._save_last_translation_cache(asr_data, task)
 
         if task.output_subtitle_path:
             asr_data.to_srt(task.output_subtitle_path)
@@ -1718,13 +2019,17 @@ class VideoTranslationProcessor:
                     max(0.0, time.time() - diar_started),
                 )
                 segments = self._apply_speaker_turns(segments, turns)
+                self._save_speaker_analysis_cache(segments, turns)
             except Exception as e:
                 logger.warning("Diarization failed, fallback to heuristic: %s", e)
                 try:
                     turns = HeuristicPauseDiarizer().diarize(str(speech_audio), asr_data)
                     segments = self._apply_speaker_turns(segments, turns)
+                    self._save_speaker_analysis_cache(segments, turns)
                 except Exception:
                     pass
+        else:
+            self._save_speaker_analysis_cache(segments, None)
 
         # Управление overlap-сценариями: для studio/high оставляем оригинальные пересечения,
         # для fast/balanced можно включать строгую раздвижку сегментов.

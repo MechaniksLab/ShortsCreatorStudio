@@ -600,6 +600,7 @@ class TaskFactory:
             segment_min_mean_db=cfg.video_translate_segment_min_mean_db.value,
             segment_max_peak_db=cfg.video_translate_segment_max_peak_db.value,
             enable_background_ducking=cfg.video_translate_enable_background_ducking.value,
+            preserve_background_loudness=cfg.video_translate_preserve_background_loudness.value,
             aggressive_vocal_suppression=cfg.video_translate_aggressive_vocal_suppression.value,
             reference_enhancement_enabled=cfg.video_translate_reference_enhancement_enabled.value,
             reference_min_mean_db=cfg.video_translate_reference_min_mean_db.value,

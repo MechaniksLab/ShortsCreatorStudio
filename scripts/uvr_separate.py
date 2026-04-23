@@ -81,6 +81,23 @@ def _pick_stem(paths: list[Path], want_vocals: bool) -> Path | None:
     return sorted(paths, key=lambda x: x.stat().st_size if x.exists() else 0, reverse=True)[0]
 
 
+def _derive_vocals_from_inst(mix_wav: Path, inst_wav: Path, out_vocals: Path) -> None:
+    # Оценка вокала как разница mix - instrumental.
+    _run(
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            str(mix_wav),
+            "-i",
+            str(inst_wav),
+            "-filter_complex",
+            "[0:a][1:a]amix=inputs=2:weights='1 -1':normalize=0,alimiter=limit=0.98",
+            str(out_vocals),
+        ]
+    )
+
+
 def _pseudo_no_vocals(input_wav: Path, output_no_vocals: Path) -> None:
     _run(
         [
@@ -122,13 +139,21 @@ def main() -> int:
     _normalize_wav(src, normalized)
 
     all_outputs: list[Path] = []
+    vocal_outputs: list[Path] = []
+    inst_outputs: list[Path] = []
     try:
         if vocal_model.exists():
             _safe_print(f"[INFO] vocal model: {vocal_model.name}")
-            all_outputs += _separate_with_audio_separator(normalized, out_dir, vocal_model)
+            model_out = out_dir / "vocal_model"
+            model_out.mkdir(parents=True, exist_ok=True)
+            vocal_outputs = _separate_with_audio_separator(normalized, model_out, vocal_model)
+            all_outputs += vocal_outputs
         if inst_model.exists():
             _safe_print(f"[INFO] inst model: {inst_model.name}")
-            all_outputs += _separate_with_audio_separator(normalized, out_dir, inst_model)
+            model_out = out_dir / "inst_model"
+            model_out.mkdir(parents=True, exist_ok=True)
+            inst_outputs = _separate_with_audio_separator(normalized, model_out, inst_model)
+            all_outputs += inst_outputs
     except Exception as e:
         _safe_print(f"[WARN] audio-separator failed: {e}")
 
@@ -141,8 +166,8 @@ def main() -> int:
         seen.add(rp)
         uniq.append(rp)
 
-    vocals = _pick_stem(uniq, want_vocals=True)
-    no_vocals = _pick_stem(uniq, want_vocals=False)
+    vocals = _pick_stem(vocal_outputs, want_vocals=True) or _pick_stem(uniq, want_vocals=True)
+    no_vocals = _pick_stem(inst_outputs, want_vocals=False) or _pick_stem(uniq, want_vocals=False)
 
     out_vocals = out_dir / "vocals.wav"
     out_bg = out_dir / "no_vocals.wav"
@@ -151,6 +176,17 @@ def main() -> int:
         shutil.copy2(vocals, out_vocals)
     if no_vocals and no_vocals.exists():
         shutil.copy2(no_vocals, out_bg)
+
+    # Приоритет для MDX Inst_HQ_3: строим вокал как разницу mix - instrumental.
+    # Это обычно даёт более «чистый» голос (меньше музыки/SFX), чем прямой vocal stem.
+    if out_bg.exists() and out_bg.stat().st_size > 0:
+        try:
+            if out_vocals.exists() and out_vocals.stat().st_size > 0:
+                backup_vocals = out_dir / "vocals_from_model.wav"
+                shutil.copy2(out_vocals, backup_vocals)
+            _derive_vocals_from_inst(normalized, out_bg, out_vocals)
+        except Exception:
+            pass
 
     # Если no_vocals не получен, строим псевдо-фон.
     if not out_bg.exists() or out_bg.stat().st_size == 0:
