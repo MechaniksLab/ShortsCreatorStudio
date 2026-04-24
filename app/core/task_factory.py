@@ -594,6 +594,7 @@ class TaskFactory:
             allow_speaker_overlap=cfg.video_translate_allow_speaker_overlap.value,
             overlap_aware_mix=cfg.video_translate_overlap_aware_mix.value,
             segment_qa_enabled=cfg.video_translate_segment_qa_enabled.value,
+            speaker_chunk_synthesis_enabled=cfg.video_translate_speaker_chunk_synthesis_enabled.value,
             segment_qa_retry_count=cfg.video_translate_segment_qa_retry_count.value,
             segment_min_duration_ms=cfg.video_translate_segment_min_duration_ms.value,
             segment_min_size_bytes=cfg.video_translate_segment_min_size_bytes.value,

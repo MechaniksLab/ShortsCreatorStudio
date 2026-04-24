@@ -171,6 +171,7 @@
         "SegmentQARetryCount": 2,
         "SourceLanguage": "俄语",
         "SourceSeparationMode": "uvr_mdx_kim",
+        "SpeakerChunkSynthesisEnabled": true,
         "TargetLanguage": "英语",
         "TTSParallelWorkers": 5,
         "UseASRCache": true,

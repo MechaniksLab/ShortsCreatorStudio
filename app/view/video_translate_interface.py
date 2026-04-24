@@ -391,6 +391,20 @@ class VideoTranslateInterface(QWidget):
         row3.addWidget(self.qa_retry_label)
         row3.addWidget(self.qa_retry_combo, 1)
 
+        row3b = QHBoxLayout()
+        row3b.setSpacing(10)
+        self.speaker_chunk_label = BodyLabel("Озвучка крупными кусками спикера (менее рваная речь)", self)
+        self.speaker_chunk_label.setMinimumWidth(form_label_w)
+        self.speaker_chunk_combo = ComboBox(self)
+        self.speaker_chunk_combo.setMinimumWidth(form_field_min_w)
+        self.speaker_chunk_combo.addItems(["Да", "Нет"])
+        self.speaker_chunk_combo.setCurrentIndex(
+            0 if bool(getattr(cfg.video_translate_speaker_chunk_synthesis_enabled, "value", True)) else 1
+        )
+        row3b.addWidget(self.speaker_chunk_label)
+        row3b.addWidget(self.speaker_chunk_combo, 1)
+        row3b.addStretch(1)
+
         row4 = QHBoxLayout()
         row4.setSpacing(10)
         self.duck_label = BodyLabel("Ducking фона под речь (не действует в режиме 1:1 фона)", self)
@@ -604,6 +618,12 @@ class VideoTranslateInterface(QWidget):
         _set_pair_tooltip(self.mix_label, self.mix_combo, "Специальный микс для overlap-сегментов, чтобы уменьшить конфликт голосов в пересечениях.")
         _set_pair_tooltip(self.qa_label, self.qa_combo, "Пост-проверка сегментов TTS перед финальной сборкой. Повышает чистоту, но замедляет.")
         _set_pair_tooltip(self.qa_retry_label, self.qa_retry_combo, "Сколько раз пытаться переозвучить проблемный сегмент при QA-проверке.")
+        _set_pair_tooltip(
+            self.speaker_chunk_label,
+            self.speaker_chunk_combo,
+            "Объединяет соседние реплики одного спикера в более длинные блоки перед синтезом, "
+            "чтобы речь звучала естественнее и менее «по словам».",
+        )
         _set_pair_tooltip(self.duck_label, self.duck_combo, "Понижение фона во время речи, чтобы голос был разборчивее.")
         _set_pair_tooltip(self.preserve_bg_label, self.preserve_bg_combo, "Сохранять фон 1:1 по громкости. В этом режиме ducking и часть фильтров микса отключаются.")
 
@@ -771,6 +791,7 @@ class VideoTranslateInterface(QWidget):
         stage56_layout.addLayout(row6_workers)
         stage56_layout.addLayout(row2)
         stage56_layout.addLayout(row3)
+        stage56_layout.addLayout(row3b)
         stage56_layout.addLayout(row4)
         self.stage56_button = PrimaryPushButton("Запустить этап 5-6 (финальный рендер)", self)
         self.stage56_check_button = PushButton("Проверка: открыть папку результата", self)
@@ -906,6 +927,7 @@ class VideoTranslateInterface(QWidget):
         self.mix_combo.currentIndexChanged.connect(self._on_overlap_mix_changed)
         self.qa_combo.currentIndexChanged.connect(self._on_qa_changed)
         self.qa_retry_combo.currentIndexChanged.connect(self._on_qa_retry_changed)
+        self.speaker_chunk_combo.currentIndexChanged.connect(self._on_speaker_chunk_mode_changed)
         self.duck_combo.currentIndexChanged.connect(self._on_ducking_changed)
         self.preserve_bg_combo.currentIndexChanged.connect(self._on_preserve_bg_changed)
         self.vocal_kill_combo.currentIndexChanged.connect(self._on_aggressive_vocal_suppression_changed)
@@ -1148,6 +1170,12 @@ class VideoTranslateInterface(QWidget):
         except Exception:
             retries = 1
         cfg.set(cfg.video_translate_segment_qa_retry_count, max(0, min(4, retries)))
+
+    def _on_speaker_chunk_mode_changed(self):
+        cfg.set(
+            cfg.video_translate_speaker_chunk_synthesis_enabled,
+            self.speaker_chunk_combo.currentIndex() == 0,
+        )
 
     def _on_ducking_changed(self):
         cfg.set(cfg.video_translate_enable_background_ducking, self.duck_combo.currentIndex() == 0)
@@ -2063,6 +2091,7 @@ class VideoTranslateInterface(QWidget):
         self.task.video_translate_config.overlap_aware_mix = self.mix_combo.currentIndex() == 0
         self.task.video_translate_config.segment_qa_enabled = self.qa_combo.currentIndex() == 0
         self.task.video_translate_config.segment_qa_retry_count = int(self.qa_retry_combo.currentText() or 1)
+        self.task.video_translate_config.speaker_chunk_synthesis_enabled = self.speaker_chunk_combo.currentIndex() == 0
         self.task.video_translate_config.enable_background_ducking = self.duck_combo.currentIndex() == 0
         self.task.video_translate_config.preserve_background_loudness = self.preserve_bg_combo.currentIndex() == 0
         self.task.video_translate_config.aggressive_vocal_suppression = self.vocal_kill_combo.currentIndex() == 0
@@ -2158,6 +2187,7 @@ class VideoTranslateInterface(QWidget):
         task.video_translate_config.overlap_aware_mix = self.mix_combo.currentIndex() == 0
         task.video_translate_config.segment_qa_enabled = self.qa_combo.currentIndex() == 0
         task.video_translate_config.segment_qa_retry_count = int(self.qa_retry_combo.currentText() or 1)
+        task.video_translate_config.speaker_chunk_synthesis_enabled = self.speaker_chunk_combo.currentIndex() == 0
         task.video_translate_config.enable_background_ducking = self.duck_combo.currentIndex() == 0
         task.video_translate_config.preserve_background_loudness = self.preserve_bg_combo.currentIndex() == 0
         task.video_translate_config.aggressive_vocal_suppression = self.vocal_kill_combo.currentIndex() == 0

@@ -549,6 +549,9 @@ class Config(QConfig):
     video_translate_segment_qa_enabled = ConfigItem(
         "VideoTranslate", "SegmentQAEnabled", True, BoolValidator()
     )
+    video_translate_speaker_chunk_synthesis_enabled = ConfigItem(
+        "VideoTranslate", "SpeakerChunkSynthesisEnabled", True, BoolValidator()
+    )
     video_translate_segment_qa_retry_count = RangeConfigItem(
         "VideoTranslate", "SegmentQARetryCount", 1, RangeValidator(0, 4)
     )

@@ -813,6 +813,7 @@ class VideoTranslateConfig:
     overlap_aware_mix: bool = True
     segment_qa_enabled: bool = True
     segment_qa_retry_count: int = 1
+    speaker_chunk_synthesis_enabled: bool = True
     segment_min_duration_ms: int = 180
     segment_min_size_bytes: int = 2500
     segment_min_mean_db: float = -43.0

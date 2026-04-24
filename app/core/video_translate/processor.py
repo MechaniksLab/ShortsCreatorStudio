@@ -779,6 +779,49 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         merged.append(cur)
         return merged
 
+    @staticmethod
+    def _merge_segments_for_speaker_chunks(segments: List[VoiceSegment]) -> List[VoiceSegment]:
+        """Мягко объединяет соседние реплики одного спикера в более цельные фразы.
+
+        Нужен для режима перевода (TTS->RVC/XTTS), чтобы речь звучала менее «рвано».
+        """
+        if not segments:
+            return segments
+        ordered = sorted(segments, key=lambda s: (s.start_ms, s.end_ms))
+        merged: List[VoiceSegment] = []
+
+        max_gap_ms = 220
+        max_chunk_ms = 12000
+        cur = VoiceSegment(
+            idx=int(ordered[0].idx),
+            start_ms=int(ordered[0].start_ms),
+            end_ms=int(ordered[0].end_ms),
+            text=str(ordered[0].text or "").strip(),
+            speaker_id=str(ordered[0].speaker_id or "spk_0"),
+        )
+
+        for seg in ordered[1:]:
+            same_spk = str(seg.speaker_id) == str(cur.speaker_id)
+            gap = int(seg.start_ms) - int(cur.end_ms)
+            next_total = int(seg.end_ms) - int(cur.start_ms)
+            can_merge = same_spk and gap <= max_gap_ms and next_total <= max_chunk_ms
+            if can_merge:
+                add_text = str(seg.text or "").strip()
+                if add_text:
+                    cur.text = (f"{cur.text} {add_text}").strip()
+                cur.end_ms = max(int(cur.end_ms), int(seg.end_ms))
+            else:
+                merged.append(cur)
+                cur = VoiceSegment(
+                    idx=int(seg.idx),
+                    start_ms=int(seg.start_ms),
+                    end_ms=int(seg.end_ms),
+                    text=str(seg.text or "").strip(),
+                    speaker_id=str(seg.speaker_id or "spk_0"),
+                )
+        merged.append(cur)
+        return merged
+
     def synthesize(
         self,
         segments: List[VoiceSegment],
@@ -841,6 +884,12 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                 ]
             else:
                 segments = self._merge_segments_for_rvc_passthrough(segments)
+        else:
+            speaker_chunk_mode = bool(getattr(cfg, "speaker_chunk_synthesis_enabled", True))
+            if speaker_chunk_mode:
+                # Для режима с переводом объединяем соседние куски одного спикера,
+                # чтобы убрать «рубленую» подачу по одной короткой фразе.
+                segments = self._merge_segments_for_speaker_chunks(segments)
         manual_map_raw = str(getattr(cfg, "manual_voice_map_json", "") or "").strip()
         speaker_slot_map: Dict[str, str] = {}
         if manual_map_raw:
@@ -1241,9 +1290,9 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         if not rvc_passthrough_mode:
             # Гибкий режим: стараемся держать исходные таймкоды,
             # но слегка сдвигаем только если предыдущий сегмент реально наползает.
-            min_gap_ms = 8
-            max_shift_ms = 140
-            overlap_tolerance_ms = 40
+            min_gap_ms = 4
+            max_shift_ms = 280
+            overlap_tolerance_ms = 60
             prev_end = 0
             for seg, dur_ms in zip(segments, wav_durations_ms):
                 nominal_start = max(0, int(seg.start_ms))
@@ -1254,7 +1303,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     start_ms = nominal_start + min(max_shift_ms, max(0, spill))
                 adjusted_starts.append(start_ms)
                 target_ms = max(1, int(seg.end_ms - seg.start_ms))
-                effective_sched_dur = min(int(dur_ms), target_ms + 140)
+                effective_sched_dur = min(int(dur_ms), target_ms + 260)
                 prev_end = start_ms + effective_sched_dur + min_gap_ms
         elif allow_overlap_cfg:
             adjusted_starts = [max(0, int(seg.start_ms)) for seg in segments]
