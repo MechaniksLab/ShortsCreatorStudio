@@ -1035,7 +1035,6 @@ class AutoShortsInterface(QWidget):
         self._link_fx_control_pair(self.gm_saturation, self.gm_saturation_slider)
         self._link_fx_control_pair(self.gm_gamma, self.gm_gamma_slider)
         self._link_fx_control_pair(self.gm_temperature, self.gm_temperature_slider)
-        self.main_layout.addWidget(self.template_card)
 
         self.stage3_card = CardWidget(self)
         self.stage3_card.setObjectName("shortsStage3Card")
@@ -1065,6 +1064,11 @@ class AutoShortsInterface(QWidget):
         self.table.setSortingEnabled(True)
         stage3_layout.addWidget(self.table)
         self.main_layout.addWidget(self.stage3_card)
+
+        # Монтаж применяется именно на этапе рендера,
+        # поэтому блок наглядного пресета должен быть расположен
+        # непосредственно перед этапом 4.
+        self.main_layout.addWidget(self.template_card)
 
         self.stage4_card = CardWidget(self)
         self.stage4_card.setObjectName("shortsStage4Card")
