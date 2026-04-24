@@ -2,8 +2,8 @@ import logging
 import os
 from pathlib import Path
 
-VERSION = "v1.4.0"
-YEAR = 2025
+VERSION = "v1.5.0"
+YEAR = 2026
 APP_NAME = "MechaniksLab Creator Studio"
 AUTHOR = "MechaniksLab"
 

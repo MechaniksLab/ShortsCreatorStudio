@@ -11,6 +11,8 @@
 ![FFmpeg](https://img.shields.io/badge/Video-FFmpeg-orange)
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-informational)
 
+**Текущая версия:** `v1.5.0`
+
 ---
 
 ## 🚀 Что это за проект
@@ -71,6 +73,14 @@
   3. формирование субтитров,
   4. рендер финального результата.
 
+### 5) Переозвучка / перевод видео (Video Translate)
+
+- каскад распознавания + перевод + синтез нового голоса;
+- поддержка voice clone через **Coqui XTTS**;
+- native-конвертация **RVC** (через отдельный runtime для совместимости);
+- source separation: **Demucs** и **UVR/MDX** с fallback-режимами;
+- fallback-логика по ключевым этапам (ASR/diarization/TTS), чтобы пайплайн не падал целиком.
+
 ---
 
 ## 🧭 Вкладки и что в них делать
@@ -95,6 +105,10 @@
 
 Финальный рендер с наложением выбранного стиля субтитров и параметров видео.
 
+### Главная → **Переозвучка/Перевод видео**
+
+Модуль локальной переозвучки: перевод реплик, сборка voice reference, синтез, опциональный RVC-финиш и экспорт итоговой дорожки/видео.
+
 ### Отдельный раздел → **Пакетная обработка**
 
 Для массовых задач: быстро прогонять десятки файлов в одном режиме, без ручного повторения одинаковых действий.
@@ -111,6 +125,37 @@
 - акцент и основные пользовательские цвета интерфейса;
 - LLM/переводчики/ASR-конфиги;
 - рабочие директории и системные параметры.
+
+---
+
+## 🧩 Актуальные модули интерфейса
+
+`app/view/`:
+
+- `main_window.py` — главное окно, навигация, проверка обновлений;
+- `home_interface.py` — контейнер ключевых вкладок;
+- `auto_shorts_interface.py` — создание шортсов;
+- `task_creation_interface.py` — создание субтитров (старт пайплайна);
+- `transcription_interface.py` — распознавание речи;
+- `subtitle_interface.py` — оптимизация/перевод субтитров;
+- `video_synthesis_interface.py` — синтез видео с субтитрами;
+- `video_translate_interface.py` — переозвучка/перевод видео;
+- `batch_process_interface.py` — пакетная обработка;
+- `subtitle_style_interface.py` — стиль и пресеты субтитров;
+- `setting_interface.py` — настройки приложения;
+- `log_window.py` — просмотр логов.
+
+Ключевые backend-пакеты в `app/core/`: `shorts`, `subtitle_processor`, `video_translate`, `bk_asr`, `storage`, `utils`.
+
+Дополнительно по архитектуре:
+
+- `app/thread/` — фоновые worker-потоки (ASR, batch, synthesis, video translate, автошортсы, проверка версий и т.д.);
+- `app/components/` — переиспользуемые UI-компоненты и карточки настроек;
+- `app/common/` — общая конфигурация, сигналы, тема;
+- `scripts/` — утилиты установки/диагностики окружений и служебные скрипты pipeline.
+
+> В README перечислены все пользовательские разделы интерфейса и ключевые backend-модули. 
+> Внутренние служебные файлы внутри пакетов (helper’ы/утилиты) не расписаны построчно, чтобы не перегружать документацию.
 
 ---
 
@@ -139,11 +184,13 @@
 
 ## 📦 Инструкция по запуску (правильный способ)
 
-Важно: в репозитории находится в основном **актуальный код программы**, а часть окружения для запуска (например, `runtime`, `resource` и т.д.) уже лежит в архиве релиза.
+Важно: в архиве релиза уже лежит **готовая сборка** — исполняемый файл, runtime-окружения, ресурсы и предзагруженные модели (включая модели для video translate/UVR, если они входят в конкретный релиз).
+
+Репозиторий в первую очередь содержит исходный код и скрипты обслуживания. Для обычного пользователя правильный путь — запуск из **архива Releases**.
 
 Поэтому запуск делается так:
 
-1. Скачайте архив программы из раздела **Releases** (это база со всеми нужными папками для запуска).
+1. Скачайте архив программы из раздела **Releases** (в нём уже есть всё необходимое для старта).
 2. Распакуйте архив в отдельную папку.
 3. Запустите `ShortsCreatorStudio.exe`.
 4. Обновить программу, если она предложит.
@@ -169,6 +216,7 @@
 ### Важно для модуля «Перевод видео» (voice clone)
 В проект добавлен production-подход для установки зависимостей video translate под разные ПК:
 
+- `scripts\\install_video_translate_full_auto.cmd` — **полный авто-режим**: определяет тип GPU, ставит основной стек (GPU-auto или CPU), затем пытается подготовить отдельный `runtime_rvc` для native RVC;
 - `scripts\\install_video_translate_cpu.cmd` — стабильный CPU-профиль (работает почти везде);
 - `scripts\\install_video_translate_gpu_auto.cmd` — авто-выбор GPU профиля (пытается cu128 → cu124 → fallback на CPU);
 - `scripts\\install_video_translate_gpu_cu124.cmd` — принудительный GPU-профиль CUDA 12.4;
@@ -178,15 +226,29 @@
 - `scripts\\install_video_translate_experimental_addons.cmd` — экспериментальные дополнения (WhisperX/Resemblyzer/WebRTCVAD) в best-effort режиме + авто-восстановление production core-версий;
 - `scripts\\check_video_translate_env.py` — диагностика готовности окружения.
 
+По runtime для video translate:
+
+- основной runtime: `runtime` (сейчас обычно Python 3.11) — XTTS/ASR/diarization/общий стек;
+- RVC runtime: `runtime_rvc` (обычно Python 3.10) — отдельный runtime для совместимости `rvc-python/fairseq`;
+- в интерфейсе можно явно задать путь `VideoTranslate -> RVCRuntimePython`.
+
+Это нормальный сценарий для текущей версии, потому что часть RVC-стека нестабильна на Python 3.11.
+
+Как выбрать установку под вашу видеокарту:
+
+- **NVIDIA (не уверены в версии CUDA)** → запускайте `install_video_translate_full_auto.cmd` (рекомендуется);
+- **NVIDIA (точно знаете CUDA 12.8 / 12.4)** → можно использовать `...gpu_cu128.cmd` / `...gpu_cu124.cmd`;
+- **AMD / Intel / встроенная графика / сервер без GPU** → используйте `install_video_translate_cpu.cmd`;
+- если нужен только апдейт моделей/пакетов без смены torch-профиля — `install_video_translate_deps_only.cmd`.
+
 Рекомендуемый порядок:
 
-1. Для большинства пользователей NVIDIA: `scripts\\install_video_translate_gpu_auto.cmd`.
-2. Если знаете свою совместимость точнее — используйте `...gpu_cu124.cmd` или `...gpu_cu128.cmd`.
-3. Если GPU не нужен/нет — `scripts\\install_video_translate_cpu.cmd`.
-4. Для обновления только voice/ASR/diarization/separation-стека — `scripts\\install_video_translate_deps_only.cmd`.
-5. Для «студийного» качества микса/очистки — `scripts\\install_video_translate_studio_addons.cmd`.
-6. Экспериментально (опционально): `scripts\\install_video_translate_experimental_addons.cmd`.
-7. Проверяйте состояние через `scripts\\check_video_translate_env.py`.
+1. Базово для большинства пользователей: `scripts\\install_video_translate_full_auto.cmd`.
+2. Если хотите ручной контроль профиля torch: `...gpu_auto.cmd` / `...gpu_cu124.cmd` / `...gpu_cu128.cmd` / `...cpu.cmd`.
+3. Для обновления только voice/ASR/diarization/separation-стека — `scripts\\install_video_translate_deps_only.cmd`.
+4. Для «студийного» качества микса/очистки — `scripts\\install_video_translate_studio_addons.cmd`.
+5. Экспериментально (опционально): `scripts\\install_video_translate_experimental_addons.cmd`.
+6. Проверяйте состояние через `scripts\\check_video_translate_env.py`.
 
 Важно по experimental-пакетам:
 
