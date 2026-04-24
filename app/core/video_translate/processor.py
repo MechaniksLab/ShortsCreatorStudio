@@ -625,18 +625,12 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                 return src_wav
 
             if ratio > 1.0:
-                # Ключевое изменение: НЕ режем конец фразы atrim'ом и
-                # не ускоряем речь слишком сильно.
-                # Иначе получаем «тараторку» + обрезание последних слогов.
-                max_speedup = 1.15
+                # Слегка сжимаем реплики, но НЕ обрезаем конец atrim'ом,
+                # чтобы не терять последние слоги/согласные.
+                max_speedup = 1.22
                 speed = min(ratio, max_speedup)
                 atempo = _build_atempo_filter(speed)
-                est_after_ms = int(cur_ms / max(0.01, speed))
-                max_allowed_ms = target_ms + 140
-                if est_after_ms > max_allowed_ms:
-                    af = f"{atempo},atrim=0:{max_allowed_ms / 1000.0:.6f}"
-                else:
-                    af = atempo
+                af = atempo
             else:
                 # Важно: не дополняем короткие фразы тишиной,
                 # иначе появляются искусственные паузы между словами/репликами.
@@ -1290,8 +1284,8 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         if not rvc_passthrough_mode:
             # Гибкий режим: стараемся держать исходные таймкоды,
             # но слегка сдвигаем только если предыдущий сегмент реально наползает.
-            min_gap_ms = 4
-            max_shift_ms = 280
+            min_gap_ms = 6
+            max_shift_ms = 520
             overlap_tolerance_ms = 60
             prev_end = 0
             for seg, dur_ms in zip(segments, wav_durations_ms):
@@ -1303,7 +1297,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     start_ms = nominal_start + min(max_shift_ms, max(0, spill))
                 adjusted_starts.append(start_ms)
                 target_ms = max(1, int(seg.end_ms - seg.start_ms))
-                effective_sched_dur = min(int(dur_ms), target_ms + 260)
+                effective_sched_dur = min(int(dur_ms), target_ms + 420)
                 prev_end = start_ms + effective_sched_dur + min_gap_ms
         elif allow_overlap_cfg:
             adjusted_starts = [max(0, int(seg.start_ms)) for seg in segments]
