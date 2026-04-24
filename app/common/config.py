@@ -585,6 +585,40 @@ class Config(QConfig):
     video_translate_reference_target_total_sec = RangeConfigItem(
         "VideoTranslate", "ReferenceTargetTotalSec", 18.0, RangeValidator(4.0, 60.0)
     )
+    # Тайминги/укладка озвучки (advanced)
+    video_translate_segment_fit_tail_guard_ms = RangeConfigItem(
+        "VideoTranslate", "SegmentFitTailGuardMs", 35, RangeValidator(0, 220)
+    )
+    video_translate_segment_fit_max_speedup = RangeConfigItem(
+        "VideoTranslate", "SegmentFitMaxSpeedup", 1.22, RangeValidator(1.0, 1.6)
+    )
+    video_translate_rvc_passthrough_post_pad_ms = RangeConfigItem(
+        "VideoTranslate", "RVCPassthroughPostPadMs", 160, RangeValidator(0, 600)
+    )
+    video_translate_speaker_chunk_max_gap_ms = RangeConfigItem(
+        "VideoTranslate", "SpeakerChunkMaxGapMs", 220, RangeValidator(80, 1200)
+    )
+    video_translate_speaker_chunk_max_chunk_ms = RangeConfigItem(
+        "VideoTranslate", "SpeakerChunkMaxChunkMs", 12000, RangeValidator(2000, 30000)
+    )
+    video_translate_rvc_passthrough_chunk_max_gap_ms = RangeConfigItem(
+        "VideoTranslate", "RVCPassthroughChunkMaxGapMs", 320, RangeValidator(80, 1600)
+    )
+    video_translate_rvc_passthrough_chunk_max_chunk_ms = RangeConfigItem(
+        "VideoTranslate", "RVCPassthroughChunkMaxChunkMs", 7200, RangeValidator(1500, 30000)
+    )
+    video_translate_schedule_min_gap_ms = RangeConfigItem(
+        "VideoTranslate", "ScheduleMinGapMs", 6, RangeValidator(0, 120)
+    )
+    video_translate_schedule_max_shift_ms = RangeConfigItem(
+        "VideoTranslate", "ScheduleMaxShiftMs", 520, RangeValidator(0, 2000)
+    )
+    video_translate_schedule_overlap_tolerance_ms = RangeConfigItem(
+        "VideoTranslate", "ScheduleOverlapToleranceMs", 60, RangeValidator(0, 500)
+    )
+    video_translate_schedule_effective_duration_extra_ms = RangeConfigItem(
+        "VideoTranslate", "ScheduleEffectiveDurationExtraMs", 420, RangeValidator(0, 2000)
+    )
     video_translate_uvr_model_dir = ConfigItem(
         "VideoTranslate", "UVRModelDir", ""
     )

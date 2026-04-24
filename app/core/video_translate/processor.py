@@ -607,7 +607,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         return True, "ok"
 
     @staticmethod
-    def _fit_segment_to_target_window(src_wav: Path, dst_wav: Path, target_ms: int) -> Path:
+    def _fit_segment_to_target_window(src_wav: Path, dst_wav: Path, target_ms: int, cfg=None) -> Path:
         """Подгоняет длительность сегмента под окно тайминга: time-stretch + мягкий tail-safe.
 
         Важно: не режем фразу "в ноль" по границе сегмента, оставляем небольшой хвост,
@@ -615,7 +615,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         """
         try:
             target_ms = max(120, int(target_ms))
-            tail_guard_ms = 35
+            tail_guard_ms = int(getattr(cfg, "segment_fit_tail_guard_ms", 35) or 35)
             soft_target_ms = target_ms + tail_guard_ms
             cur_ms = max(1, _probe_audio_duration_ms(src_wav))
             ratio = cur_ms / float(soft_target_ms)
@@ -627,7 +627,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             if ratio > 1.0:
                 # Слегка сжимаем реплики, но НЕ обрезаем конец atrim'ом,
                 # чтобы не терять последние слоги/согласные.
-                max_speedup = 1.22
+                max_speedup = float(getattr(cfg, "segment_fit_max_speedup", 1.22) or 1.22)
                 speed = min(ratio, max_speedup)
                 atempo = _build_atempo_filter(speed)
                 af = atempo
@@ -731,7 +731,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             raise RuntimeError("native RVC не создал выходной wav")
 
     @staticmethod
-    def _merge_segments_for_rvc_passthrough(segments: List[VoiceSegment]) -> List[VoiceSegment]:
+    def _merge_segments_for_rvc_passthrough(segments: List[VoiceSegment], cfg=None) -> List[VoiceSegment]:
         """
         Склеивает слишком короткие соседние сегменты в фразы для RVC-only режима,
         чтобы не было эффекта «по слову» и обрывов на каждой границе.
@@ -741,8 +741,8 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         ordered = sorted(segments, key=lambda s: (s.start_ms, s.end_ms))
         merged: List[VoiceSegment] = []
 
-        max_chunk_ms = 7200
-        max_gap_ms = 320
+        max_chunk_ms = int(getattr(cfg, "rvc_passthrough_chunk_max_chunk_ms", 7200) or 7200)
+        max_gap_ms = int(getattr(cfg, "rvc_passthrough_chunk_max_gap_ms", 320) or 320)
         cur = VoiceSegment(
             idx=int(ordered[0].idx),
             start_ms=int(ordered[0].start_ms),
@@ -774,7 +774,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         return merged
 
     @staticmethod
-    def _merge_segments_for_speaker_chunks(segments: List[VoiceSegment]) -> List[VoiceSegment]:
+    def _merge_segments_for_speaker_chunks(segments: List[VoiceSegment], cfg=None) -> List[VoiceSegment]:
         """Мягко объединяет соседние реплики одного спикера в более цельные фразы.
 
         Нужен для режима перевода (TTS->RVC/XTTS), чтобы речь звучала менее «рвано».
@@ -784,8 +784,8 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         ordered = sorted(segments, key=lambda s: (s.start_ms, s.end_ms))
         merged: List[VoiceSegment] = []
 
-        max_gap_ms = 220
-        max_chunk_ms = 12000
+        max_gap_ms = int(getattr(cfg, "speaker_chunk_max_gap_ms", 220) or 220)
+        max_chunk_ms = int(getattr(cfg, "speaker_chunk_max_chunk_ms", 12000) or 12000)
         cur = VoiceSegment(
             idx=int(ordered[0].idx),
             start_ms=int(ordered[0].start_ms),
@@ -877,13 +877,13 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     )
                 ]
             else:
-                segments = self._merge_segments_for_rvc_passthrough(segments)
+                segments = self._merge_segments_for_rvc_passthrough(segments, cfg=cfg)
         else:
             speaker_chunk_mode = bool(getattr(cfg, "speaker_chunk_synthesis_enabled", True))
             if speaker_chunk_mode:
                 # Для режима с переводом объединяем соседние куски одного спикера,
                 # чтобы убрать «рубленую» подачу по одной короткой фразе.
-                segments = self._merge_segments_for_speaker_chunks(segments)
+                segments = self._merge_segments_for_speaker_chunks(segments, cfg=cfg)
         manual_map_raw = str(getattr(cfg, "manual_voice_map_json", "") or "").strip()
         speaker_slot_map: Dict[str, str] = {}
         if manual_map_raw:
@@ -1121,7 +1121,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     # Без перевода: не делаем Local TTS, берём оригинальный speech-сегмент и прогоняем через RVC.
                     # Даём заметный запас, чтобы не «съедать» окончания слов на границах сегмента.
                     pre_pad_sec = 0.00
-                    post_pad_sec = 0.16
+                    post_pad_sec = max(0.0, float(getattr(cfg, "rvc_passthrough_post_pad_ms", 160) or 160) / 1000.0)
                     clip_start_sec = max(0.0, (seg.start_ms / 1000.0) - pre_pad_sec)
                     clip_dur_sec = max(0.20, (seg.end_ms - seg.start_ms) / 1000.0 + pre_pad_sec + post_pad_sec)
                     _safe_run(
@@ -1249,7 +1249,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             # чтобы речь попадала в исходные тайминги, а не «ехала» по порядку.
             if (not rvc_passthrough_mode) and target_ms > 0:
                 fitted_wav = tts_dir / f"seg_{i:04d}_fit.wav"
-                fixed_wav = self._fit_segment_to_target_window(fixed_wav, fitted_wav, target_ms)
+                fixed_wav = self._fit_segment_to_target_window(fixed_wav, fitted_wav, target_ms, cfg=cfg)
 
             if qa_enabled and last_reason:
                 logger.warning("Segment %s accepted with last QA warning: %s", i, last_reason)
@@ -1284,9 +1284,10 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         if not rvc_passthrough_mode:
             # Гибкий режим: стараемся держать исходные таймкоды,
             # но слегка сдвигаем только если предыдущий сегмент реально наползает.
-            min_gap_ms = 6
-            max_shift_ms = 520
-            overlap_tolerance_ms = 60
+            min_gap_ms = int(getattr(cfg, "schedule_min_gap_ms", 6) or 6)
+            max_shift_ms = int(getattr(cfg, "schedule_max_shift_ms", 520) or 520)
+            overlap_tolerance_ms = int(getattr(cfg, "schedule_overlap_tolerance_ms", 60) or 60)
+            effective_extra_ms = int(getattr(cfg, "schedule_effective_duration_extra_ms", 420) or 420)
             prev_end = 0
             for seg, dur_ms in zip(segments, wav_durations_ms):
                 nominal_start = max(0, int(seg.start_ms))
@@ -1297,7 +1298,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     start_ms = nominal_start + min(max_shift_ms, max(0, spill))
                 adjusted_starts.append(start_ms)
                 target_ms = max(1, int(seg.end_ms - seg.start_ms))
-                effective_sched_dur = min(int(dur_ms), target_ms + 420)
+                effective_sched_dur = min(int(dur_ms), target_ms + effective_extra_ms)
                 prev_end = start_ms + effective_sched_dur + min_gap_ms
         elif allow_overlap_cfg:
             adjusted_starts = [max(0, int(seg.start_ms)) for seg in segments]
@@ -1663,6 +1664,34 @@ class VideoTranslationProcessor:
         return re.sub(r"<think>.*?</think>", "", str(text or ""), flags=re.DOTALL).strip()
 
     @staticmethod
+    def _build_video_fingerprint(task: VideoTranslateTask) -> str:
+        """Стабильный отпечаток видео + настроек перевода для межсессионного cache hit."""
+        video_path = Path(str(getattr(task, "video_path", "") or "").strip())
+        stat_size = 0
+        stat_mtime = 0
+        try:
+            if video_path.exists():
+                st = video_path.stat()
+                stat_size = int(st.st_size)
+                stat_mtime = int(st.st_mtime)
+        except Exception:
+            pass
+
+        vt_cfg = getattr(task, "video_translate_config", None)
+        sub_cfg = getattr(task, "subtitle_config", None)
+        payload = {
+            "video_path": str(video_path),
+            "video_size": stat_size,
+            "video_mtime": stat_mtime,
+            "translation_enabled": bool(getattr(vt_cfg, "translation_enabled", True)),
+            "target_language": str(getattr(vt_cfg, "target_language", "") or ""),
+            "translator_service": str(getattr(vt_cfg, "translator_service", "") or ""),
+            "llm_model": str(getattr(sub_cfg, "llm_model", "") or ""),
+        }
+        raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+        return hashlib.sha1(raw.encode("utf-8", errors="ignore")).hexdigest()
+
+    @staticmethod
     def _build_translation_cache_key(asr_data: ASRData, task: VideoTranslateTask) -> str:
         cfg = task.video_translate_config
         payload = {
@@ -1689,7 +1718,13 @@ class VideoTranslationProcessor:
             raw = json.loads(_LAST_TRANSLATION_CACHE.read_text(encoding="utf-8", errors="ignore") or "{}")
             if not isinstance(raw, dict):
                 return False
-            if str(raw.get("cache_key", "")) != str(cache_key):
+            key_match = str(raw.get("cache_key", "")) == str(cache_key)
+            if not key_match:
+                current_fp = VideoTranslationProcessor._build_video_fingerprint(task)
+                cached_fp = str(raw.get("video_fingerprint", "") or "")
+                # Fallback для межсессионного кэша: то же видео + те же базовые настройки перевода.
+                key_match = bool(cached_fp and current_fp and cached_fp == current_fp)
+            if not key_match:
                 return False
             rows = raw.get("rows", [])
             if not isinstance(rows, list) or len(rows) != len(asr_data.segments):
@@ -2180,6 +2215,7 @@ class VideoTranslationProcessor:
                 )
             payload = {
                 "video_path": str(task.video_path or ""),
+                "video_fingerprint": VideoTranslationProcessor._build_video_fingerprint(task),
                 "cache_key": str(cache_key or ""),
                 "rows": rows,
             }

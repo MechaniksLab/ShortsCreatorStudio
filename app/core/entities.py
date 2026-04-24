@@ -824,6 +824,18 @@ class VideoTranslateConfig:
     reference_enhancement_enabled: bool = True
     reference_min_mean_db: float = -48.0
     reference_target_total_sec: float = 18.0
+    # Тайминги укладки и склейки
+    segment_fit_tail_guard_ms: int = 35
+    segment_fit_max_speedup: float = 1.22
+    rvc_passthrough_post_pad_ms: int = 160
+    speaker_chunk_max_gap_ms: int = 220
+    speaker_chunk_max_chunk_ms: int = 12000
+    rvc_passthrough_chunk_max_gap_ms: int = 320
+    rvc_passthrough_chunk_max_chunk_ms: int = 7200
+    schedule_min_gap_ms: int = 6
+    schedule_max_shift_ms: int = 520
+    schedule_overlap_tolerance_ms: int = 60
+    schedule_effective_duration_extra_ms: int = 420
     uvr_model_dir: str = ""
     uvr_inst_hq3_model_name: str = "UVR-MDX-NET-Inst_HQ_3.onnx"
     uvr_kim_vocal_model_name: str = "Kim_Vocal_2.onnx"

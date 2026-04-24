@@ -585,6 +585,67 @@ class VideoTranslateInterface(QWidget):
         row6_workers.addWidget(self.workers_label)
         row6_workers.addWidget(self.workers_combo, 1)
 
+        # ------------------------------
+        # Ключевые тайминги (вынесено из хардкода процессора)
+        # ------------------------------
+        row_timing_main = QHBoxLayout()
+        row_timing_main.setSpacing(10)
+        self.tail_guard_label = BodyLabel("Защита хвоста фразы (мс)", self)
+        self.tail_guard_label.setMinimumWidth(form_label_w)
+        self.tail_guard_combo = ComboBox(self)
+        self.tail_guard_combo.setMinimumWidth(form_field_min_w)
+        self.tail_guard_combo.addItems([str(v) for v in range(0, 221, 5)])
+        self.tail_guard_combo.setCurrentText(str(int(getattr(cfg.video_translate_segment_fit_tail_guard_ms, "value", 35) or 35)))
+        row_timing_main.addWidget(self.tail_guard_label)
+        row_timing_main.addWidget(self.tail_guard_combo, 1)
+
+        self.fit_speed_label = BodyLabel("Макс. ускорение укладки", self)
+        self.fit_speed_label.setMinimumWidth(form_label_w)
+        self.fit_speed_combo = ComboBox(self)
+        self.fit_speed_combo.setMinimumWidth(form_field_min_w)
+        self.fit_speed_combo.addItems([f"{v/100:.2f}" for v in range(100, 161, 1)])
+        self.fit_speed_combo.setCurrentText(f"{float(getattr(cfg.video_translate_segment_fit_max_speedup, 'value', 1.22) or 1.22):.2f}")
+        row_timing_main.addWidget(self.fit_speed_label)
+        row_timing_main.addWidget(self.fit_speed_combo, 1)
+
+        self.rvc_post_pad_label = BodyLabel("RVC без перевода: хвост сегмента (мс)", self)
+        self.rvc_post_pad_label.setMinimumWidth(form_label_w)
+        self.rvc_post_pad_combo = ComboBox(self)
+        self.rvc_post_pad_combo.setMinimumWidth(form_field_min_w)
+        self.rvc_post_pad_combo.addItems([str(v) for v in range(0, 601, 10)])
+        self.rvc_post_pad_combo.setCurrentText(str(int(getattr(cfg.video_translate_rvc_passthrough_post_pad_ms, "value", 160) or 160)))
+        row_timing_main.addWidget(self.rvc_post_pad_label)
+        row_timing_main.addWidget(self.rvc_post_pad_combo, 1)
+
+        row_timing_adv = QHBoxLayout()
+        row_timing_adv.setSpacing(10)
+        self.schedule_shift_label = BodyLabel("Макс. сдвиг при укладке (мс)", self)
+        self.schedule_shift_label.setMinimumWidth(form_label_w)
+        self.schedule_shift_combo = ComboBox(self)
+        self.schedule_shift_combo.setMinimumWidth(form_field_min_w)
+        self.schedule_shift_combo.addItems([str(v) for v in range(0, 2001, 20)])
+        self.schedule_shift_combo.setCurrentText(str(int(getattr(cfg.video_translate_schedule_max_shift_ms, "value", 520) or 520)))
+        row_timing_adv.addWidget(self.schedule_shift_label)
+        row_timing_adv.addWidget(self.schedule_shift_combo, 1)
+
+        self.schedule_extra_label = BodyLabel("Запас длительности окна (мс)", self)
+        self.schedule_extra_label.setMinimumWidth(form_label_w)
+        self.schedule_extra_combo = ComboBox(self)
+        self.schedule_extra_combo.setMinimumWidth(form_field_min_w)
+        self.schedule_extra_combo.addItems([str(v) for v in range(0, 2001, 20)])
+        self.schedule_extra_combo.setCurrentText(str(int(getattr(cfg.video_translate_schedule_effective_duration_extra_ms, "value", 420) or 420)))
+        row_timing_adv.addWidget(self.schedule_extra_label)
+        row_timing_adv.addWidget(self.schedule_extra_combo, 1)
+
+        self.schedule_overlap_tol_label = BodyLabel("Допуск overlap (мс)", self)
+        self.schedule_overlap_tol_label.setMinimumWidth(form_label_w)
+        self.schedule_overlap_tol_combo = ComboBox(self)
+        self.schedule_overlap_tol_combo.setMinimumWidth(form_field_min_w)
+        self.schedule_overlap_tol_combo.addItems([str(v) for v in range(0, 501, 5)])
+        self.schedule_overlap_tol_combo.setCurrentText(str(int(getattr(cfg.video_translate_schedule_overlap_tolerance_ms, "value", 60) or 60)))
+        row_timing_adv.addWidget(self.schedule_overlap_tol_label)
+        row_timing_adv.addWidget(self.schedule_overlap_tol_combo, 1)
+
         def _set_pair_tooltip(label: BodyLabel, combo: ComboBox, text: str):
             label.setToolTip(text)
             combo.setToolTip(text)
@@ -614,6 +675,12 @@ class VideoTranslateInterface(QWidget):
             "Encode видео: Copy = без перекодирования (быстро), CPU = libx264, GPU = h264_nvenc.",
         )
         _set_pair_tooltip(self.workers_label, self.workers_combo, "Количество параллельных TTS задач на этапе 5-6. Больше — быстрее, но выше нагрузка.")
+        _set_pair_tooltip(self.tail_guard_label, self.tail_guard_combo, "Дополнительный запас по хвосту реплики при укладке в тайм-окно, чтобы не обрезать окончания слов.")
+        _set_pair_tooltip(self.fit_speed_label, self.fit_speed_combo, "Максимально допустимое ускорение сегмента при укладке в окно. Слишком высокие значения делают речь неестественной.")
+        _set_pair_tooltip(self.rvc_post_pad_label, self.rvc_post_pad_combo, "Дополнительный хвост в режиме RVC без перевода при вырезке исходного speech-сегмента.")
+        _set_pair_tooltip(self.schedule_shift_label, self.schedule_shift_combo, "Максимальный сдвиг старта сегмента при устранении конфликтов тайминга в режиме с переводом.")
+        _set_pair_tooltip(self.schedule_extra_label, self.schedule_extra_combo, "Допустимый запас к целевой длительности сегмента при планировании стартов.")
+        _set_pair_tooltip(self.schedule_overlap_tol_label, self.schedule_overlap_tol_combo, "Допуск на небольшой overlap перед тем, как начинать сдвигать следующий сегмент.")
         _set_pair_tooltip(self.overlap_label, self.overlap_combo, "Разрешает пересечения реплик разных спикеров. Имеет смысл при диалогах с перебиваниями.")
         _set_pair_tooltip(self.mix_label, self.mix_combo, "Специальный микс для overlap-сегментов, чтобы уменьшить конфликт голосов в пересечениях.")
         _set_pair_tooltip(self.qa_label, self.qa_combo, "Пост-проверка сегментов TTS перед финальной сборкой. Повышает чистоту, но замедляет.")
@@ -793,6 +860,8 @@ class VideoTranslateInterface(QWidget):
         stage56_layout.addLayout(row3)
         stage56_layout.addLayout(row3b)
         stage56_layout.addLayout(row4)
+        stage56_layout.addLayout(row_timing_main)
+        stage56_layout.addLayout(row_timing_adv)
         self.stage56_button = PrimaryPushButton("Запустить этап 5-6 (финальный рендер)", self)
         self.stage56_check_button = PushButton("Проверка: открыть папку результата", self)
         stage56_btns = QHBoxLayout()
@@ -911,6 +980,12 @@ class VideoTranslateInterface(QWidget):
         self.device_combo.currentIndexChanged.connect(self._on_device_changed)
         self.quality_combo.currentIndexChanged.connect(self._on_quality_changed)
         self.workers_combo.currentIndexChanged.connect(self._on_workers_changed)
+        self.tail_guard_combo.currentIndexChanged.connect(self._on_tail_guard_changed)
+        self.fit_speed_combo.currentIndexChanged.connect(self._on_fit_speed_changed)
+        self.rvc_post_pad_combo.currentIndexChanged.connect(self._on_rvc_post_pad_changed)
+        self.schedule_shift_combo.currentIndexChanged.connect(self._on_schedule_shift_changed)
+        self.schedule_extra_combo.currentIndexChanged.connect(self._on_schedule_extra_changed)
+        self.schedule_overlap_tol_combo.currentIndexChanged.connect(self._on_schedule_overlap_tol_changed)
         self.cache_combo.currentIndexChanged.connect(self._on_cache_changed)
         self.asr_cache_combo.currentIndexChanged.connect(self._on_asr_cache_changed)
         self.autonomous_mode_combo.currentIndexChanged.connect(self._on_autonomous_mode_changed)
@@ -1102,6 +1177,48 @@ class VideoTranslateInterface(QWidget):
             workers = 3
         workers = max(1, min(8, workers))
         cfg.set(cfg.video_translate_tts_parallel_workers, workers)
+
+    def _on_tail_guard_changed(self):
+        try:
+            v = int(float(self.tail_guard_combo.currentText()))
+        except Exception:
+            v = 35
+        cfg.set(cfg.video_translate_segment_fit_tail_guard_ms, max(0, min(220, v)))
+
+    def _on_fit_speed_changed(self):
+        try:
+            v = float(self.fit_speed_combo.currentText())
+        except Exception:
+            v = 1.22
+        cfg.set(cfg.video_translate_segment_fit_max_speedup, max(1.0, min(1.6, v)))
+
+    def _on_rvc_post_pad_changed(self):
+        try:
+            v = int(float(self.rvc_post_pad_combo.currentText()))
+        except Exception:
+            v = 160
+        cfg.set(cfg.video_translate_rvc_passthrough_post_pad_ms, max(0, min(600, v)))
+
+    def _on_schedule_shift_changed(self):
+        try:
+            v = int(float(self.schedule_shift_combo.currentText()))
+        except Exception:
+            v = 520
+        cfg.set(cfg.video_translate_schedule_max_shift_ms, max(0, min(2000, v)))
+
+    def _on_schedule_extra_changed(self):
+        try:
+            v = int(float(self.schedule_extra_combo.currentText()))
+        except Exception:
+            v = 420
+        cfg.set(cfg.video_translate_schedule_effective_duration_extra_ms, max(0, min(2000, v)))
+
+    def _on_schedule_overlap_tol_changed(self):
+        try:
+            v = int(float(self.schedule_overlap_tol_combo.currentText()))
+        except Exception:
+            v = 60
+        cfg.set(cfg.video_translate_schedule_overlap_tolerance_ms, max(0, min(500, v)))
 
     def _on_cache_changed(self):
         cfg.set(cfg.video_translate_use_translation_cache, self.cache_combo.currentIndex() == 0)
@@ -2084,6 +2201,12 @@ class VideoTranslateInterface(QWidget):
             3: "auto",
         }.get(self.sep_combo.currentIndex(), "demucs_plus_uvr")
         self.task.video_translate_config.tts_parallel_workers = selected_workers
+        self.task.video_translate_config.segment_fit_tail_guard_ms = int(float(self.tail_guard_combo.currentText() or 35))
+        self.task.video_translate_config.segment_fit_max_speedup = float(self.fit_speed_combo.currentText() or 1.22)
+        self.task.video_translate_config.rvc_passthrough_post_pad_ms = int(float(self.rvc_post_pad_combo.currentText() or 160))
+        self.task.video_translate_config.schedule_max_shift_ms = int(float(self.schedule_shift_combo.currentText() or 520))
+        self.task.video_translate_config.schedule_effective_duration_extra_ms = int(float(self.schedule_extra_combo.currentText() or 420))
+        self.task.video_translate_config.schedule_overlap_tolerance_ms = int(float(self.schedule_overlap_tol_combo.currentText() or 60))
         self.task.video_translate_config.use_translation_cache = selected_cache
         self.task.video_translate_config.autonomous_mode = selected_autonomous_mode
         self.task.video_translate_config.auto_download_models = selected_auto_download_models
@@ -2180,6 +2303,12 @@ class VideoTranslateInterface(QWidget):
             3: "auto",
         }.get(self.sep_combo.currentIndex(), "demucs_plus_uvr")
         task.video_translate_config.tts_parallel_workers = selected_workers
+        task.video_translate_config.segment_fit_tail_guard_ms = int(float(self.tail_guard_combo.currentText() or 35))
+        task.video_translate_config.segment_fit_max_speedup = float(self.fit_speed_combo.currentText() or 1.22)
+        task.video_translate_config.rvc_passthrough_post_pad_ms = int(float(self.rvc_post_pad_combo.currentText() or 160))
+        task.video_translate_config.schedule_max_shift_ms = int(float(self.schedule_shift_combo.currentText() or 520))
+        task.video_translate_config.schedule_effective_duration_extra_ms = int(float(self.schedule_extra_combo.currentText() or 420))
+        task.video_translate_config.schedule_overlap_tolerance_ms = int(float(self.schedule_overlap_tol_combo.currentText() or 60))
         task.video_translate_config.use_translation_cache = selected_cache
         task.video_translate_config.autonomous_mode = selected_autonomous_mode
         task.video_translate_config.auto_download_models = selected_auto_download_models
