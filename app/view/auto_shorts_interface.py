@@ -58,12 +58,20 @@ class LayerPreviewWidget(QWidget):
         self.resize_aspect_ratio = 1.0
         self.interactive = True
         self.show_layer_overlay = True
+        self.webcam_enabled = True
 
     def set_interactive(self, value: bool):
         self.interactive = bool(value)
 
     def set_show_layer_overlay(self, value: bool):
         self.show_layer_overlay = bool(value)
+        self.update()
+
+    def set_webcam_enabled(self, value: bool):
+        self.webcam_enabled = bool(value)
+        if not self.webcam_enabled and self.active_layer == "webcam":
+            self.active_layer = "game"
+            self.drag_mode = "none"
         self.update()
 
     def set_keep_aspect(self, value: bool):
@@ -141,6 +149,8 @@ class LayerPreviewWidget(QWidget):
 
     def _layer_hit_test(self, canvas_pos: QPointF):
         for name in ["webcam", "game"]:
+            if name == "webcam" and not self.webcam_enabled:
+                continue
             if self.layers[name].contains(canvas_pos):
                 return name
         return None
@@ -235,7 +245,8 @@ class LayerPreviewWidget(QWidget):
         p.drawRect(area)
 
         if self.show_layer_overlay:
-            for name in ["game", "webcam"]:
+            layer_order = ["game", "webcam"] if self.webcam_enabled else ["game"]
+            for name in layer_order:
                 r = self.layers[name]
                 tl = self._canvas_to_view(r.topLeft())
                 br = self._canvas_to_view(r.bottomRight())
@@ -836,6 +847,14 @@ class AutoShortsInterface(QWidget):
         frame_row.addWidget(self.keep_aspect_checkbox)
         template_layout.addLayout(frame_row)
 
+        row_tpl_actions = QHBoxLayout()
+        self.dual_layer_enabled = CheckBox("Включить область веб-камеры")
+        self.dual_layer_enabled.setChecked(True)
+        self.dual_layer_enabled.stateChanged.connect(self._on_webcam_area_toggled)
+        row_tpl_actions.addWidget(self.dual_layer_enabled)
+        row_tpl_actions.addStretch(1)
+        template_layout.addLayout(row_tpl_actions)
+
         template_layout.addWidget(BodyLabel("1) На исходном кадре перетяните и растяните области WEBCAM и GAME (кроп)."))
         self.source_preview = LayerPreviewWidget(1920, 1080, self)
         self.source_preview.set_keep_aspect(True)
@@ -873,13 +892,7 @@ class AutoShortsInterface(QWidget):
 
         self.source_preview.changed.connect(lambda _: self._on_layout_changed())
         self.output_preview.changed.connect(lambda _: self._on_layout_changed())
-
-        row_tpl_actions = QHBoxLayout()
-        self.dual_layer_enabled = CheckBox("Включить двухслойный пресет")
-        self.dual_layer_enabled.setChecked(True)
-        row_tpl_actions.addWidget(self.dual_layer_enabled)
-        row_tpl_actions.addStretch(1)
-        template_layout.addLayout(row_tpl_actions)
+        self._on_webcam_area_toggled()
 
         fx_title_row = QHBoxLayout()
         fx_title = StrongBodyLabel("Цветокоррекция слоёв")
@@ -1280,6 +1293,14 @@ class AutoShortsInterface(QWidget):
         self.effects_preview.set_keep_aspect(enabled)
 
     def _on_layout_changed(self):
+        self._refresh_output_composite_preview()
+
+    def _on_webcam_area_toggled(self):
+        enabled = bool(self.dual_layer_enabled.isChecked()) if hasattr(self, "dual_layer_enabled") else True
+        if hasattr(self, "source_preview"):
+            self.source_preview.set_webcam_enabled(enabled)
+        if hasattr(self, "output_preview"):
+            self.output_preview.set_webcam_enabled(enabled)
         self._refresh_output_composite_preview()
 
     def _apply_theme_style(self):
@@ -2838,9 +2859,11 @@ class AutoShortsInterface(QWidget):
 
         src_layers = self.source_preview.get_layers()
         out_layers = self.output_preview.get_layers()
+        use_webcam = bool(self.dual_layer_enabled.isChecked()) if hasattr(self, "dual_layer_enabled") else True
+        layer_keys = ["webcam", "game"] if use_webcam else ["game"]
         painter = QPainter(canvas)
         try:
-            for key in ["webcam", "game"]:
+            for key in layer_keys:
                 sr = src_layers.get(key, {})
                 dr = out_layers.get(key, {})
 

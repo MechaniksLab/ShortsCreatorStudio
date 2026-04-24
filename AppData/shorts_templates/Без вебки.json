@@ -1,0 +1,69 @@
+{
+  "enabled": false,
+  "source_canvas": {
+    "w": 2560,
+    "h": 1440
+  },
+  "webcam": {
+    "crop_x": 0,
+    "crop_y": 0,
+    "crop_w": 777,
+    "crop_h": 460,
+    "out_x": 0,
+    "out_y": 0,
+    "out_w": 1080,
+    "out_h": 636
+  },
+  "game": {
+    "crop_x": 659,
+    "crop_y": 0,
+    "crop_w": 1219,
+    "crop_h": 1440,
+    "out_x": 0,
+    "out_y": 0,
+    "out_w": 1080,
+    "out_h": 1920
+  },
+  "webcam_fx": {
+    "brightness": 0.12,
+    "contrast": 1.27,
+    "saturation": 1.03,
+    "gamma": 1.0,
+    "temperature": 0.0
+  },
+  "game_fx": {
+    "brightness": 0.17,
+    "contrast": 1.33,
+    "saturation": 0.95,
+    "gamma": 1.0,
+    "temperature": 0.0
+  },
+  "render_settings": {
+    "backend": "gpu",
+    "fps": "60",
+    "resolution": "1080x1920",
+    "quality": "Сбалансированное",
+    "repeat_similarity_percent": 90,
+    "speech_min_coverage_percent": 74,
+    "speech_merge_gap_ms": 160,
+    "speech_pre_pad_ms": 150,
+    "speech_post_pad_ms": 200,
+    "clip_head_pad_ms": 120,
+    "clip_tail_pad_ms": 320
+  },
+  "ui_settings": {
+    "preview_time_s": 10,
+    "keep_aspect": false,
+    "autonomous": false,
+    "range_start_s": 0,
+    "range_end_s": 568,
+    "min_duration_s": 22,
+    "max_duration_s": 110,
+    "min_candidates": 30,
+    "max_candidates": 150,
+    "auto_filter_weak_enabled": true,
+    "auto_filter_profile": "balanced",
+    "interest_threshold_percent": 30,
+    "llm_search_intensity": 3
+  }
+}
