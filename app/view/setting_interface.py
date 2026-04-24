@@ -152,11 +152,12 @@ class SettingInterface(ScrollArea):
         self.videoTranslateVoiceProviderCard = ComboBoxSettingCard(
             cfg.video_translate_voice_provider,
             FIF.MICROPHONE,
-            "Провайдер клонирования голоса",
-            "Движок TTS/Voice Clone для озвучки",
+            "Режим озвучки/клонирования",
+            "auto/rvc: RVC-пайплайн (без перевода = RVC-only, с переводом = TTS→RVC). xtts: отдельный режим клонирования.",
             texts=[
                 "auto",
                 "xtts",
+                "rvc",
                 "openvoice",
                 "fish_speech",
                 "elevenlabs",

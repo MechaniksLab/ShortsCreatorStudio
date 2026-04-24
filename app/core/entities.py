@@ -828,6 +828,8 @@ class VideoTranslateConfig:
     uvr_kim_vocal_model_name: str = "Kim_Vocal_2.onnx"
     manual_transcription_json: str = ""
     manual_translation_json: str = ""
+    video_decode_backend: str = "auto"  # auto|cpu|cuda
+    video_encode_backend: str = "copy"  # copy|cpu|nvenc
 
 
 @dataclass

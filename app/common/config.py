@@ -465,7 +465,7 @@ class Config(QConfig):
     video_translate_voice_provider = OptionsConfigItem(
         "VideoTranslate",
         "VoiceProvider",
-        "xtts",
+        "auto",
         OptionsValidator(["auto", "xtts", "rvc", "openvoice", "fish_speech", "elevenlabs", "azure", "cartesia"]),
     )
     video_translate_voice_quality = OptionsConfigItem(
@@ -602,6 +602,18 @@ class Config(QConfig):
     )
     video_translate_cartesia_api_key = ConfigItem(
         "VideoTranslate", "CartesiaApiKey", ""
+    )
+    video_translate_video_decode_backend = OptionsConfigItem(
+        "VideoTranslate",
+        "VideoDecodeBackend",
+        "auto",
+        OptionsValidator(["auto", "cpu", "cuda"]),
+    )
+    video_translate_video_encode_backend = OptionsConfigItem(
+        "VideoTranslate",
+        "VideoEncodeBackend",
+        "copy",
+        OptionsValidator(["copy", "cpu", "nvenc"]),
     )
 
     # ------------------- 更新配置 -------------------

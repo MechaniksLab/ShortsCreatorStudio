@@ -608,6 +608,8 @@ class TaskFactory:
             uvr_model_dir=cfg.video_translate_uvr_model_dir.value,
             uvr_inst_hq3_model_name=cfg.video_translate_uvr_inst_hq3_model_name.value,
             uvr_kim_vocal_model_name=cfg.video_translate_uvr_kim_vocal_model_name.value,
+            video_decode_backend=cfg.video_translate_video_decode_backend.value,
+            video_encode_backend=cfg.video_translate_video_encode_backend.value,
         )
 
         # Для автономного режима форсируем локальный ASR-маршрут

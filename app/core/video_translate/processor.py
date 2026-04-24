@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import json
 import os
 import re
@@ -14,6 +15,7 @@ from typing import Callable, Dict, List, Optional
 
 import numpy as np
 import requests
+from openai import OpenAI
 
 from app.config import PROJECT_ROOT
 from app.core.bk_asr.asr_data import ASRData
@@ -21,6 +23,7 @@ from app.core.bk_asr.asr_data import ASRDataSeg
 from app.core.bk_asr.transcribe import transcribe
 from app.core.entities import TranslatorServiceEnum, VideoTranslateTask
 from app.core.subtitle_processor.translate import TranslatorFactory, TranslatorType
+from app.core.utils import json_repair
 from app.core.utils.logger import setup_logger
 from app.core.utils.video_utils import video2audio
 from app.core.video_translate.bootstrap import VideoTranslateBootstrap
@@ -603,6 +606,63 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
 
         return True, "ok"
 
+    @staticmethod
+    def _fit_segment_to_target_window(src_wav: Path, dst_wav: Path, target_ms: int) -> Path:
+        """Подгоняет длительность сегмента под окно тайминга: time-stretch + мягкий tail-safe.
+
+        Важно: не режем фразу "в ноль" по границе сегмента, оставляем небольшой хвост,
+        чтобы не съедать последние согласные/слоги.
+        """
+        try:
+            target_ms = max(120, int(target_ms))
+            tail_guard_ms = 35
+            soft_target_ms = target_ms + tail_guard_ms
+            cur_ms = max(1, _probe_audio_duration_ms(src_wav))
+            ratio = cur_ms / float(soft_target_ms)
+
+            # Если уже близко к окну — лишний ffmpeg не гоняем.
+            if 0.93 <= ratio <= 1.04:
+                return src_wav
+
+            if ratio > 1.0:
+                # Ключевое изменение: НЕ режем конец фразы atrim'ом и
+                # не ускоряем речь слишком сильно.
+                # Иначе получаем «тараторку» + обрезание последних слогов.
+                max_speedup = 1.15
+                speed = min(ratio, max_speedup)
+                atempo = _build_atempo_filter(speed)
+                est_after_ms = int(cur_ms / max(0.01, speed))
+                max_allowed_ms = target_ms + 140
+                if est_after_ms > max_allowed_ms:
+                    af = f"{atempo},atrim=0:{max_allowed_ms / 1000.0:.6f}"
+                else:
+                    af = atempo
+            else:
+                # Важно: не дополняем короткие фразы тишиной,
+                # иначе появляются искусственные паузы между словами/репликами.
+                return src_wav
+
+            _safe_run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    str(src_wav),
+                    "-af",
+                    af,
+                    "-ac",
+                    "1",
+                    "-ar",
+                    "24000",
+                    str(dst_wav),
+                ]
+            )
+            if dst_wav.exists() and dst_wav.stat().st_size > 0:
+                return dst_wav
+        except Exception:
+            pass
+        return src_wav
+
     @classmethod
     def _enhance_reference_clip(cls, src_wav: Path, dst_wav: Path) -> Path:
         """Мягкая очистка/нормализация эталона голоса для XTTS."""
@@ -731,24 +791,34 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         if not endpoint:
             raise RuntimeError("Не задан local TTS endpoint")
 
+        provider_mode = str(getattr(cfg, "voice_clone_provider", "auto") or "auto").strip().lower()
+        xtts_clone_mode = provider_mode == "xtts"
+        rvc_pipeline_mode = not xtts_clone_mode
+
         quality = "rvc_pipeline"
         tts_device_pref = str(getattr(task.transcribe_config, "faster_whisper_device", "auto") or "auto").strip().lower()
         gpu_pref = tts_device_pref == "cuda"
         allow_overlap_cfg = False
         qa_enabled = False
         qa_retry_count = 0
-        strict_xtts = True
-        prefer_xtts = True
+        strict_xtts = bool(xtts_clone_mode)
+        prefer_xtts = bool(xtts_clone_mode)
         allow_non_strict_fallback = False
         max_retries = 2
         req_timeout = 90
 
-        # RVC mapping (спикер -> slot) + использование params.json каждой модели.
         translation_enabled = bool(getattr(cfg, "translation_enabled", True))
-        # Целевой упрощённый режим:
+        # Для RVC-пайплайна:
         # - без перевода: сразу RVC по оригинальному speech stem
-        # - с переводом: XTTS -> RVC
-        rvc_passthrough_mode = bool(not translation_enabled)
+        # - с переводом: быстрый local TTS -> RVC
+        rvc_passthrough_mode = bool(rvc_pipeline_mode and (not translation_enabled))
+
+        # В RVC-пайплайне с переводом intentionally НЕ используем XTTS-клонирование:
+        # сначала быстрый обычный local TTS, затем тембр даёт RVC.
+        if rvc_pipeline_mode and translation_enabled:
+            strict_xtts = False
+            prefer_xtts = False
+
         diarization_enabled = bool(getattr(cfg, "enable_diarization", False))
         if rvc_passthrough_mode:
             # В RVC-only режиме overlap даёт эффект «двойных слов» на стыках сегментов.
@@ -785,23 +855,24 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         rvc_models_by_slot = {}
         model_root_raw = str(getattr(cfg, "rvc_model_dir", "") or "").strip()
         model_root = Path(model_root_raw) if model_root_raw else default_rvc_model_root()
-        for m in scan_rvc_models(model_root):
-            rvc_models_by_slot[str(m.slot)] = m
+        if rvc_pipeline_mode:
+            for m in scan_rvc_models(model_root):
+                rvc_models_by_slot[str(m.slot)] = m
 
-        if not speaker_slot_map and rvc_models_by_slot:
-            default_raw = str(getattr(cfg, "rvc_default_model", "") or "").strip()
-            default_slot = ""
-            if default_raw:
-                if default_raw in rvc_models_by_slot:
-                    default_slot = default_raw
-                else:
-                    for _slot, _m in rvc_models_by_slot.items():
-                        if str(getattr(_m, "name", "")).strip().lower() == default_raw.lower():
-                            default_slot = _slot
-                            break
-            if not default_slot:
-                default_slot = sorted(rvc_models_by_slot.keys())[0]
-            speaker_slot_map["default"] = default_slot
+            if not speaker_slot_map and rvc_models_by_slot:
+                default_raw = str(getattr(cfg, "rvc_default_model", "") or "").strip()
+                default_slot = ""
+                if default_raw:
+                    if default_raw in rvc_models_by_slot:
+                        default_slot = default_raw
+                    else:
+                        for _slot, _m in rvc_models_by_slot.items():
+                            if str(getattr(_m, "name", "")).strip().lower() == default_raw.lower():
+                                default_slot = _slot
+                                break
+                if not default_slot:
+                    default_slot = sorted(rvc_models_by_slot.keys())[0]
+                speaker_slot_map["default"] = default_slot
 
         if single_voice_mode and str(speaker_slot_map.get("default", "")).strip():
             # Принудительно одним голосом для всех спикеров.
@@ -809,24 +880,26 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
             for seg in segments:
                 speaker_slot_map[str(seg.speaker_id)] = default_slot
 
-        if progress_cb:
+        if rvc_pipeline_mode and progress_cb:
             progress_cb(
                 1,
                 f"RVC registry: {len(rvc_models_by_slot)} моделей ({model_root})",
             )
 
-        if not rvc_models_by_slot:
+        if rvc_pipeline_mode and (not rvc_models_by_slot):
             raise RuntimeError(
-                "Требуется хотя бы одна RVC-модель. Откройте менеджер RVC и добавьте модели/назначения спикеров."
+                "Для режима RVC требуется хотя бы одна RVC-модель. Откройте менеджер RVC и добавьте модели/назначения спикеров."
             )
 
         if progress_cb:
-            if rvc_passthrough_mode:
+            if xtts_clone_mode:
+                progress_cb(0, "XTTS mode: отдельный режим клонирования голоса")
+            elif rvc_passthrough_mode:
                 progress_cb(0, f"RVC-only mode: переозвучка без XTTS ({quality})")
             else:
                 progress_cb(
                     0,
-                    f"XTTS -> RVC mode: {quality}",
+                    f"TTS -> RVC mode: {quality}",
                 )
 
         rvc_runtime_py = _runtime_python_for_rvc(cfg)
@@ -1027,9 +1100,16 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     )
                     fixed_wav = wav_path
                 else:
+                    tts_text = re.sub(r"\s+", " ", str(seg.text or "")).strip()
+                    # Для очень коротких реплик уменьшаем пунктуационные паузы TTS.
+                    if len(tts_text.split()) <= 3:
+                        tts_text = re.sub(r"[,:;.!?…]+", "", tts_text)
+                        tts_text = re.sub(r"\s+", " ", tts_text).strip()
+                    if not tts_text:
+                        tts_text = str(seg.text or "").strip() or "_"
                     self._synthesize_one(
                         endpoint=endpoint,
-                        text=seg.text,
+                        text=tts_text,
                         speaker_wav=speaker_refs.get(seg.speaker_id, reference_audio),
                         lang=lang,
                         device_preference=tts_device_pref,
@@ -1044,7 +1124,7 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     fixed_wav = wav_path
 
                 # Native RVC post-convert по params.json и назначению спикера.
-                if model_meta is not None:
+                if rvc_pipeline_mode and (model_meta is not None):
                     model_pth = model_meta.slot_dir / str(model_meta.model_file)
                     index_file_name = str(model_meta.index_file or "").strip()
                     model_index = model_meta.slot_dir / index_file_name if index_file_name else None
@@ -1122,6 +1202,12 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
                     reason,
                 )
 
+            # В режиме перевода (TTS->RVC) фиксируем длительность в окно сегмента,
+            # чтобы речь попадала в исходные тайминги, а не «ехала» по порядку.
+            if (not rvc_passthrough_mode) and target_ms > 0:
+                fitted_wav = tts_dir / f"seg_{i:04d}_fit.wav"
+                fixed_wav = self._fit_segment_to_target_window(fixed_wav, fitted_wav, target_ms)
+
             if qa_enabled and last_reason:
                 logger.warning("Segment %s accepted with last QA warning: %s", i, last_reason)
             return i, fixed_wav
@@ -1152,7 +1238,25 @@ class LocalXTTSProvider(BaseVoiceCloneProvider):
         # Перестановка стартов под реальную длительность синтезированных кусков,
         # чтобы не было наложений/обрубания окончаний при миксе.
         adjusted_starts: List[int] = []
-        if allow_overlap_cfg:
+        if not rvc_passthrough_mode:
+            # Гибкий режим: стараемся держать исходные таймкоды,
+            # но слегка сдвигаем только если предыдущий сегмент реально наползает.
+            min_gap_ms = 8
+            max_shift_ms = 140
+            overlap_tolerance_ms = 40
+            prev_end = 0
+            for seg, dur_ms in zip(segments, wav_durations_ms):
+                nominal_start = max(0, int(seg.start_ms))
+                if prev_end <= nominal_start + overlap_tolerance_ms:
+                    start_ms = nominal_start
+                else:
+                    spill = prev_end - nominal_start
+                    start_ms = nominal_start + min(max_shift_ms, max(0, spill))
+                adjusted_starts.append(start_ms)
+                target_ms = max(1, int(seg.end_ms - seg.start_ms))
+                effective_sched_dur = min(int(dur_ms), target_ms + 140)
+                prev_end = start_ms + effective_sched_dur + min_gap_ms
+        elif allow_overlap_cfg:
             adjusted_starts = [max(0, int(seg.start_ms)) for seg in segments]
         else:
             min_gap_ms = 55
@@ -1511,9 +1615,171 @@ class VideoTranslationProcessor:
             return False
         return True
 
+    @staticmethod
+    def _strip_reasoning_tags(text: str) -> str:
+        return re.sub(r"<think>.*?</think>", "", str(text or ""), flags=re.DOTALL).strip()
+
+    @staticmethod
+    def _build_translation_cache_key(asr_data: ASRData, task: VideoTranslateTask) -> str:
+        cfg = task.video_translate_config
+        payload = {
+            "target_language": str(getattr(cfg, "target_language", "") or ""),
+            "translator_service": str(getattr(cfg, "translator_service", "") or ""),
+            "llm_model": str(getattr(task.subtitle_config, "llm_model", "") or ""),
+            "rows": [
+                {
+                    "start_ms": int(seg.start_time),
+                    "end_ms": int(seg.end_time),
+                    "text": str(seg.text or ""),
+                }
+                for seg in (asr_data.segments or [])
+            ],
+        }
+        raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+        return hashlib.sha1(raw.encode("utf-8", errors="ignore")).hexdigest()
+
+    @staticmethod
+    def _try_apply_translation_cache(asr_data: ASRData, task: VideoTranslateTask, cache_key: str) -> bool:
+        try:
+            if not _LAST_TRANSLATION_CACHE.exists():
+                return False
+            raw = json.loads(_LAST_TRANSLATION_CACHE.read_text(encoding="utf-8", errors="ignore") or "{}")
+            if not isinstance(raw, dict):
+                return False
+            if str(raw.get("cache_key", "")) != str(cache_key):
+                return False
+            rows = raw.get("rows", [])
+            if not isinstance(rows, list) or len(rows) != len(asr_data.segments):
+                return False
+            for i, seg in enumerate(asr_data.segments):
+                tr = str((rows[i] or {}).get("translated", "") or "").strip()
+                seg.translated_text = tr if tr else str(seg.text or "")
+            return True
+        except Exception:
+            return False
+
+    def _translate_asr_openai_holistic(self, asr_data: ASRData, task: VideoTranslateTask) -> Optional[ASRData]:
+        """Переводит весь ASR единым JSON-запросом (id + тайминги), без дробления на чанки."""
+        sub_cfg = task.subtitle_config
+        base_url = str(getattr(sub_cfg, "base_url", "") or "").strip()
+        api_key = str(getattr(sub_cfg, "api_key", "") or "").strip()
+        model = str(getattr(sub_cfg, "llm_model", "") or "gpt-4o-mini").strip()
+        if not (base_url and api_key):
+            return None
+
+        target_language = str(getattr(sub_cfg, "target_language", "") or "English")
+        items = []
+        for i, seg in enumerate(asr_data.segments, start=1):
+            items.append(
+                {
+                    "id": i,
+                    "start_ms": int(seg.start_time),
+                    "end_ms": int(seg.end_time),
+                    "text": str(seg.text or ""),
+                }
+            )
+        if not items:
+            return asr_data
+
+        strict_en = ""
+        if str(target_language).strip().lower() in {"english", "en", "英语"}:
+            strict_en = " For English target use only English words/alphabet; never output Cyrillic."
+
+        system_prompt = (
+            "You are a subtitle translator. "
+            "Translate each item text to target language while preserving meaning and subtitle style. "
+            "Return ONLY valid JSON object in this exact schema: "
+            "{\"items\":[{\"id\":1,\"translated_text\":\"...\"}]}. "
+            "Do not add/remove ids, do not merge/split items, no explanations, no markdown. "
+            "You MUST return all ids from input exactly once. Never omit any id."
+            + strict_en
+        )
+        user_payload = {
+            "target_language": target_language,
+            "items": items,
+        }
+
+        # На длинных роликах часть id может пропадать из-за обрезки ответа по токенам.
+        # Даём достаточный бюджет completion, сохраняя один строгий запрос без fallback.
+        est_chars = sum(max(8, len(str(x.get("text", "")))) for x in items)
+        est_tokens = int(est_chars * 0.9) + len(items) * 16 + 800
+        max_tokens = max(2500, min(16000, est_tokens))
+
+        client = OpenAI(base_url=base_url, api_key=api_key)
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
+            ],
+            temperature=0.0,
+            max_tokens=max_tokens,
+            timeout=120,
+        )
+        content = self._strip_reasoning_tags(response.choices[0].message.content)
+        parsed = json_repair.loads(content)
+        rows = parsed.get("items", []) if isinstance(parsed, dict) else []
+        if not isinstance(rows, list):
+            raise RuntimeError("Holistic translate: invalid JSON format")
+
+        translated_by_id: Dict[int, str] = {}
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            try:
+                idx = int(row.get("id"))
+            except Exception:
+                continue
+            tr = str(row.get("translated_text") or "").strip()
+            if idx > 0 and tr:
+                translated_by_id[idx] = tr
+
+        if len(translated_by_id) != len(items):
+            expected_ids = {int(x["id"]) for x in items}
+            got_ids = set(translated_by_id.keys())
+            missing = sorted(expected_ids - got_ids)
+            extra = sorted(got_ids - expected_ids)
+            missing_preview = ",".join(str(x) for x in missing[:40])
+            extra_preview = ",".join(str(x) for x in extra[:40])
+            raise RuntimeError(
+                "ПРЕДУПРЕЖДЕНИЕ: модель вернула неполный перевод (id mismatch). "
+                f"Получено {len(translated_by_id)} из {len(items)} сегментов. "
+                f"missing_ids=[{missing_preview}] extra_ids=[{extra_preview}]. "
+                "Fallback отключён: обработка остановлена, проверьте модель/промпт/API."
+            )
+
+        non_cyr_target = self._target_prefers_non_cyrillic(target_language)
+        for i, seg in enumerate(asr_data.segments, start=1):
+            tr = str(translated_by_id.get(i) or "").strip()
+            src = str(seg.text or "").strip()
+            if non_cyr_target and self._contains_cyrillic(src) and self._contains_cyrillic(tr):
+                raise RuntimeError(
+                    f"ПРЕДУПРЕЖДЕНИЕ: сегмент {i} не переведён (обнаружена кириллица в результате для non-cyr target). "
+                    "Fallback отключён: обработка остановлена."
+                )
+            seg.translated_text = tr if tr else src
+        return asr_data
+
     def _translate_asr(self, asr_data: ASRData, task: VideoTranslateTask) -> ASRData:
         sub_cfg = task.subtitle_config
         translator_type = self._translator_type(sub_cfg.translator_service)
+
+        # Строгий режим: для OpenAI используем ТОЛЬКО holistic JSON-перевод
+        # без fallback-веток. При любой проблеме сразу понятная ошибка.
+        if translator_type == TranslatorType.OPENAI:
+            try:
+                holistic = self._translate_asr_openai_holistic(asr_data, task)
+                if holistic is not None:
+                    logger.info("Holistic OpenAI translation used for video revoice")
+                    return holistic
+                raise RuntimeError(
+                    "Не настроен OpenAI-перевод: проверьте Base URL/API Key в настройках."
+                )
+            except Exception as e:
+                raise RuntimeError(
+                    "Ошибка перевода (строгий режим, без fallback): "
+                    f"{e}. Проверьте модель/ключ/API и формат ответа JSON."
+                )
 
         # Для video translate с LLM-переводом уменьшаем количество запросов:
         # один поток + максимально крупный batch.
@@ -1723,12 +1989,25 @@ class VideoTranslationProcessor:
         return sorted(segments, key=lambda s: (s.start_ms, s.end_ms))
 
     def _select_provider(self, task: VideoTranslateTask) -> BaseVoiceCloneProvider:
-        endpoint = (task.video_translate_config.local_tts_endpoint or "").strip()
-        ok = VideoTranslateServiceManager.instance().ensure_local_tts(endpoint)
-        if not ok:
-            raise RuntimeError(
-                f"Не удалось поднять локальный XTTS сервис: {endpoint or 'http://127.0.0.1:8020'}"
-            )
+        cfg = task.video_translate_config
+        endpoint = (cfg.local_tts_endpoint or "").strip()
+        provider_mode = str(getattr(cfg, "voice_clone_provider", "auto") or "auto").strip().lower()
+        translation_enabled = bool(getattr(cfg, "translation_enabled", True))
+
+        # Нужен local TTS endpoint:
+        # - XTTS mode (клонирование)
+        # - RVC mode при переводе (быстрый TTS -> RVC)
+        need_local_tts = (provider_mode == "xtts") or translation_enabled
+        if need_local_tts:
+            ok = VideoTranslateServiceManager.instance().ensure_local_tts(endpoint)
+            if not ok:
+                if provider_mode == "xtts":
+                    raise RuntimeError(
+                        f"Не удалось поднять локальный XTTS сервис: {endpoint or 'http://127.0.0.1:8020'}"
+                    )
+                raise RuntimeError(
+                    f"Не удалось поднять локальный TTS сервис для режима TTS->RVC: {endpoint or 'http://127.0.0.1:8020'}"
+                )
         return LocalXTTSProvider()
 
     def _prepare_audio_stems(
@@ -1753,31 +2032,77 @@ class VideoTranslationProcessor:
         return _finalize_selected_stems(work_dir, uvr_vocals, uvr_bg)
 
     def _mux_video(self, task: VideoTranslateTask, background_audio: Path, dubbed_audio: Path, output_path: str):
-        # Минимальный микс без аудио-фильтров: фон MDX + дубляж.
-        _safe_run(
-            [
-                "ffmpeg",
-                "-y",
-                "-i",
-                task.video_path,
-                "-i",
-                str(background_audio),
-                "-i",
-                str(dubbed_audio),
-                "-filter_complex",
-                "[1:a][2:a]amix=inputs=2:normalize=0[mix]",
-                "-map",
-                "0:v:0",
-                "-map",
-                "[mix]",
-                "-c:v",
-                "copy",
-                "-c:a",
-                "aac",
-                "-shortest",
-                output_path,
-            ]
-        )
+        # Финальная сборка видео: добавлены настраиваемые decode/encode backend'ы.
+        cfg = task.video_translate_config
+        decode_backend = str(getattr(cfg, "video_decode_backend", "auto") or "auto").strip().lower()
+        encode_backend = str(getattr(cfg, "video_encode_backend", "copy") or "copy").strip().lower()
+
+        base_cmd = ["ffmpeg", "-y"]
+        if decode_backend == "cuda":
+            base_cmd += ["-hwaccel", "cuda", "-hwaccel_output_format", "cuda"]
+
+        cmd = base_cmd + [
+            "-i",
+            task.video_path,
+            "-i",
+            str(background_audio),
+            "-i",
+            str(dubbed_audio),
+            "-filter_complex",
+            "[1:a][2:a]amix=inputs=2:normalize=0[mix]",
+            "-map",
+            "0:v:0",
+            "-map",
+            "[mix]",
+        ]
+
+        if encode_backend == "nvenc":
+            # GPU encode (NVIDIA): сохраняем визуально качественный профиль.
+            cmd += ["-c:v", "h264_nvenc", "-preset", "p5", "-cq", "19", "-b:v", "0"]
+        elif encode_backend == "cpu":
+            cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "18"]
+        else:
+            # copy = без перекодирования видео (быстро/без потери от re-encode).
+            cmd += ["-c:v", "copy"]
+
+        cmd += ["-c:a", "aac", "-shortest", output_path]
+
+        try:
+            _safe_run(cmd)
+        except Exception as e:
+            # Безопасный fallback: если CUDA/NVENC недоступны, не роняем пайплайн.
+            if decode_backend == "cuda" or encode_backend == "nvenc":
+                logger.warning(
+                    "GPU mux failed (decode=%s, encode=%s), fallback to CPU/copy. reason=%s",
+                    decode_backend,
+                    encode_backend,
+                    e,
+                )
+                fallback_cmd = [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    task.video_path,
+                    "-i",
+                    str(background_audio),
+                    "-i",
+                    str(dubbed_audio),
+                    "-filter_complex",
+                    "[1:a][2:a]amix=inputs=2:normalize=0[mix]",
+                    "-map",
+                    "0:v:0",
+                    "-map",
+                    "[mix]",
+                    "-c:v",
+                    "copy",
+                    "-c:a",
+                    "aac",
+                    "-shortest",
+                    output_path,
+                ]
+                _safe_run(fallback_cmd)
+            else:
+                raise
 
     @staticmethod
     def _save_speaker_analysis_cache(segments: List[VoiceSegment], turns: Optional[List[SpeakerTurn]] = None):
@@ -1797,7 +2122,7 @@ class VideoTranslationProcessor:
             logger.warning("Failed to save speaker analysis cache: %s", e)
 
     @staticmethod
-    def _save_last_translation_cache(asr_data: ASRData, task: VideoTranslateTask):
+    def _save_last_translation_cache(asr_data: ASRData, task: VideoTranslateTask, cache_key: str = ""):
         try:
             _LAST_TRANSLATION_CACHE.parent.mkdir(parents=True, exist_ok=True)
             rows = []
@@ -1812,6 +2137,7 @@ class VideoTranslationProcessor:
                 )
             payload = {
                 "video_path": str(task.video_path or ""),
+                "cache_key": str(cache_key or ""),
                 "rows": rows,
             }
             _LAST_TRANSLATION_CACHE.write_text(
@@ -1911,6 +2237,7 @@ class VideoTranslationProcessor:
                     raise
 
         translation_enabled = bool(getattr(task.video_translate_config, "translation_enabled", True))
+        translation_cache_key = ""
         self._emit(progress_cb, 35, "Перевод текста" if translation_enabled else "Режим без перевода")
         if translation_enabled:
             manual_tr_json = str(getattr(task.video_translate_config, "manual_translation_json", "") or "").strip()
@@ -1918,14 +2245,20 @@ class VideoTranslationProcessor:
                 asr_data = self._apply_manual_translation_json(asr_data, manual_tr_json)
                 self._emit(progress_cb, 38, "Применён подтверждённый перевод из предпросмотра")
             else:
-                asr_data = self._translate_asr(asr_data, task)
-                asr_data = self._retry_untranslated_segments(asr_data, task)
+                translation_cache_key = self._build_translation_cache_key(asr_data, task)
+                use_cache = bool(getattr(task.video_translate_config, "use_translation_cache", True))
+                if use_cache and self._try_apply_translation_cache(asr_data, task, translation_cache_key):
+                    self._emit(progress_cb, 38, "Перевод взят из кэша")
+                else:
+                    asr_data = self._translate_asr(asr_data, task)
         else:
             for seg in asr_data.segments:
                 seg.translated_text = str(seg.text or "")
             self._emit(progress_cb, 38, "Озвучка будет выполнена по оригинальному тексту")
 
-        self._save_last_translation_cache(asr_data, task)
+        if translation_enabled and not translation_cache_key:
+            translation_cache_key = self._build_translation_cache_key(asr_data, task)
+        self._save_last_translation_cache(asr_data, task, translation_cache_key)
 
         if task.output_subtitle_path:
             asr_data.to_srt(task.output_subtitle_path)

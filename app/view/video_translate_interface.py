@@ -246,6 +246,7 @@ class VideoTranslateInterface(QWidget):
         self._refresh_rvc_models()
         self._build_ui()
         self._connect_signals()
+        self._apply_interface_style()
 
     def _refresh_rvc_models(self):
         root = Path(str(getattr(cfg, "video_translate_rvc_model_dir", None).value or "").strip()) if str(getattr(cfg, "video_translate_rvc_model_dir", None).value or "").strip() else default_rvc_model_root()
@@ -414,20 +415,55 @@ class VideoTranslateInterface(QWidget):
         row4.addWidget(self.preserve_bg_label)
         row4.addWidget(self.preserve_bg_combo, 1)
 
-        self.provider_label = BodyLabel("Клонирование голоса", self)
+        self.provider_label = BodyLabel("Режим озвучки/клонирования", self)
         self.provider_label.setMinimumWidth(form_label_w)
         self.provider_combo = ComboBox(self)
         self.provider_combo.setMinimumWidth(form_field_min_w)
         self.provider_combo.addItems([
-            "auto (рекомендуется)",
-            "xtts (локально)",
-            "rvc (локально, через модели)",
+            "auto (RVC-пайплайн: без перевода = RVC-only, с переводом = TTS→RVC)",
+            "xtts (отдельный режим клонирования голоса)",
+            "rvc (принудительно RVC-пайплайн)",
         ])
         current_provider = str(cfg.video_translate_voice_provider.value or "auto").strip().lower()
         provider_to_idx = {"auto": 0, "xtts": 1, "rvc": 2}
         self.provider_combo.setCurrentIndex(provider_to_idx.get(current_provider, 0))
-        row4.addWidget(self.provider_label)
-        row4.addWidget(self.provider_combo, 1)
+        row4_provider = QHBoxLayout()
+        row4_provider.setSpacing(10)
+        row4_provider.addWidget(self.provider_label)
+        row4_provider.addWidget(self.provider_combo, 1)
+        row4_provider.addStretch(1)
+
+        row4_gpu = QHBoxLayout()
+        row4_gpu.setSpacing(10)
+        self.video_decode_label = BodyLabel("Видео decode (финальный рендер)", self)
+        self.video_decode_label.setMinimumWidth(form_label_w)
+        self.video_decode_combo = ComboBox(self)
+        self.video_decode_combo.setMinimumWidth(form_field_min_w)
+        self.video_decode_combo.addItems([
+            "Auto",
+            "CPU",
+            "GPU (CUDA)",
+        ])
+        decode_to_idx = {"auto": 0, "cpu": 1, "cuda": 2}
+        current_decode = str(getattr(cfg.video_translate_video_decode_backend, "value", "auto") or "auto").strip().lower()
+        self.video_decode_combo.setCurrentIndex(decode_to_idx.get(current_decode, 0))
+        row4_gpu.addWidget(self.video_decode_label)
+        row4_gpu.addWidget(self.video_decode_combo, 1)
+
+        self.video_encode_label = BodyLabel("Видео encode (финальный рендер)", self)
+        self.video_encode_label.setMinimumWidth(form_label_w)
+        self.video_encode_combo = ComboBox(self)
+        self.video_encode_combo.setMinimumWidth(form_field_min_w)
+        self.video_encode_combo.addItems([
+            "Copy (без перекодирования)",
+            "CPU (libx264)",
+            "GPU (NVENC)",
+        ])
+        encode_to_idx = {"copy": 0, "cpu": 1, "nvenc": 2}
+        current_encode = str(getattr(cfg.video_translate_video_encode_backend, "value", "copy") or "copy").strip().lower()
+        self.video_encode_combo.setCurrentIndex(encode_to_idx.get(current_encode, 0))
+        row4_gpu.addWidget(self.video_encode_label)
+        row4_gpu.addWidget(self.video_encode_combo, 1)
 
         row4b = QHBoxLayout()
         row4b.setSpacing(10)
@@ -517,10 +553,10 @@ class VideoTranslateInterface(QWidget):
                 self.translator_combo.setCurrentIndex(i)
                 break
 
-        row6 = QHBoxLayout()
-        row6.setSpacing(10)
-        row6.addWidget(self.translator_label)
-        row6.addWidget(self.translator_combo, 1)
+        row6_translator = QHBoxLayout()
+        row6_translator.setSpacing(10)
+        row6_translator.addWidget(self.translator_label)
+        row6_translator.addWidget(self.translator_combo, 1)
 
         self.workers_label = BodyLabel("Параллельных TTS задач (ускорение этапа озвучки)", self)
         self.workers_label.setMinimumWidth(form_label_w)
@@ -530,8 +566,46 @@ class VideoTranslateInterface(QWidget):
         current_workers = int(getattr(cfg.video_translate_tts_parallel_workers, "value", 3) or 3)
         current_workers = max(1, min(8, current_workers))
         self.workers_combo.setCurrentText(str(current_workers))
-        row6.addWidget(self.workers_label)
-        row6.addWidget(self.workers_combo, 1)
+        row6_workers = QHBoxLayout()
+        row6_workers.setSpacing(10)
+        row6_workers.addWidget(self.workers_label)
+        row6_workers.addWidget(self.workers_combo, 1)
+
+        def _set_pair_tooltip(label: BodyLabel, combo: ComboBox, text: str):
+            label.setToolTip(text)
+            combo.setToolTip(text)
+
+        _set_pair_tooltip(self.device_label, self.device_combo, "Устройство для ASR и части обработки. GPU быстрее, CPU стабильнее на слабых ПК.")
+        _set_pair_tooltip(self.quality_label, self.quality_combo, "Глобальный пресет качества озвучки/микса. Чем выше качество, тем дольше рендер.")
+        _set_pair_tooltip(self.sep_label, self.sep_combo, "Метод отделения голоса от фона. UVR MDX/Kim обычно лучший старт для этапа 1.")
+        _set_pair_tooltip(self.vocal_kill_label, self.vocal_kill_combo, "Дополнительное подавление остатков оригинального голоса. Полезно при заметном пробиве исходной речи.")
+        _set_pair_tooltip(self.translation_mode_label, self.translation_mode_combo, "Включить полноценный перевод или оставить исходный язык и сделать только переозвучку.")
+        _set_pair_tooltip(self.source_lang_label, self.source_lang_combo, "Язык исходной речи для ASR/перевода.")
+        _set_pair_tooltip(self.target_lang_label, self.target_lang_combo, "Язык итоговой дорожки после перевода.")
+        _set_pair_tooltip(self.translator_label, self.translator_combo, "Сервис, который выполняет перевод текста на этапе 3.")
+        _set_pair_tooltip(
+            self.provider_label,
+            self.provider_combo,
+            "auto/rvc: без перевода идёт сразу RVC по исходной речи, с переводом — быстрый local TTS и затем RVC. "
+            "xtts: отдельный режим чистого клонирования голоса XTTS.",
+        )
+        _set_pair_tooltip(
+            self.video_decode_label,
+            self.video_decode_combo,
+            "Decode исходного видео на этапе финального mux. CUDA снижает CPU при поддержке ffmpeg/NVIDIA.",
+        )
+        _set_pair_tooltip(
+            self.video_encode_label,
+            self.video_encode_combo,
+            "Encode видео: Copy = без перекодирования (быстро), CPU = libx264, GPU = h264_nvenc.",
+        )
+        _set_pair_tooltip(self.workers_label, self.workers_combo, "Количество параллельных TTS задач на этапе 5-6. Больше — быстрее, но выше нагрузка.")
+        _set_pair_tooltip(self.overlap_label, self.overlap_combo, "Разрешает пересечения реплик разных спикеров. Имеет смысл при диалогах с перебиваниями.")
+        _set_pair_tooltip(self.mix_label, self.mix_combo, "Специальный микс для overlap-сегментов, чтобы уменьшить конфликт голосов в пересечениях.")
+        _set_pair_tooltip(self.qa_label, self.qa_combo, "Пост-проверка сегментов TTS перед финальной сборкой. Повышает чистоту, но замедляет.")
+        _set_pair_tooltip(self.qa_retry_label, self.qa_retry_combo, "Сколько раз пытаться переозвучить проблемный сегмент при QA-проверке.")
+        _set_pair_tooltip(self.duck_label, self.duck_combo, "Понижение фона во время речи, чтобы голос был разборчивее.")
+        _set_pair_tooltip(self.preserve_bg_label, self.preserve_bg_combo, "Сохранять фон 1:1 по громкости. В этом режиме ducking и часть фильтров микса отключаются.")
 
 
         row7 = QHBoxLayout()
@@ -583,6 +657,11 @@ class VideoTranslateInterface(QWidget):
         row7b.addWidget(self.auto_download_models_label)
         row7b.addWidget(self.auto_download_models_combo, 1)
         row7b.addStretch(1)
+
+        _set_pair_tooltip(self.cache_label, self.cache_combo, "Кэш перевода ускоряет повторы на тех же данных.")
+        _set_pair_tooltip(self.asr_cache_label, self.asr_cache_combo, "Кэш ASR ускоряет повторные прогоны без изменения исходного аудио.")
+        _set_pair_tooltip(self.autonomous_mode_label, self.autonomous_mode_combo, "Preflight-проверка окружения/моделей перед запуском полного пайплайна.")
+        _set_pair_tooltip(self.auto_download_models_label, self.auto_download_models_combo, "Автоматически докачивать недостающие модели при preflight.")
 
         # ------------------------------
         # Этап 1: отделение голоса
@@ -642,6 +721,7 @@ class VideoTranslateInterface(QWidget):
         stage3_layout.addWidget(BodyLabel("Этап 3: Перевод и ручная правка", self))
         stage3_layout.addLayout(row4c)
         stage3_layout.addLayout(row5)
+        stage3_layout.addLayout(row6_translator)
         self.stage3_button = PushButton("Запустить этап 3 (предпросмотр)", self)
         self.stage3_check_button = PushButton("Проверка: открыть перевод", self)
         stage3_btns = QHBoxLayout()
@@ -664,7 +744,8 @@ class VideoTranslateInterface(QWidget):
         stage4_layout.setContentsMargins(12, 12, 12, 12)
         stage4_layout.setSpacing(8)
         stage4_layout.addWidget(BodyLabel("Этап 4: Голоса спикеров и RVC", self))
-        stage4_layout.addLayout(row6)
+        stage4_layout.addLayout(row4_provider)
+        stage4_layout.addLayout(row4_gpu)
         self.stage4_button = PushButton("Запустить этап 4 (назначение голосов)", self)
         self.stage4_check_button = PushButton("Проверка: менеджер RVC моделей", self)
         stage4_btns = QHBoxLayout()
@@ -687,6 +768,7 @@ class VideoTranslateInterface(QWidget):
         stage56_layout.setContentsMargins(12, 12, 12, 12)
         stage56_layout.setSpacing(8)
         stage56_layout.addWidget(BodyLabel("Этап 5-6: Озвучка, микс и рендер", self))
+        stage56_layout.addLayout(row6_workers)
         stage56_layout.addLayout(row2)
         stage56_layout.addLayout(row3)
         stage56_layout.addLayout(row4)
@@ -733,6 +815,65 @@ class VideoTranslateInterface(QWidget):
         bottom.addWidget(self.status_label)
         self.main_layout.addLayout(bottom)
 
+    def _apply_interface_style(self):
+        dark = isDarkTheme()
+        window_bg = "#171717" if dark else "#F5F7FA"
+        card_bg = "#202020" if dark else "#FFFFFF"
+        border = "#333333" if dark else "#D6DCE5"
+        text = "#F1F1F1" if dark else "#202124"
+        thumb = "#4A4A4A" if dark else "#C5CDD8"
+        thumb_hover = "#7A7A7A" if dark else "#98A6B8"
+
+        self.setStyleSheet(
+            f"""
+            QWidget#VideoTranslateInterface {{ background: {window_bg}; }}
+            QScrollArea {{ border: none; background: transparent; }}
+            QScrollArea > QWidget > QWidget {{ background: {window_bg}; }}
+            CardWidget {{
+                background: {card_bg};
+                border: 1px solid {border};
+                border-radius: 10px;
+            }}
+            QLabel, BodyLabel {{ color: {text}; }}
+            QScrollBar:vertical {{
+                background: transparent;
+                width: 12px;
+                margin: 2px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {thumb};
+                min-height: 40px;
+                border-radius: 6px;
+            }}
+            QScrollBar::handle:vertical:hover {{ background: {thumb_hover}; }}
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical,
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {{
+                background: transparent;
+                height: 0px;
+            }}
+            QScrollBar:horizontal {{
+                background: transparent;
+                height: 12px;
+                margin: 2px;
+            }}
+            QScrollBar::handle:horizontal {{
+                background: {thumb};
+                min-width: 40px;
+                border-radius: 6px;
+            }}
+            QScrollBar::handle:horizontal:hover {{ background: {thumb_hover}; }}
+            QScrollBar::add-line:horizontal,
+            QScrollBar::sub-line:horizontal,
+            QScrollBar::add-page:horizontal,
+            QScrollBar::sub-page:horizontal {{
+                background: transparent;
+                width: 0px;
+            }}
+            """
+        )
+
     def _connect_signals(self):
         self.video_button.clicked.connect(self.choose_video_file)
         self.start_button.clicked.connect(self.start_translate)
@@ -758,6 +899,8 @@ class VideoTranslateInterface(QWidget):
         self.target_lang_combo.currentIndexChanged.connect(self._on_target_language_changed)
         self.translator_combo.currentIndexChanged.connect(self._on_translator_changed)
         self.provider_combo.currentIndexChanged.connect(self._on_provider_changed)
+        self.video_decode_combo.currentIndexChanged.connect(self._on_video_decode_backend_changed)
+        self.video_encode_combo.currentIndexChanged.connect(self._on_video_encode_backend_changed)
         self.sep_combo.currentIndexChanged.connect(self._on_separation_mode_changed)
         self.overlap_combo.currentIndexChanged.connect(self._on_overlap_changed)
         self.mix_combo.currentIndexChanged.connect(self._on_overlap_mix_changed)
@@ -971,6 +1114,14 @@ class VideoTranslateInterface(QWidget):
     def _on_provider_changed(self):
         provider = {0: "auto", 1: "xtts", 2: "rvc"}.get(self.provider_combo.currentIndex(), "auto")
         cfg.set(cfg.video_translate_voice_provider, provider)
+
+    def _on_video_decode_backend_changed(self):
+        backend = {0: "auto", 1: "cpu", 2: "cuda"}.get(self.video_decode_combo.currentIndex(), "auto")
+        cfg.set(cfg.video_translate_video_decode_backend, backend)
+
+    def _on_video_encode_backend_changed(self):
+        backend = {0: "copy", 1: "cpu", 2: "nvenc"}.get(self.video_encode_combo.currentIndex(), "copy")
+        cfg.set(cfg.video_translate_video_encode_backend, backend)
 
     def _on_separation_mode_changed(self):
         mode = {
@@ -1892,6 +2043,12 @@ class VideoTranslateInterface(QWidget):
         self.task.video_translate_config.voice_clone_quality = selected_quality
         self.task.video_translate_config.translation_enabled = self._translation_enabled()
         self.task.video_translate_config.voice_clone_provider = sel_provider
+        self.task.video_translate_config.video_decode_backend = {0: "auto", 1: "cpu", 2: "cuda"}.get(
+            self.video_decode_combo.currentIndex(), "auto"
+        )
+        self.task.video_translate_config.video_encode_backend = {0: "copy", 1: "cpu", 2: "nvenc"}.get(
+            self.video_encode_combo.currentIndex(), "copy"
+        )
         self.task.video_translate_config.source_separation_mode = {
             0: "demucs_plus_uvr",
             1: "demucs",
@@ -1981,6 +2138,12 @@ class VideoTranslateInterface(QWidget):
         task.video_translate_config.voice_clone_quality = selected_quality
         task.video_translate_config.translation_enabled = self._translation_enabled()
         task.video_translate_config.voice_clone_provider = sel_provider
+        task.video_translate_config.video_decode_backend = {0: "auto", 1: "cpu", 2: "cuda"}.get(
+            self.video_decode_combo.currentIndex(), "auto"
+        )
+        task.video_translate_config.video_encode_backend = {0: "copy", 1: "cpu", 2: "nvenc"}.get(
+            self.video_encode_combo.currentIndex(), "copy"
+        )
         task.video_translate_config.source_separation_mode = {
             0: "demucs_plus_uvr",
             1: "demucs",
