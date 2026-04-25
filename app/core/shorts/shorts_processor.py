@@ -182,6 +182,21 @@ class ShortsProcessor:
                 if len(reranked) >= self.min_candidates:
                     break
 
+        # Если материала хватает, не "прижимаем" итог к минимуму:
+        # стараемся отдать больше интересных моментов в пределах min..max.
+        target_count = self._resolve_target_candidate_count(pre_precision_candidates, reranked)
+        if len(reranked) < target_count:
+            reserve_pool = sorted(pre_precision_candidates, key=lambda x: x.score, reverse=True)
+            seen = {(c.start_ms, c.end_ms) for c in reranked}
+            for c in reserve_pool:
+                key = (c.start_ms, c.end_ms)
+                if key in seen:
+                    continue
+                reranked.append(c)
+                seen.add(key)
+                if len(reranked) >= target_count:
+                    break
+
         if len(reranked) > self.max_candidates:
             reranked = reranked[: self.max_candidates]
 
@@ -189,6 +204,42 @@ class ShortsProcessor:
             progress_cb(85, f"Кандидаты после ранжирования: {len(reranked)}")
         final_candidates = list(reranked)
         return final_candidates
+
+    def _resolve_target_candidate_count(
+        self,
+        base_pool: List[ShortCandidate],
+        current: List[ShortCandidate],
+    ) -> int:
+        """Определяет целевой размер финального списка в диапазоне [min_candidates, max_candidates]."""
+        min_c = int(self.min_candidates)
+        max_c = int(self.max_candidates)
+        if max_c <= min_c:
+            return min_c
+        if not base_pool:
+            return min_c
+
+        # Оцениваем "глубину" пула: сколько кандидатов около/выше порога интереса.
+        soft_threshold = max(30.0, float(self.interest_threshold_percent) - 6.0)
+        strong_count = sum(
+            1
+            for c in base_pool
+            if float(getattr(c, "quality_score", 0.0) or 0.0) >= soft_threshold
+        )
+        strong_ratio = strong_count / max(1, len(base_pool))
+
+        # Интенсивность поиска тоже влияет на ожидаемую плотность выдачи.
+        intensity_ratio = (int(self.llm_search_intensity) - 1) / 4.0
+        intensity_ratio = max(0.0, min(1.0, intensity_ratio))
+
+        # 0.35..1.0: при хорошем пуле и высокой интенсивности тянемся ближе к max.
+        fill_ratio = 0.35 + 0.40 * strong_ratio + 0.25 * intensity_ratio
+        fill_ratio = max(0.35, min(1.0, fill_ratio))
+
+        target = min_c + int(round((max_c - min_c) * fill_ratio))
+        target = max(min_c, min(max_c, target))
+
+        # Если в текущем списке уже больше — не занижаем искусственно.
+        return max(target, min(len(current), max_c))
 
     def _llm_ready(self) -> bool:
         return bool(self.llm_model and self.llm_base_url and self.llm_api_key)
@@ -807,7 +858,12 @@ class ShortsProcessor:
         try:
             # Rerank делаем компактным, чтобы не выбивать контекст на локальных LLM.
             rerank_top_map = {1: 24, 2: 30, 3: 36, 4: 42, 5: 50}
-            top = candidates[: rerank_top_map.get(int(self.llm_search_intensity), 44)]
+            base_top = rerank_top_map.get(int(self.llm_search_intensity), 44)
+            # Важно: rerank не должен обрезать пул до околомин. значения.
+            # Берём как минимум 2x max_candidates (в разумном лимите), чтобы
+            # после фильтров оставалась возможность выйти за min_candidates.
+            dynamic_top = max(base_top, min(120, int(self.max_candidates) * 2))
+            top = candidates[:dynamic_top]
             payload = [
                 {
                     "id": i,
@@ -868,6 +924,11 @@ class ShortsProcessor:
             for i, c in enumerate(top):
                 if i not in used:
                     reranked.append(c)
+
+            # Хвост кандидатов вне rerank-окна возвращаем обратно,
+            # чтобы этап rerank не терял сильные моменты из общего пула.
+            if len(candidates) > len(top):
+                reranked.extend(candidates[len(top) :])
 
             reranked.sort(key=lambda x: x.score, reverse=True)
             return self._deduplicate(reranked)

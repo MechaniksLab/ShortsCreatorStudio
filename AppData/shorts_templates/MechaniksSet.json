@@ -1,24 +1,24 @@
 {
   "enabled": true,
   "source_canvas": {
-    "w": 2560,
-    "h": 1440
+    "w": 1920,
+    "h": 1080
   },
   "webcam": {
     "crop_x": 0,
     "crop_y": 0,
-    "crop_w": 777,
-    "crop_h": 460,
+    "crop_w": 583,
+    "crop_h": 345,
     "out_x": 0,
     "out_y": 0,
     "out_w": 1080,
     "out_h": 636
   },
   "game": {
-    "crop_x": 505,
+    "crop_x": 379,
     "crop_y": 0,
-    "crop_w": 1604,
-    "crop_h": 1440,
+    "crop_w": 1203,
+    "crop_h": 1080,
     "out_x": 0,
     "out_y": 640,
     "out_w": 1080,
@@ -56,14 +56,14 @@
     "keep_aspect": true,
     "autonomous": false,
     "range_start_s": 0,
-    "range_end_s": 556,
+    "range_end_s": 3179,
     "min_duration_s": 22,
     "max_duration_s": 110,
-    "min_candidates": 30,
+    "min_candidates": 40,
     "max_candidates": 150,
     "auto_filter_weak_enabled": true,
     "auto_filter_profile": "balanced",
-    "interest_threshold_percent": 35,
-    "llm_search_intensity": 3
+    "interest_threshold_percent": 45,
+    "llm_search_intensity": 4
   }
 }
