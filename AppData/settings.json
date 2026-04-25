@@ -3,7 +3,7 @@
         "AutoShortsClipHeadPadMs": 120,
         "AutoShortsClipTailPadMs": 320,
         "AutoShortsRenderBackend": "gpu",
-        "AutoShortsRepeatSimilarityPercent": 90,
+        "AutoShortsRepeatSimilarityPercent": 95,
         "AutoShortsSpeechMergeGapMs": 160,
         "AutoShortsSpeechMinCoveragePercent": 74,
         "AutoShortsSpeechPostPadMs": 200,

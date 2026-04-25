@@ -35,7 +35,7 @@ class TaskFactory:
     PREFIX_SUBTITLE = "суб"
     PREFIX_SPLIT_SUBTITLE = "разб"
     PREFIX_SMART_SPLIT_SUBTITLE = "умразб"
-    PREFIX_RENDERED_VIDEO = "видео"
+    PREFIX_RENDERED_VIDEO = "субт"
     PREFIX_TRANSLATED_VIDEO = "перевод"
 
     # Безопасные лимиты для Windows-путей

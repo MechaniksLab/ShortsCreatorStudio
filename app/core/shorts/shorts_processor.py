@@ -40,6 +40,7 @@ class ShortCandidate:
     title: str
     reason: str
     excerpt: str
+    viral_title: str = ""
     speech_ranges: Optional[List[Tuple[int, int]]] = None
     speech_density: float = 0.0
     pause_ratio: float = 0.0
@@ -521,6 +522,7 @@ class ShortsProcessor:
                         title=str(item.get("title", "")).strip() or self._build_title(excerpt),
                         reason=str(item.get("reason", "")).strip() or "AI Enterprise selection",
                         excerpt=self._shorten(excerpt, 220),
+                        viral_title=self._build_viral_title(str(item.get("title", "")).strip() or excerpt),
                         speech_ranges=speech_ranges,
                         speech_density=round(speech_density, 3),
                         pause_ratio=round(pause_ratio, 3),
@@ -658,6 +660,7 @@ class ShortsProcessor:
                         title=self._build_title(joined),
                         reason=self._build_reason(joined, score),
                         excerpt=excerpt,
+                        viral_title=self._build_viral_title(joined),
                         speech_ranges=self._build_speech_ranges_from_segments(
                             [prepared[k]["seg"] for k in range(i, j + 1)]
                         ),
@@ -916,6 +919,7 @@ class ShortsProcessor:
                 reason = (it.get("reason") or "").strip()
                 if title:
                     c.title = title
+                    c.viral_title = self._build_viral_title(title)
                 if reason:
                     c.reason = reason
                 reranked.append(c)
@@ -1106,6 +1110,20 @@ class ShortsProcessor:
         return ShortsProcessor._shorten(txt, 72)
 
     @staticmethod
+    def _build_viral_title(text: str) -> str:
+        txt = re.sub(r"\s+", " ", (text or "")).strip()
+        if not txt:
+            return "Смотри до конца"
+        low = txt.lower()
+        if any(k in low for k in ["шок", "жесть", "неожидан", "внезап", "поворот"]):
+            return ShortsProcessor._shorten(f"Вот это поворот: {txt}", 56)
+        if any(k in low for k in ["смеш", "угар", "ха", "мем", "ору"]):
+            return ShortsProcessor._shorten(f"Я не мог не выложить это 😅 {txt}", 56)
+        if any(k in low for k in ["секрет", "факт", "лайфхак", "совет"]):
+            return ShortsProcessor._shorten(f"Это должен знать каждый: {txt}", 56)
+        return ShortsProcessor._shorten(txt, 56)
+
+    @staticmethod
     def _build_reason(text: str, score: float) -> str:
         t = text.lower()
         tags = []
@@ -1178,21 +1196,40 @@ def render_shorts(
             raw = raw[:max_len].rstrip(" .")
         return raw
 
-    def _fit_filename_to_path_limit(parent: Path, filename: str, max_path_len: int = 240) -> str:
+    def _fit_filename_to_path_limit(
+        parent: Path,
+        filename: str,
+        max_path_len: int = 240,
+        max_filename_len: int = 180,
+    ) -> str:
         """Ограничивает имя файла, чтобы полный путь не превышал безопасную длину на Windows."""
         ext = Path(filename).suffix
         stem = Path(filename).stem
         full = str(parent / filename)
-        if len(full) <= max_path_len and len(filename) <= 180:
+        if len(full) <= max_path_len and len(filename) <= max_filename_len:
             return filename
 
         max_stem_by_path = max(8, max_path_len - len(str(parent)) - 1 - len(ext))
-        max_stem_by_name = max(8, 180 - len(ext))
+        max_stem_by_name = max(8, max_filename_len - len(ext))
         max_stem = max(8, min(max_stem_by_path, max_stem_by_name))
         digest = hashlib.md5(stem.encode("utf-8", errors="ignore")).hexdigest()[:8]
         head_len = max(4, max_stem - 9)
         short_stem = stem[:head_len].rstrip(" ._") or "шорт"
         return f"{short_stem}_{digest}{ext}"
+
+    filename_options = render_options.get("filename_options") if isinstance(render_options, dict) else {}
+    include_title = bool(filename_options.get("include_title", True))
+    include_time_range = bool(filename_options.get("include_time_range", True))
+    include_quality = bool(filename_options.get("include_quality", False))
+    include_score = bool(filename_options.get("include_score", False))
+    include_hook = bool(filename_options.get("include_hook", False))
+    include_grade = bool(filename_options.get("include_grade", False))
+
+    # Резервируем место под будущий префикс пакетной обработки субтитров (например: "субт_").
+    reserved_future_prefix = str(
+        render_options.get("future_prefix_reserve", "субт_") if isinstance(render_options, dict) else "субт_"
+    )
+    max_filename_len_safe = max(64, 180 - len(reserved_future_prefix))
 
     def _safe_int(v, default=0):
         try:
@@ -1616,9 +1653,33 @@ def render_shorts(
         duration_s = max(0.2, end_s - start_s)
         clip_start_ms = int(round(start_s * 1000.0))
         clip_end_ms = int(round(end_s * 1000.0))
-        title_part = _safe_filename(c.title or c.excerpt or "short")
-        out_name = f"шорт_{i:03d}_{title_part}_{int(start_s)}-{int(end_s)}с.mp4"
-        out_name = _fit_filename_to_path_limit(out_dir, out_name)
+        parts: List[str] = ["шорт", f"{i:03d}"]
+
+        if include_title:
+            title_part = _safe_filename(
+                getattr(c, "viral_title", "") or c.title or c.excerpt or "short",
+                max_len=72,
+            )
+            parts.append(title_part)
+        if include_time_range:
+            parts.append(f"{int(start_s)}-{int(end_s)}с")
+        if include_quality:
+            parts.append(f"Q{int(round(float(getattr(c, 'quality_score', 0) or 0)))}")
+        if include_score:
+            parts.append(f"S{int(round(float(getattr(c, 'score', 0) or 0)))}")
+        if include_hook:
+            parts.append(f"H{int(round(float(getattr(c, 'hook_score', 0) or 0)))}")
+        if include_grade:
+            grade_part = _safe_filename(str(getattr(c, "quality_grade", "") or ""), max_len=16)
+            if grade_part:
+                parts.append(grade_part)
+
+        out_name = _safe_filename("_".join(parts), max_len=160) + ".mp4"
+        out_name = _fit_filename_to_path_limit(
+            out_dir,
+            out_name,
+            max_filename_len=max_filename_len_safe,
+        )
         out_path = out_dir / out_name
 
         def _normalize_candidate_ranges() -> List[Tuple[int, int]]:

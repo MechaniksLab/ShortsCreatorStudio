@@ -43,7 +43,14 @@
     "fps": "60",
     "resolution": "1080x1920",
     "quality": "Сбалансированное",
-    "repeat_similarity_percent": 90,
+    "sort_mode": "time_asc",
+    "filename_include_title": true,
+    "filename_include_time_range": true,
+    "filename_include_quality": true,
+    "filename_include_score": true,
+    "filename_include_hook": false,
+    "filename_include_grade": false,
+    "repeat_similarity_percent": 95,
     "speech_min_coverage_percent": 74,
     "speech_merge_gap_ms": 160,
     "speech_pre_pad_ms": 150,
@@ -63,7 +70,14 @@
     "max_candidates": 150,
     "auto_filter_weak_enabled": true,
     "auto_filter_profile": "balanced",
-    "interest_threshold_percent": 45,
-    "llm_search_intensity": 4
+    "interest_threshold_percent": 35,
+    "llm_search_intensity": 4,
+    "render_sort_mode": "time_asc",
+    "filename_include_title": true,
+    "filename_include_time_range": true,
+    "filename_include_quality": true,
+    "filename_include_score": true,
+    "filename_include_hook": false,
+    "filename_include_grade": false
   }
 }

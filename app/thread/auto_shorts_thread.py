@@ -491,6 +491,7 @@ class AutoShortsRenderThread(QThread):
                     title=str(c.get("title", "")),
                     reason=str(c.get("reason", "")),
                     excerpt=str(c.get("excerpt", "")),
+                    viral_title=str(c.get("viral_title", "")),
                     speech_ranges=c.get("speech_ranges") or [],
                 )
                 for c in self.selected_candidates

@@ -1042,7 +1042,7 @@ class AutoShortsInterface(QWidget):
         stage3_layout.addWidget(StrongBodyLabel("Этап 3: Проверка и ручной выбор кандидатов"))
 
         self.table = QTableWidget(self)
-        self.table.setColumnCount(10)
+        self.table.setColumnCount(11)
         self.table.setHorizontalHeaderLabels(
             [
                 "Выбрать",
@@ -1054,9 +1054,11 @@ class AutoShortsInterface(QWidget):
                 "Hook",
                 "Pause",
                 "Заголовок",
+                "Вирусный заголовок",
                 "Почему выбран",
             ]
         )
+        self._apply_candidates_table_tooltips()
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setAlternatingRowColors(False)
@@ -1077,6 +1079,73 @@ class AutoShortsInterface(QWidget):
         stage4_hint = BodyLabel("Параметры рендера ниже применяются только на этапе 4.")
         stage4_hint.setWordWrap(True)
         stage4_layout.addWidget(stage4_hint)
+
+        sort_row = QHBoxLayout()
+        sort_row.addWidget(BodyLabel("Порядок нумерации шортсов:"))
+        self.render_sort_combo = ComboBox(self)
+        self.render_sort_combo.addItems(
+            [
+                "По времени (раньше → позже)",
+                "По времени (позже → раньше)",
+                "По интересу (Q ↓)",
+                "По общему score (↓)",
+                "По hook (↓)",
+                "По длительности (длинные сначала)",
+                "По длительности (короткие сначала)",
+            ]
+        )
+        self.render_sort_combo.setCurrentIndex(0)
+        self.render_sort_combo.setToolTip(
+            "Определяет порядок, в котором выбранные кандидаты будут пронумерованы как 001..N.\n"
+            "Этот же порядок влияет на итоговые имена файлов шортсов."
+        )
+        sort_row.addWidget(self.render_sort_combo)
+        sort_row.addStretch(1)
+        stage4_layout.addLayout(sort_row)
+
+        filename_hint = BodyLabel("Что включать в имя файла шортса:")
+        filename_hint.setWordWrap(True)
+        stage4_layout.addWidget(filename_hint)
+
+        filename_row = QHBoxLayout()
+        self.filename_include_title_checkbox = CheckBox("Заголовок", self)
+        self.filename_include_title_checkbox.setChecked(True)
+        self.filename_include_title_checkbox.setToolTip(
+            "Добавлять в имя файла краткий вирусный заголовок (YouTube-стиль)."
+        )
+        self.filename_include_time_checkbox = CheckBox("Таймкод", self)
+        self.filename_include_time_checkbox.setChecked(True)
+        self.filename_include_time_checkbox.setToolTip(
+            "Добавлять в имя файла диапазон времени фрагмента (в секундах)."
+        )
+        self.filename_include_quality_checkbox = CheckBox("Q (интерес)", self)
+        self.filename_include_quality_checkbox.setChecked(False)
+        self.filename_include_quality_checkbox.setToolTip(
+            "Q = интегральная оценка интересности фрагмента (0..100)."
+        )
+        self.filename_include_score_checkbox = CheckBox("Score", self)
+        self.filename_include_score_checkbox.setChecked(False)
+        self.filename_include_score_checkbox.setToolTip(
+            "Score = исходный базовый балл кандидата до финальных quality-правок."
+        )
+        self.filename_include_hook_checkbox = CheckBox("Hook", self)
+        self.filename_include_hook_checkbox.setChecked(False)
+        self.filename_include_hook_checkbox.setToolTip(
+            "Hook = сила захвата внимания в начале фрагмента (0..10)."
+        )
+        self.filename_include_grade_checkbox = CheckBox("Grade", self)
+        self.filename_include_grade_checkbox.setChecked(False)
+        self.filename_include_grade_checkbox.setToolTip(
+            "Grade = буквенная категория качества (A/B/C/D)."
+        )
+        filename_row.addWidget(self.filename_include_title_checkbox)
+        filename_row.addWidget(self.filename_include_time_checkbox)
+        filename_row.addWidget(self.filename_include_quality_checkbox)
+        filename_row.addWidget(self.filename_include_score_checkbox)
+        filename_row.addWidget(self.filename_include_hook_checkbox)
+        filename_row.addWidget(self.filename_include_grade_checkbox)
+        filename_row.addStretch(1)
+        stage4_layout.addLayout(filename_row)
 
         self.bottom_card = QWidget(self)
         bottom_layout = QHBoxLayout(self.bottom_card)
@@ -1681,6 +1750,7 @@ class AutoShortsInterface(QWidget):
             self.table.setItem(row, 6, QTableWidgetItem(str(c.get("hook_score", ""))))
             self.table.setItem(row, 7, QTableWidgetItem(str(c.get("pause_ratio", ""))))
             self.table.setItem(row, 8, QTableWidgetItem(str(c.get("title", ""))))
+            self.table.setItem(row, 9, QTableWidgetItem(str(c.get("viral_title", ""))))
             info_text = str(c.get("reason", ""))
             excerpt = str(c.get("excerpt", ""))
             tags = c.get("explainability_tags") or []
@@ -1688,7 +1758,7 @@ class AutoShortsInterface(QWidget):
                 info_text = f"{info_text}\nТеги: {', '.join(str(t) for t in tags)}"
             if excerpt:
                 info_text = f"{info_text}\n{excerpt}"
-            self.table.setItem(row, 9, QTableWidgetItem(info_text))
+            self.table.setItem(row, 10, QTableWidgetItem(info_text))
 
             row_bg = bg_even if row % 2 == 0 else bg_odd
             for col in range(1, self.table.columnCount()):
@@ -1698,8 +1768,27 @@ class AutoShortsInterface(QWidget):
                     item.setBackground(row_bg)
 
         self.table.resizeColumnsToContents()
-        self.table.setColumnWidth(9, max(420, self.table.columnWidth(9)))
+        self.table.setColumnWidth(10, max(420, self.table.columnWidth(10)))
         self.table.setSortingEnabled(True)
+
+    def _apply_candidates_table_tooltips(self):
+        tips = {
+            0: "Отметка, какие кандидаты отправлять в рендер.",
+            1: "Таймкод начала и конца фрагмента в исходном видео.",
+            2: "Длительность фрагмента.",
+            3: "Score: базовая оценка кандидата (до финального quality-ранжирования).",
+            4: "Q: итоговая оценка интереса/качества (0..100), основной ориентир для отбора.",
+            5: "Grade: буквенная категория качества (A — лучший, D — слабый).",
+            6: "Hook: сила захвата внимания в начале фрагмента (0..10).",
+            7: "Pause: доля пауз/тишины внутри кандидата (меньше — обычно лучше).",
+            8: "Развёрнутый описательный заголовок содержания фрагмента.",
+            9: "Краткий вирусный заголовок для YouTube Shorts (используется и в именах файлов).",
+            10: "Почему кандидат был выбран: причина + теги + фрагмент текста.",
+        }
+        for idx, tip in tips.items():
+            item = self.table.horizontalHeaderItem(idx)
+            if item:
+                item.setToolTip(tip)
 
     def _collect_selected(self) -> List[Dict]:
         selected = []
@@ -1726,6 +1815,7 @@ class AutoShortsInterface(QWidget):
         if not self.video_path:
             return
         selected = self._collect_selected()
+        selected = self._sort_candidates_for_render(selected)
         if not selected:
             InfoBar.warning(
                 "Внимание",
@@ -1882,6 +1972,13 @@ class AutoShortsInterface(QWidget):
                 "fps": (self.render_fps_combo.currentText() or "30").strip(),
                 "resolution": (self.render_resolution_combo.currentText() or "1080x1920").strip(),
                 "quality": (self.render_quality_combo.currentText() or "Сбалансированное").strip(),
+                "sort_mode": self._get_render_sort_mode(),
+                "filename_include_title": bool(self.filename_include_title_checkbox.isChecked()),
+                "filename_include_time_range": bool(self.filename_include_time_checkbox.isChecked()),
+                "filename_include_quality": bool(self.filename_include_quality_checkbox.isChecked()),
+                "filename_include_score": bool(self.filename_include_score_checkbox.isChecked()),
+                "filename_include_hook": bool(self.filename_include_hook_checkbox.isChecked()),
+                "filename_include_grade": bool(self.filename_include_grade_checkbox.isChecked()),
                 "repeat_similarity_percent": int(self.repeat_similarity_spin.value()),
                 "speech_min_coverage_percent": int(self.speech_min_coverage_spin.value()),
                 "speech_merge_gap_ms": int(self.speech_merge_gap_spin.value()),
@@ -1904,6 +2001,13 @@ class AutoShortsInterface(QWidget):
                 "auto_filter_profile": self._auto_filter_profile_value(),
                 "interest_threshold_percent": int(self.interest_threshold_spin.value()),
                 "llm_search_intensity": int(self.llm_search_intensity_spin.value()),
+                "render_sort_mode": self._get_render_sort_mode(),
+                "filename_include_title": bool(self.filename_include_title_checkbox.isChecked()),
+                "filename_include_time_range": bool(self.filename_include_time_checkbox.isChecked()),
+                "filename_include_quality": bool(self.filename_include_quality_checkbox.isChecked()),
+                "filename_include_score": bool(self.filename_include_score_checkbox.isChecked()),
+                "filename_include_hook": bool(self.filename_include_hook_checkbox.isChecked()),
+                "filename_include_grade": bool(self.filename_include_grade_checkbox.isChecked()),
             },
         }
 
@@ -2119,6 +2223,28 @@ class AutoShortsInterface(QWidget):
                 if quality_text in {"Высокое", "Сбалансированное", "Быстрое"}:
                     self.render_quality_combo.setCurrentText(quality_text)
 
+                self._set_render_sort_mode(
+                    str(render_settings.get("sort_mode", self._get_render_sort_mode()) or self._get_render_sort_mode())
+                )
+                self.filename_include_title_checkbox.setChecked(
+                    bool(render_settings.get("filename_include_title", self.filename_include_title_checkbox.isChecked()))
+                )
+                self.filename_include_time_checkbox.setChecked(
+                    bool(render_settings.get("filename_include_time_range", self.filename_include_time_checkbox.isChecked()))
+                )
+                self.filename_include_quality_checkbox.setChecked(
+                    bool(render_settings.get("filename_include_quality", self.filename_include_quality_checkbox.isChecked()))
+                )
+                self.filename_include_score_checkbox.setChecked(
+                    bool(render_settings.get("filename_include_score", self.filename_include_score_checkbox.isChecked()))
+                )
+                self.filename_include_hook_checkbox.setChecked(
+                    bool(render_settings.get("filename_include_hook", self.filename_include_hook_checkbox.isChecked()))
+                )
+                self.filename_include_grade_checkbox.setChecked(
+                    bool(render_settings.get("filename_include_grade", self.filename_include_grade_checkbox.isChecked()))
+                )
+
                 try:
                     self.repeat_similarity_spin.setValue(
                         int(render_settings.get("repeat_similarity_percent", self.repeat_similarity_spin.value()))
@@ -2179,6 +2305,28 @@ class AutoShortsInterface(QWidget):
                     )
                     self.llm_search_intensity_spin.setValue(
                         int(ui_settings.get("llm_search_intensity", self.llm_search_intensity_spin.value()))
+                    )
+
+                    self._set_render_sort_mode(
+                        str(ui_settings.get("render_sort_mode", self._get_render_sort_mode()) or self._get_render_sort_mode())
+                    )
+                    self.filename_include_title_checkbox.setChecked(
+                        bool(ui_settings.get("filename_include_title", self.filename_include_title_checkbox.isChecked()))
+                    )
+                    self.filename_include_time_checkbox.setChecked(
+                        bool(ui_settings.get("filename_include_time_range", self.filename_include_time_checkbox.isChecked()))
+                    )
+                    self.filename_include_quality_checkbox.setChecked(
+                        bool(ui_settings.get("filename_include_quality", self.filename_include_quality_checkbox.isChecked()))
+                    )
+                    self.filename_include_score_checkbox.setChecked(
+                        bool(ui_settings.get("filename_include_score", self.filename_include_score_checkbox.isChecked()))
+                    )
+                    self.filename_include_hook_checkbox.setChecked(
+                        bool(ui_settings.get("filename_include_hook", self.filename_include_hook_checkbox.isChecked()))
+                    )
+                    self.filename_include_grade_checkbox.setChecked(
+                        bool(ui_settings.get("filename_include_grade", self.filename_include_grade_checkbox.isChecked()))
                     )
 
                     loaded_start = int(ui_settings.get("range_start_s", self.selected_start_s))
@@ -2978,13 +3126,76 @@ class AutoShortsInterface(QWidget):
             "resolution_mode": resolution_mode,
             "resolution": resolution_value,
             "quality_profile": quality_profile,
+            "sort_mode": self._get_render_sort_mode(),
             "clip_head_pad_ms": int(self.clip_head_pad_spin.value()),
             "clip_tail_pad_ms": int(self.clip_tail_pad_spin.value()),
             "speech_pre_pad_ms": int(self.speech_pre_pad_spin.value()),
             "speech_post_pad_ms": int(self.speech_post_pad_spin.value()),
             "speech_merge_gap_ms": int(self.speech_merge_gap_spin.value()),
             "speech_min_coverage_percent": int(self.speech_min_coverage_spin.value()),
+            "filename_options": {
+                "include_title": bool(self.filename_include_title_checkbox.isChecked()),
+                "include_time_range": bool(self.filename_include_time_checkbox.isChecked()),
+                "include_quality": bool(self.filename_include_quality_checkbox.isChecked()),
+                "include_score": bool(self.filename_include_score_checkbox.isChecked()),
+                "include_hook": bool(self.filename_include_hook_checkbox.isChecked()),
+                "include_grade": bool(self.filename_include_grade_checkbox.isChecked()),
+            },
         }
+
+    def _get_render_sort_mode(self) -> str:
+        idx = int(self.render_sort_combo.currentIndex()) if hasattr(self, "render_sort_combo") else 0
+        return {
+            0: "time_asc",
+            1: "time_desc",
+            2: "quality_desc",
+            3: "score_desc",
+            4: "hook_desc",
+            5: "duration_desc",
+            6: "duration_asc",
+        }.get(idx, "time_asc")
+
+    def _set_render_sort_mode(self, sort_mode: str):
+        mode = str(sort_mode or "time_asc").strip().lower()
+        idx = {
+            "time_asc": 0,
+            "time_desc": 1,
+            "quality_desc": 2,
+            "score_desc": 3,
+            "hook_desc": 4,
+            "duration_desc": 5,
+            "duration_asc": 6,
+        }.get(mode, 0)
+        if hasattr(self, "render_sort_combo"):
+            self.render_sort_combo.setCurrentIndex(idx)
+
+    def _sort_candidates_for_render(self, candidates: List[Dict]) -> List[Dict]:
+        if not candidates:
+            return []
+        mode = self._get_render_sort_mode()
+        items = list(candidates)
+
+        def _duration_ms(item: Dict) -> int:
+            try:
+                return max(0, int(item.get("end_ms", 0)) - int(item.get("start_ms", 0)))
+            except Exception:
+                return 0
+
+        if mode == "time_desc":
+            items.sort(key=lambda x: int(x.get("start_ms", 0) or 0), reverse=True)
+        elif mode == "quality_desc":
+            items.sort(key=lambda x: float(x.get("quality_score", 0.0) or 0.0), reverse=True)
+        elif mode == "score_desc":
+            items.sort(key=lambda x: float(x.get("score", 0.0) or 0.0), reverse=True)
+        elif mode == "hook_desc":
+            items.sort(key=lambda x: float(x.get("hook_score", 0.0) or 0.0), reverse=True)
+        elif mode == "duration_desc":
+            items.sort(key=_duration_ms, reverse=True)
+        elif mode == "duration_asc":
+            items.sort(key=_duration_ms)
+        else:
+            items.sort(key=lambda x: int(x.get("start_ms", 0) or 0))
+        return items
 
     @staticmethod
     def _fmt_s(total: int) -> str:
