@@ -134,11 +134,12 @@ class AntiMateRenderThread(QThread):
     finished = pyqtSignal(str)
     error = pyqtSignal(str)
 
-    def __init__(self, video_path: str, output_path: str, regions: List[Dict]):
+    def __init__(self, video_path: str, output_path: str, regions: List[Dict], render_device: str = "cpu"):
         super().__init__()
         self.video_path = str(video_path or "")
         self.output_path = str(output_path or "")
         self.regions = list(regions or [])
+        self.render_device = str(render_device or "cpu").strip().lower()
         self.beep_profile: str = "classic"
         self.beep_frequency: int = 1000
         self.beep_volume: float = 0.9
@@ -169,6 +170,7 @@ class AntiMateRenderThread(QThread):
                 self.output_path,
                 converted,
                 mode="mixed",
+                render_device=self.render_device,
                 beep_profile=self.beep_profile,
                 beep_frequency=self.beep_frequency,
                 beep_volume=self.beep_volume,

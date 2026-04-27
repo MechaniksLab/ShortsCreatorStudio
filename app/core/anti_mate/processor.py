@@ -197,21 +197,34 @@ def detect_profanity_regions(
     else:
         forbidden = {_normalize_word(w) for w in (forced_forbidden_words or []) if _normalize_word(w)}
     allowed = {_normalize_word(w) for w in (forced_allowed_words or []) if _normalize_word(w)}
+    if progress_cb:
+        progress_cb(18, f"Словари: forbidden={len(forbidden)}, allowed={len(allowed)}")
 
     transcript = " ".join(str(w.get("word", "")) for w in words)
+    if progress_cb:
+        progress_cb(26, "Подготовка транскрипта для анализа")
+
     llm_bad_words: set[str] = set()
     if use_llm:
+        if progress_cb:
+            progress_cb(36, "LLM: отправка запроса")
         llm_bad_words = _llm_detect_bad_words(transcript, llm_config=llm_config, notify_cb=notify_cb)
+        if progress_cb:
+            progress_cb(52, "LLM: ответ получен, обработка")
     elif progress_cb:
         progress_cb(45, "LLM отключён пользователем: используется только словарный режим")
     if progress_cb:
-        progress_cb(45, f"LLM-кандидатов: {len(llm_bad_words)}")
+        progress_cb(58, f"LLM-кандидатов: {len(llm_bad_words)}")
 
     raw_regions: List[CensorRegion] = []
-    for w in words:
+    words_total = max(1, len(words))
+    for idx, w in enumerate(words, start=1):
         raw_word = str(w.get("word", "") or "")
         n = _normalize_word(raw_word)
         if not n or n in allowed:
+            if progress_cb and idx % 100 == 0:
+                p = 60 + int((idx / words_total) * 20)
+                progress_cb(min(82, p), f"Сканирование слов: {idx}/{words_total}")
             continue
 
         source = ""
@@ -241,16 +254,20 @@ def detect_profanity_regions(
                 mode=default_mode,
             )
         )
+        if progress_cb and idx % 100 == 0:
+            p = 60 + int((idx / words_total) * 20)
+            progress_cb(min(82, p), f"Сканирование слов: {idx}/{words_total}")
 
     if progress_cb:
-        progress_cb(70, f"Найдено триггеров: {len(raw_regions)}")
+        progress_cb(84, f"Найдено триггеров: {len(raw_regions)}")
 
     if not raw_regions:
         return []
 
     raw_regions.sort(key=lambda r: r.start_ms)
     merged: List[CensorRegion] = [raw_regions[0]]
-    for r in raw_regions[1:]:
+    total_regions = max(1, len(raw_regions) - 1)
+    for i, r in enumerate(raw_regions[1:], start=1):
         last = merged[-1]
         if r.start_ms <= last.end_ms + int(merge_gap_ms):
             last.end_ms = max(last.end_ms, r.end_ms)
@@ -266,6 +283,9 @@ def detect_profanity_regions(
                 last.source = "mixed"
         else:
             merged.append(r)
+        if progress_cb and (i % 40 == 0 or i == total_regions):
+            p = 86 + int((i / total_regions) * 12)
+            progress_cb(min(98, p), f"Объединение зон: {i}/{total_regions}")
 
     if progress_cb:
         progress_cb(100, f"Готово: областей цензуры {len(merged)}")
@@ -381,6 +401,7 @@ def render_censored_video(
     regions: List[CensorRegion],
     *,
     mode: str = "beep",
+    render_device: str = "cpu",
     beep_frequency: int = 1000,
     beep_volume: float = 0.90,
     beep_profile: str = "classic",
@@ -403,10 +424,18 @@ def render_censored_video(
     beep_expr_regions = _build_activity_expr(active, mode_filter="beep")
     mute_expr_regions = _build_activity_expr(active, mode_filter="mute")
 
-    if progress_cb:
-        progress_cb(15, "Рендер антимата: подготовка FFmpeg")
-
     has_video = src.suffix.lower() in {".mp4", ".mov", ".mkv", ".webm", ".avi", ".m4v", ".ts"}
+    render_dev = str(render_device or "cpu").strip().lower()
+    is_gpu = render_dev in {"cuda", "gpu", "nvenc"}
+    # Для текущего пайплайна мы модифицируем только аудио-дорожку,
+    # поэтому копирование видео-потока существенно быстрее и не ухудшает качество.
+    # Режим CPU/GPU оставляем как индикатор/бэкенд рендера, но без принудительного
+    # ре-энкода видео, чтобы не замедлять экспорт.
+    vcodec = "copy" if has_video else ("h264_nvenc" if is_gpu else "libx264")
+
+    if progress_cb:
+        progress_cb(15, f"Рендер антимата: подготовка FFmpeg ({'GPU/CUDA' if is_gpu else 'CPU'})")
+
     cmd: List[str]
     mode_norm = str(mode).strip().lower()
     if mode_norm == "mute":
@@ -423,7 +452,7 @@ def render_censored_video(
             "-map",
             "[aout]",
             "-c:v",
-            "copy" if has_video else "libx264",
+            vcodec,
             "-c:a",
             "aac",
             str(out),
@@ -459,7 +488,7 @@ def render_censored_video(
             "-map",
             "[aout]",
             "-c:v",
-            "copy" if has_video else "libx264",
+            vcodec,
             "-c:a",
             "aac",
             str(out),
@@ -495,27 +524,76 @@ def render_censored_video(
             "-map",
             "[aout]",
             "-c:v",
-            "copy" if has_video else "libx264",
+            vcodec,
             "-c:a",
             "aac",
             str(out),
         ]
 
+    cmd = [
+        cmd[0],
+        "-progress",
+        "pipe:1",
+        "-nostats",
+        *cmd[1:],
+    ]
+
     if progress_cb:
         progress_cb(35, "FFmpeg: применение цензуры")
 
     with tempfile.TemporaryDirectory(prefix="anti_mate_"):
-        p = subprocess.run(
+        creationflags = subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0
+        proc = subprocess.Popen(
             cmd,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
             encoding="utf-8",
             errors="replace",
-            creationflags=(subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0),
+            creationflags=creationflags,
         )
-        if p.returncode != 0:
-            err = (p.stderr or p.stdout or "").strip()
-            raise RuntimeError(f"FFmpeg ошибка при рендере антимата: {err[-1200:]}")
+
+        last_progress = 35
+        stderr_text = ""
+        try:
+            while True:
+                line = proc.stdout.readline() if proc.stdout else ""
+                if not line:
+                    if proc.poll() is not None:
+                        break
+                    continue
+                line = line.strip()
+                if not line or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                if key == "out_time_ms":
+                    try:
+                        out_sec = max(0.0, float(value) / 1_000_000.0)
+                        ratio = min(1.0, out_sec / max(0.1, duration))
+                        p = 35 + int(ratio * 63)
+                        if p > last_progress and (p - last_progress >= 2 or p >= 98):
+                            last_progress = p
+                            if progress_cb:
+                                progress_cb(min(98, p), f"FFmpeg: рендер {int(ratio * 100)}%")
+                    except Exception:
+                        pass
+                elif key == "progress" and value == "end":
+                    if progress_cb:
+                        progress_cb(99, "FFmpeg: финализация")
+
+            stderr_text = (proc.stderr.read() or "") if proc.stderr else ""
+            return_code = proc.wait()
+            if return_code != 0:
+                err = (stderr_text or "").strip()
+                raise RuntimeError(f"FFmpeg ошибка при рендере антимата: {err[-1200:]}")
+        finally:
+            try:
+                if proc.stdout:
+                    proc.stdout.close()
+                if proc.stderr:
+                    proc.stderr.close()
+            except Exception:
+                pass
 
     if progress_cb:
         progress_cb(100, f"Готово: {out}")

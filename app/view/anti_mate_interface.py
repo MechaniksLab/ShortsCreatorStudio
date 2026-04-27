@@ -10,12 +10,14 @@ from PyQt5.QtCore import Qt, QStandardPaths
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QFileDialog,
+    QHeaderView,
     QHBoxLayout,
     QLineEdit,
     QSizePolicy,
     QSpinBox,
     QTableWidget,
     QTableWidgetItem,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -58,17 +60,19 @@ class WordsEditDialog(MessageBoxBase):
         super().__init__(parent)
         self.titleLabel = BodyLabel(title, self)
         self.contentLabel = BodyLabel("По одному слову на строку или через запятую/точку с запятой", self)
-        self.edit = QLineEdit(self)
+        self.edit = QTextEdit(self)
         self.edit.setPlaceholderText(placeholder)
-        self.edit.setText(", ".join(words or []))
+        self.edit.setPlainText("\n".join(words or []))
+        self.edit.setMinimumHeight(220)
         self.viewLayout.addWidget(self.titleLabel)
         self.viewLayout.addWidget(self.contentLabel)
         self.viewLayout.addWidget(self.edit)
         self.yesButton.setText("Сохранить")
         self.cancelButton.setText("Отмена")
+        self.widget.setMinimumWidth(760)
 
     def get_words(self) -> List[str]:
-        parts = re.split(r"[\n,;]+", self.edit.text() or "")
+        parts = re.split(r"[\n,;]+", self.edit.toPlainText() or "")
         return [p.strip() for p in parts if p and p.strip()]
 
 
@@ -200,7 +204,7 @@ class AntiMateInterface(QWidget):
         self.llm_mode_combo = ComboBox(self)
         self.llm_mode_combo.addItems(["Гибрид: LLM + списки", "Только списки (без LLM)"])
         row1.addWidget(self.llm_mode_combo)
-        row1.addWidget(BodyLabel("Устройство ASR:"))
+        row1.addWidget(BodyLabel("Устройство (ASR + рендер):"))
         self.device_combo = ComboBox(self)
         self.device_combo.addItems(["GPU (CUDA)", "CPU"])
         current_dev = str(cfg.faster_whisper_device.value or "cuda").strip().lower()
@@ -335,7 +339,19 @@ class AntiMateInterface(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.table.setWordWrap(False)
+        self.table.setTextElideMode(Qt.ElideNone)
+        self.table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.table.setMinimumHeight(240)
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.Stretch)
+        header.setSectionResizeMode(4, QHeaderView.Stretch)
+        header.setSectionResizeMode(5, QHeaderView.ResizeToContents)
         lay.addWidget(self.table)
         row = QHBoxLayout()
         self.select_all_btn = PushButton("Выбрать все")
@@ -347,6 +363,13 @@ class AntiMateInterface(QWidget):
         row.addStretch(1)
         lay.addLayout(row)
         self.scroll_layout.addWidget(self.table_card)
+
+    def _update_table_height(self):
+        header_h = self.table.horizontalHeader().height() if self.table.horizontalHeader() else 28
+        rows_h = sum(self.table.rowHeight(r) for r in range(self.table.rowCount()))
+        frame_h = self.table.frameWidth() * 2
+        total_h = max(240, header_h + rows_h + frame_h + 8)
+        self.table.setFixedHeight(total_h)
 
     def _apply_theme_style(self):
         p = get_theme_palette()
@@ -664,6 +687,7 @@ class AntiMateInterface(QWidget):
         self.asr_json = {}
         self.regions = []
         self.table.setRowCount(0)
+        self._update_table_height()
         self._set_progress(0, "Файл выбран")
 
     def _resolve_llm_config(self) -> Dict[str, str]:
@@ -763,6 +787,7 @@ class AntiMateInterface(QWidget):
             mode_combo.setCurrentText(str(r.get("mode", "beep") or "beep"))
             self.table.setCellWidget(row, 5, mode_combo)
         self.table.resizeColumnsToContents()
+        self._update_table_height()
 
     def _set_all_region_checks(self, enabled: bool):
         for row in range(self.table.rowCount()):
@@ -807,7 +832,13 @@ class AntiMateInterface(QWidget):
         out_path = self._build_output_path()
         self._set_controls_enabled(False)
         self._set_progress(0, "Подготовка рендера")
-        self.render_thread = AntiMateRenderThread(self.video_path, out_path, enabled_regions)
+        render_device = "cuda" if self.device_combo.currentIndex() == 0 else "cpu"
+        self.render_thread = AntiMateRenderThread(
+            self.video_path,
+            out_path,
+            enabled_regions,
+            render_device=render_device,
+        )
         self.render_thread.beep_profile = str(self.beep_profile_combo.currentText() or "classic")
         self.render_thread.beep_frequency = int(self.beep_freq_spin.value())
         self.render_thread.beep_volume = float(self.beep_volume_spin.value()) / 100.0
