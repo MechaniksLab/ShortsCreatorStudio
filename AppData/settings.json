@@ -146,7 +146,7 @@
         "FishSpeechModelPath": "E:\\Neyro\\ShortsCreatorStudio\\AppData\\models\\fish_speech",
         "KeepBackgroundMusic": true,
         "LocalTTSEndpoint": "http://127.0.0.1:8020",
-        "ManualVoiceMapJson": "{\"spk_0\": \"17\", \"spk_1\": \"12\", \"spk_2\": \"11\", \"spk_3\": \"11\", \"default\": \"17\", \"__single_voice__\": \"0\"}",
+        "ManualVoiceMapJson": "{\"spk_0\": \"11\", \"spk_1\": \"16\", \"spk_2\": \"11\", \"spk_3\": \"11\", \"default\": \"11\", \"__single_voice__\": \"0\"}",
         "OpenVoiceModelPath": "E:\\Neyro\\ShortsCreatorStudio\\AppData\\models\\openvoice_v2",
         "OverlapAwareMix": true,
         "PreserveBackgroundLoudness": true,

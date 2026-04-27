@@ -5,6 +5,7 @@ from qfluentwidgets import SegmentedWidget
 from app.common.theme_manager import get_theme_palette
 from app.core.task_factory import TaskFactory
 from app.view.auto_shorts_interface import AutoShortsInterface
+from app.view.anti_mate_interface import AntiMateInterface
 from app.view.subtitle_interface import SubtitleInterface
 from app.view.task_creation_interface import TaskCreationInterface
 from app.view.transcription_interface import TranscriptionInterface
@@ -34,6 +35,7 @@ class HomeInterface(QWidget):
         self.subtitle_optimization_interface = SubtitleInterface(self)
         self.video_synthesis_interface = VideoSynthesisInterface(self)
         self.auto_shorts_interface = AutoShortsInterface(self)
+        self.anti_mate_interface = AntiMateInterface(self)
         self.video_translate_interface = VideoTranslateInterface(self)
 
         self.addSubInterface(
@@ -58,6 +60,11 @@ class HomeInterface(QWidget):
             self.video_synthesis_interface,
             "VideoSynthesisInterface",
             "Синтез видео с субтитрами",
+        )
+        self.addSubInterface(
+            self.anti_mate_interface,
+            "AntiMateInterface",
+            "Система Антимат",
         )
         self.addSubInterface(
             self.video_translate_interface,
@@ -133,6 +140,7 @@ class HomeInterface(QWidget):
         self.subtitle_optimization_interface.close()
         self.video_synthesis_interface.close()
         self.auto_shorts_interface.close()
+        self.anti_mate_interface.close()
         self.video_translate_interface.close()
         super().closeEvent(event)
 
