@@ -192,8 +192,10 @@ def detect_profanity_regions(
     if progress_cb:
         progress_cb(10, f"Слов с таймингами: {len(words)}")
 
-    forbidden = {_normalize_word(w) for w in (forced_forbidden_words or []) if _normalize_word(w)}
-    forbidden |= set(DEFAULT_FORBIDDEN_WORDS)
+    if forced_forbidden_words is None:
+        forbidden = set(DEFAULT_FORBIDDEN_WORDS)
+    else:
+        forbidden = {_normalize_word(w) for w in (forced_forbidden_words or []) if _normalize_word(w)}
     allowed = {_normalize_word(w) for w in (forced_allowed_words or []) if _normalize_word(w)}
 
     transcript = " ".join(str(w.get("word", "")) for w in words)
