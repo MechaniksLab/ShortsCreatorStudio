@@ -63,7 +63,7 @@
     "keep_aspect": true,
     "autonomous": false,
     "range_start_s": 0,
-    "range_end_s": 3179,
+    "range_end_s": 3820,
     "min_duration_s": 22,
     "max_duration_s": 110,
     "min_candidates": 40,
@@ -78,6 +78,10 @@
     "filename_include_quality": true,
     "filename_include_score": true,
     "filename_include_hook": false,
-    "filename_include_grade": false
+    "filename_include_grade": false,
+    "candidate_table_sort": {
+      "column": 1,
+      "order": 0
+    }
   }
 }

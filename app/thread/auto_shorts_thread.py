@@ -391,6 +391,7 @@ class AutoShortsCandidateThread(QThread):
         auto_filter_profile: str = "balanced",
         interest_threshold_percent: int = 52,
         llm_search_intensity: int = 3,
+        use_candidates_cache: bool = True,
     ):
         super().__init__()
         self.asr_payload = asr_payload or {}
@@ -404,12 +405,21 @@ class AutoShortsCandidateThread(QThread):
         self.auto_filter_profile = profile if profile in {"soft", "balanced", "strict"} else "balanced"
         self.interest_threshold_percent = max(30, min(95, int(interest_threshold_percent or 52)))
         self.llm_search_intensity = max(1, min(5, int(llm_search_intensity or 3)))
+        self.use_candidates_cache = bool(use_candidates_cache)
 
     def run(self):
         try:
             asr_json = self.asr_payload.get("asr_json")
             if not asr_json:
                 raise RuntimeError("Нет данных Whisper. Сначала выполните этап распознавания")
+
+            cache_key = self._build_candidates_cache_key(asr_json)
+            if self.use_candidates_cache:
+                cached = self._load_candidates_cache(cache_key)
+                if cached is not None:
+                    self.progress.emit(100, f"Кандидаты загружены из кэша: {len(cached)}")
+                    self.finished.emit(cached)
+                    return
 
             self.progress.emit(5, "Подготовка данных ASR...")
             asr_data = ASRData.from_json(asr_json)
@@ -447,11 +457,64 @@ class AutoShortsCandidateThread(QThread):
                             for a, b in c.speech_ranges
                         ]
 
+            result = [c.to_dict() for c in candidates]
+            if self.use_candidates_cache:
+                self._save_candidates_cache(cache_key, result)
+
             self.progress.emit(100, f"Кандидаты готовы: {len(candidates)}")
-            self.finished.emit([c.to_dict() for c in candidates])
+            self.finished.emit(result)
         except Exception as e:
             logger.exception("Auto shorts candidate selection failed: %s", e)
             self.error.emit(str(e))
+
+    @staticmethod
+    def _candidate_cache_dir() -> Path:
+        p = CACHE_PATH / "auto_shorts_candidates"
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
+    def _build_candidates_cache_key(self, asr_json: Dict) -> str:
+        payload = {
+            "v": 1,
+            "asr": asr_json,
+            "source_offset_ms": int(self.asr_payload.get("source_offset_ms", 0) or 0),
+            "min_duration_s": int(self.min_duration_s),
+            "max_duration_s": int(self.max_duration_s),
+            "repeat_similarity_percent": int(self.repeat_similarity_percent),
+            "min_candidates": int(self.min_candidates),
+            "max_candidates": int(self.max_candidates),
+            "auto_filter_weak_candidates": bool(self.auto_filter_weak_candidates),
+            "auto_filter_profile": str(self.auto_filter_profile),
+            "interest_threshold_percent": int(self.interest_threshold_percent),
+            "llm_search_intensity": int(self.llm_search_intensity),
+        }
+        raw = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+        return hashlib.sha1(raw.encode("utf-8", errors="ignore")).hexdigest()
+
+    def _load_candidates_cache(self, cache_key: str):
+        path = self._candidate_cache_dir() / f"{cache_key}.json"
+        if not path.exists():
+            return None
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            candidates = data.get("candidates") if isinstance(data, dict) else None
+            if not isinstance(candidates, list):
+                return None
+            return candidates
+        except Exception as e:
+            logger.warning("AutoShorts candidates cache read failed: %s", e)
+            return None
+
+    def _save_candidates_cache(self, cache_key: str, candidates: List[Dict]):
+        path = self._candidate_cache_dir() / f"{cache_key}.json"
+        try:
+            payload = {
+                "version": 1,
+                "candidates": candidates,
+            }
+            path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+        except Exception as e:
+            logger.warning("AutoShorts candidates cache write failed: %s", e)
 
 
 class AutoShortsRenderThread(QThread):
@@ -519,4 +582,54 @@ class AutoShortsRenderThread(QThread):
             self.finished.emit(result)
         except Exception as e:
             logger.exception("Auto shorts render failed: %s", e)
+            self.error.emit(str(e))
+
+
+class AutoShortsSinglePreviewThread(QThread):
+    finished = pyqtSignal(str)
+    error = pyqtSignal(str)
+
+    def __init__(
+        self,
+        video_path: str,
+        candidate: Dict,
+        output_dir: str,
+        layout_template: Dict = None,
+        render_backend: str = "auto",
+        render_options: Dict = None,
+    ):
+        super().__init__()
+        self.video_path = video_path
+        self.candidate = dict(candidate or {})
+        self.output_dir = output_dir
+        self.layout_template = layout_template or {}
+        self.render_backend = (render_backend or "auto").strip().lower()
+        self.render_options = render_options or {}
+
+    def run(self):
+        try:
+            c = self.candidate
+            candidate = ShortCandidate(
+                start_ms=int(c["start_ms"]),
+                end_ms=int(c["end_ms"]),
+                score=float(c.get("score", 0.0) or 0.0),
+                title=str(c.get("title", "") or "preview"),
+                reason=str(c.get("reason", "") or "preview"),
+                excerpt=str(c.get("excerpt", "") or "preview"),
+                viral_title=str(c.get("viral_title", "") or "preview"),
+                speech_ranges=c.get("speech_ranges") or [],
+            )
+            files = render_shorts(
+                input_video=self.video_path,
+                candidates=[candidate],
+                output_dir=self.output_dir,
+                layout_template=self.layout_template,
+                render_backend=self.render_backend,
+                render_options=self.render_options,
+            )
+            if not files:
+                raise RuntimeError("Не удалось собрать предпросмотр")
+            self.finished.emit(str(files[0]))
+        except Exception as e:
+            logger.exception("Auto shorts preview failed: %s", e)
             self.error.emit(str(e))

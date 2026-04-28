@@ -28,6 +28,7 @@ from app.common.config import cfg
 from app.common.theme_manager import get_theme_palette
 from app.config import APPDATA_PATH, WORK_PATH
 from app.core.entities import BatchTaskType, SupportedAudioFormats, SupportedVideoFormats
+from app.core.shorts import ShortCandidate, render_shorts
 from app.core.task_factory import TaskFactory
 
 
@@ -373,6 +374,104 @@ class TimeRangeSlider(QWidget):
         p.drawEllipse(QPointF(ex, tr.center().y()), r, r)
 
 
+class CandidateTimelineWidget(QWidget):
+    candidateClicked = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumHeight(74)
+        self.duration_ms = 1
+        self.items: List[Dict] = []
+        self.selected_index = -1
+
+    def set_data(self, duration_ms: int, items: List[Dict], selected_index: int = -1):
+        self.duration_ms = max(1, int(duration_ms or 1))
+        self.items = list(items or [])
+        self.selected_index = int(selected_index)
+        self.update()
+
+    def _track_rect(self) -> QRect:
+        return QRect(12, 18, max(30, self.width() - 24), 36)
+
+    def _x_from_ms(self, ms: int) -> int:
+        tr = self._track_rect()
+        ratio = max(0.0, min(1.0, float(ms) / float(self.duration_ms)))
+        return tr.x() + int(round(ratio * tr.width()))
+
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        tr = self._track_rect()
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(120, 120, 120, 60))
+        p.drawRoundedRect(tr, 5, 5)
+
+        for idx, it in enumerate(self.items):
+            st = max(0, int(it.get("start_ms", 0) or 0))
+            ed = max(st + 1, int(it.get("end_ms", st + 1) or (st + 1)))
+            x1 = self._x_from_ms(st)
+            x2 = self._x_from_ms(ed)
+            w = max(3, x2 - x1)
+            r = QRect(x1, tr.y() + 5, w, tr.height() - 10)
+            is_selected = idx == self.selected_index
+            color = QColor(59, 130, 246, 220) if is_selected else QColor(16, 185, 129, 170)
+            p.setBrush(color)
+            p.drawRoundedRect(r, 4, 4)
+
+        p.setPen(QPen(QColor(180, 180, 180), 1))
+        p.drawText(12, 12, "00:00")
+        end_s = int(self.duration_ms // 1000)
+        h = end_s // 3600
+        m = (end_s % 3600) // 60
+        s = end_s % 60
+        p.drawText(self.width() - 86, 12, f"{h:02}:{m:02}:{s:02}")
+
+    def mousePressEvent(self, event):
+        if not self.items:
+            return
+        x = event.pos().x()
+        best_idx = -1
+        best_dist = 10**9
+        for idx, it in enumerate(self.items):
+            st = max(0, int(it.get("start_ms", 0) or 0))
+            ed = max(st + 1, int(it.get("end_ms", st + 1) or (st + 1)))
+            x1 = self._x_from_ms(st)
+            x2 = self._x_from_ms(ed)
+            if x1 <= x <= x2:
+                best_idx = idx
+                break
+            dist = min(abs(x - x1), abs(x - x2))
+            if dist < best_dist:
+                best_dist = dist
+                best_idx = idx
+        if best_idx >= 0:
+            self.selected_index = best_idx
+            self.candidateClicked.emit(best_idx)
+            self.update()
+
+
+class SortableTableWidgetItem(QTableWidgetItem):
+    """QTableWidgetItem с корректной сортировкой по числовому ключу."""
+
+    SORT_ROLE = Qt.UserRole + 100
+
+    def __init__(self, text: str, sort_value=None):
+        super().__init__(text)
+        if sort_value is not None:
+            self.setData(self.SORT_ROLE, sort_value)
+
+    def __lt__(self, other):
+        if isinstance(other, QTableWidgetItem):
+            a = self.data(self.SORT_ROLE)
+            b = other.data(self.SORT_ROLE)
+            if a is not None and b is not None:
+                try:
+                    return a < b
+                except Exception:
+                    pass
+        return super().__lt__(other)
+
+
 class AutoShortsInterface(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -397,6 +496,9 @@ class AutoShortsInterface(QWidget):
         self._autonomous_run = False
         self._active_progress_stage = 0
         self._fx_layer_cache: Dict[tuple, QPixmap] = {}
+        self._selected_candidate_row: int = -1
+        self._preview_thread = None
+        self._preview_in_progress = False
 
         self._fx_preview_timer = QTimer(self)
         self._fx_preview_timer.setSingleShot(True)
@@ -643,6 +745,13 @@ class AutoShortsInterface(QWidget):
             "Автоматически убирает слабые моменты с низким качеством/хуком и длинными паузами"
         )
         filter_row.addWidget(self.auto_filter_weak_checkbox)
+        self.cache_candidates_checkbox = CheckBox("Кэшировать кандидатов (без повторного LLM)")
+        self.cache_candidates_checkbox.setChecked(True)
+        self.cache_candidates_checkbox.setToolTip(
+            "Если включено, результаты этапа 2 будут сохраняться и переиспользоваться\n"
+            "при тех же ASR-данных и тех же параметрах отбора."
+        )
+        filter_row.addWidget(self.cache_candidates_checkbox)
         filter_row.addStretch(1)
         stage2_layout.addLayout(filter_row)
 
@@ -1042,11 +1151,12 @@ class AutoShortsInterface(QWidget):
         stage3_layout.addWidget(StrongBodyLabel("Этап 3: Проверка и ручной выбор кандидатов"))
 
         self.table = QTableWidget(self)
-        self.table.setColumnCount(11)
+        self.table.setColumnCount(12)
         self.table.setHorizontalHeaderLabels(
             [
                 "Выбрать",
                 "Таймкод",
+                "Речь-only",
                 "Длит.",
                 "Score",
                 "Q",
@@ -1064,7 +1174,33 @@ class AutoShortsInterface(QWidget):
         self.table.setAlternatingRowColors(False)
         self.table.verticalHeader().setDefaultSectionSize(64)
         self.table.setSortingEnabled(True)
+        self.table.itemSelectionChanged.connect(self._on_candidate_table_selection_changed)
         stage3_layout.addWidget(self.table)
+
+        self.candidate_timeline = CandidateTimelineWidget(self)
+        self.candidate_timeline.candidateClicked.connect(self._on_timeline_candidate_clicked)
+        stage3_layout.addWidget(self.candidate_timeline)
+
+        edit_row = QHBoxLayout()
+        edit_row.addWidget(BodyLabel("Старт (сек):"))
+        self.cand_start_spin = SpinBox(self)
+        self.cand_start_spin.setRange(0, 24 * 3600)
+        edit_row.addWidget(self.cand_start_spin)
+        edit_row.addWidget(BodyLabel("Финиш (сек):"))
+        self.cand_end_spin = SpinBox(self)
+        self.cand_end_spin.setRange(1, 24 * 3600)
+        edit_row.addWidget(self.cand_end_spin)
+        self.cand_trim_speech_check = CheckBox("Вырезать неречевые сегменты", self)
+        edit_row.addWidget(self.cand_trim_speech_check)
+        self.preview_candidate_btn = PushButton("Предпросмотр выбранного шортса")
+        self.preview_candidate_btn.clicked.connect(self._preview_selected_candidate)
+        edit_row.addWidget(self.preview_candidate_btn)
+        edit_row.addStretch(1)
+        stage3_layout.addLayout(edit_row)
+
+        self.cand_start_spin.valueChanged.connect(self._on_candidate_editor_changed)
+        self.cand_end_spin.valueChanged.connect(self._on_candidate_editor_changed)
+        self.cand_trim_speech_check.stateChanged.connect(self._on_candidate_editor_changed)
         self.main_layout.addWidget(self.stage3_card)
 
         # Монтаж применяется именно на этапе рендера,
@@ -1476,6 +1612,7 @@ class AutoShortsInterface(QWidget):
             self.asr_payload = {}
             self.candidates = []
             self.table.setRowCount(0)
+            self.candidate_timeline.set_data(1, [], -1)
             self._update_llm_token_estimate()
             self._set_stage(1)
             self._sync_range_with_video_duration(file_path)
@@ -1695,6 +1832,7 @@ class AutoShortsInterface(QWidget):
             auto_filter_profile=self._auto_filter_profile_value(),
             interest_threshold_percent=self.interest_threshold_spin.value(),
             llm_search_intensity=self.llm_search_intensity_spin.value(),
+            use_candidates_cache=bool(self.cache_candidates_checkbox.isChecked()),
         )
         self.candidate_thread.progress.connect(self._on_progress)
         self.candidate_thread.finished.connect(self._on_candidate_selection_finished)
@@ -1707,6 +1845,10 @@ class AutoShortsInterface(QWidget):
         self.run_all_btn.setEnabled(True)
         self.render_btn.setEnabled(True)
         self.candidates = candidates
+        for c in self.candidates:
+            c["manual_start_ms"] = int(c.get("start_ms", 0) or 0)
+            c["manual_end_ms"] = int(c.get("end_ms", 0) or 0)
+            c["trim_non_speech"] = True
         self._fill_table(candidates)
         self._set_stage(3)
         self._set_stage_progress(100, f"Этап 2 завершён. Найдено кандидатов: {len(candidates)}")
@@ -1735,22 +1877,35 @@ class AutoShortsInterface(QWidget):
             cb.setChecked(True)
             self.table.setCellWidget(row, 0, cb)
 
-            start_s = int(c["start_ms"] // 1000)
-            end_s = int(c["end_ms"] // 1000)
-            timerange = f"{self._fmt_s(start_s)} - {self._fmt_s(end_s)}"
-            duration = f"{(c['end_ms'] - c['start_ms']) / 1000:.1f}с"
+            trim_cb = CheckBox("", self)
+            trim_cb.setChecked(bool(c.get("trim_non_speech", True)))
+            trim_cb.stateChanged.connect(lambda _v, r=row: self._on_table_trim_changed(r))
+            self.table.setCellWidget(row, 2, trim_cb)
 
-            timerange_item = QTableWidgetItem(timerange)
+            start_ms = int(c.get("manual_start_ms", c.get("start_ms", 0)) or 0)
+            end_ms = int(c.get("manual_end_ms", c.get("end_ms", 0)) or 0)
+            start_s = int(start_ms // 1000)
+            end_s = int(end_ms // 1000)
+            timerange = f"{self._fmt_s(start_s)} - {self._fmt_s(end_s)}"
+            duration = f"{max(0, end_ms - start_ms) / 1000:.1f}с"
+
+            timerange_item = SortableTableWidgetItem(timerange, start_ms)
             timerange_item.setData(Qt.UserRole, int(row))
             self.table.setItem(row, 1, timerange_item)
-            self.table.setItem(row, 2, QTableWidgetItem(duration))
-            self.table.setItem(row, 3, QTableWidgetItem(str(c.get("score", ""))))
-            self.table.setItem(row, 4, QTableWidgetItem(str(c.get("quality_score", ""))))
-            self.table.setItem(row, 5, QTableWidgetItem(str(c.get("quality_grade", ""))))
-            self.table.setItem(row, 6, QTableWidgetItem(str(c.get("hook_score", ""))))
-            self.table.setItem(row, 7, QTableWidgetItem(str(c.get("pause_ratio", ""))))
-            self.table.setItem(row, 8, QTableWidgetItem(str(c.get("title", ""))))
-            self.table.setItem(row, 9, QTableWidgetItem(str(c.get("viral_title", ""))))
+            self.table.setItem(row, 3, SortableTableWidgetItem(duration, max(0, end_ms - start_ms)))
+
+            score_v = float(c.get("score", 0.0) or 0.0)
+            quality_v = float(c.get("quality_score", 0.0) or 0.0)
+            hook_v = float(c.get("hook_score", 0.0) or 0.0)
+            pause_v = float(c.get("pause_ratio", 0.0) or 0.0)
+
+            self.table.setItem(row, 4, SortableTableWidgetItem(str(c.get("score", "")), score_v))
+            self.table.setItem(row, 5, SortableTableWidgetItem(str(c.get("quality_score", "")), quality_v))
+            self.table.setItem(row, 6, QTableWidgetItem(str(c.get("quality_grade", ""))))
+            self.table.setItem(row, 7, SortableTableWidgetItem(str(c.get("hook_score", "")), hook_v))
+            self.table.setItem(row, 8, SortableTableWidgetItem(str(c.get("pause_ratio", "")), pause_v))
+            self.table.setItem(row, 9, QTableWidgetItem(str(c.get("title", ""))))
+            self.table.setItem(row, 10, QTableWidgetItem(str(c.get("viral_title", ""))))
             info_text = str(c.get("reason", ""))
             excerpt = str(c.get("excerpt", ""))
             tags = c.get("explainability_tags") or []
@@ -1758,7 +1913,7 @@ class AutoShortsInterface(QWidget):
                 info_text = f"{info_text}\nТеги: {', '.join(str(t) for t in tags)}"
             if excerpt:
                 info_text = f"{info_text}\n{excerpt}"
-            self.table.setItem(row, 10, QTableWidgetItem(info_text))
+            self.table.setItem(row, 11, QTableWidgetItem(info_text))
 
             row_bg = bg_even if row % 2 == 0 else bg_odd
             for col in range(1, self.table.columnCount()):
@@ -1768,22 +1923,24 @@ class AutoShortsInterface(QWidget):
                     item.setBackground(row_bg)
 
         self.table.resizeColumnsToContents()
-        self.table.setColumnWidth(10, max(420, self.table.columnWidth(10)))
+        self.table.setColumnWidth(11, max(420, self.table.columnWidth(11)))
         self.table.setSortingEnabled(True)
+        self._refresh_candidate_timeline()
 
     def _apply_candidates_table_tooltips(self):
         tips = {
             0: "Отметка, какие кандидаты отправлять в рендер.",
             1: "Таймкод начала и конца фрагмента в исходном видео.",
-            2: "Длительность фрагмента.",
-            3: "Score: базовая оценка кандидата (до финального quality-ранжирования).",
-            4: "Q: итоговая оценка интереса/качества (0..100), основной ориентир для отбора.",
-            5: "Grade: буквенная категория качества (A — лучший, D — слабый).",
-            6: "Hook: сила захвата внимания в начале фрагмента (0..10).",
-            7: "Pause: доля пауз/тишины внутри кандидата (меньше — обычно лучше).",
-            8: "Развёрнутый описательный заголовок содержания фрагмента.",
-            9: "Краткий вирусный заголовок для YouTube Shorts (используется и в именах файлов).",
-            10: "Почему кандидат был выбран: причина + теги + фрагмент текста.",
+            2: "Если включено — в итоговом рендере внутри кандидата вырезаются неречевые фрагменты.",
+            3: "Длительность фрагмента.",
+            4: "Score: базовая оценка кандидата (до финального quality-ранжирования).",
+            5: "Q: итоговая оценка интереса/качества (0..100), основной ориентир для отбора.",
+            6: "Grade: буквенная категория качества (A — лучший, D — слабый).",
+            7: "Hook: сила захвата внимания в начале фрагмента (0..10).",
+            8: "Pause: доля пауз/тишины внутри кандидата (меньше — обычно лучше).",
+            9: "Развёрнутый описательный заголовок содержания фрагмента.",
+            10: "Краткий вирусный заголовок для YouTube Shorts (используется и в именах файлов).",
+            11: "Почему кандидат был выбран: причина + теги + фрагмент текста.",
         }
         for idx, tip in tips.items():
             item = self.table.horizontalHeaderItem(idx)
@@ -1802,8 +1959,184 @@ class AutoShortsInterface(QWidget):
             except Exception:
                 src_idx = row
             if 0 <= src_idx < len(self.candidates):
-                selected.append(self.candidates[src_idx])
+                c = dict(self.candidates[src_idx])
+                c["start_ms"] = int(c.get("manual_start_ms", c.get("start_ms", 0)) or 0)
+                c["end_ms"] = int(c.get("manual_end_ms", c.get("end_ms", 0)) or 0)
+                if not bool(c.get("trim_non_speech", True)):
+                    c["speech_ranges"] = []
+                selected.append(c)
         return selected
+
+    def _refresh_candidate_timeline(self):
+        duration_ms = max(1, int(self.video_duration_s * 1000))
+        items = []
+        for c in self.candidates:
+            items.append(
+                {
+                    "start_ms": int(c.get("manual_start_ms", c.get("start_ms", 0)) or 0),
+                    "end_ms": int(c.get("manual_end_ms", c.get("end_ms", 0)) or 0),
+                }
+            )
+        self.candidate_timeline.set_data(duration_ms, items, self._selected_candidate_row)
+
+    def _on_candidate_table_selection_changed(self):
+        row = self.table.currentRow()
+        if row < 0:
+            return
+        idx_item = self.table.item(row, 1)
+        src_idx = int(idx_item.data(Qt.UserRole)) if idx_item else row
+        if not (0 <= src_idx < len(self.candidates)):
+            return
+        self._selected_candidate_row = src_idx
+        c = self.candidates[src_idx]
+        self.cand_start_spin.blockSignals(True)
+        self.cand_end_spin.blockSignals(True)
+        self.cand_trim_speech_check.blockSignals(True)
+        self.cand_start_spin.setValue(max(0, int(c.get("manual_start_ms", c.get("start_ms", 0)) // 1000)))
+        self.cand_end_spin.setValue(max(1, int(c.get("manual_end_ms", c.get("end_ms", 0)) // 1000)))
+        self.cand_trim_speech_check.setChecked(bool(c.get("trim_non_speech", True)))
+        self.cand_start_spin.blockSignals(False)
+        self.cand_end_spin.blockSignals(False)
+        self.cand_trim_speech_check.blockSignals(False)
+        self._refresh_candidate_timeline()
+
+    def _on_timeline_candidate_clicked(self, idx: int):
+        if not (0 <= idx < len(self.candidates)):
+            return
+        self._selected_candidate_row = idx
+        for row in range(self.table.rowCount()):
+            idx_item = self.table.item(row, 1)
+            src_idx = int(idx_item.data(Qt.UserRole)) if idx_item else row
+            if src_idx == idx:
+                self.table.selectRow(row)
+                break
+        self._on_candidate_table_selection_changed()
+
+    def _on_candidate_editor_changed(self, _value=None):
+        idx = self._selected_candidate_row
+        if not (0 <= idx < len(self.candidates)):
+            return
+        start_s = int(self.cand_start_spin.value())
+        end_s = int(self.cand_end_spin.value())
+        if end_s <= start_s:
+            end_s = start_s + 1
+            self.cand_end_spin.blockSignals(True)
+            self.cand_end_spin.setValue(end_s)
+            self.cand_end_spin.blockSignals(False)
+        c = self.candidates[idx]
+        c["manual_start_ms"] = int(start_s * 1000)
+        c["manual_end_ms"] = int(end_s * 1000)
+        c["trim_non_speech"] = bool(self.cand_trim_speech_check.isChecked())
+        self._update_candidate_row_ui(idx)
+        self._refresh_candidate_timeline()
+        self._seek_preview_to_candidate_start(idx)
+
+    def _seek_preview_to_candidate_start(self, idx: int):
+        if not (0 <= idx < len(self.candidates)):
+            return
+        if not self.video_path or not Path(self.video_path).exists():
+            return
+        c = self.candidates[idx]
+        seek_s = max(0, int(c.get("manual_start_ms", c.get("start_ms", 0)) // 1000))
+        self.preview_time_s.blockSignals(True)
+        self.preview_time_s.setValue(seek_s)
+        self.preview_time_s.blockSignals(False)
+        self._load_source_preview_frame(self.video_path, seek_s)
+
+    def _find_table_row_by_src_idx(self, src_idx: int) -> int:
+        for row in range(self.table.rowCount()):
+            idx_item = self.table.item(row, 1)
+            row_src = int(idx_item.data(Qt.UserRole)) if idx_item else row
+            if row_src == src_idx:
+                return row
+        return -1
+
+    def _update_candidate_row_ui(self, src_idx: int):
+        row = self._find_table_row_by_src_idx(src_idx)
+        if row < 0 or not (0 <= src_idx < len(self.candidates)):
+            return
+        c = self.candidates[src_idx]
+        start_ms = int(c.get("manual_start_ms", c.get("start_ms", 0)) or 0)
+        end_ms = int(c.get("manual_end_ms", c.get("end_ms", 0)) or 0)
+        start_s = int(start_ms // 1000)
+        end_s = int(end_ms // 1000)
+        timerange = f"{self._fmt_s(start_s)} - {self._fmt_s(end_s)}"
+        duration = f"{max(0, end_ms - start_ms) / 1000:.1f}с"
+
+        tr_item = self.table.item(row, 1)
+        if tr_item:
+            tr_item.setText(timerange)
+        dur_item = self.table.item(row, 3)
+        if dur_item:
+            dur_item.setText(duration)
+
+        trim_cb = self.table.cellWidget(row, 2)
+        if trim_cb:
+            trim_cb.blockSignals(True)
+            trim_cb.setChecked(bool(c.get("trim_non_speech", True)))
+            trim_cb.blockSignals(False)
+
+    def _on_table_trim_changed(self, row: int):
+        if not (0 <= row < self.table.rowCount()):
+            return
+        idx_item = self.table.item(row, 1)
+        src_idx = int(idx_item.data(Qt.UserRole)) if idx_item else row
+        if not (0 <= src_idx < len(self.candidates)):
+            return
+        cb = self.table.cellWidget(row, 2)
+        self.candidates[src_idx]["trim_non_speech"] = bool(cb.isChecked()) if cb else True
+        if src_idx == self._selected_candidate_row:
+            self.cand_trim_speech_check.blockSignals(True)
+            self.cand_trim_speech_check.setChecked(bool(self.candidates[src_idx].get("trim_non_speech", True)))
+            self.cand_trim_speech_check.blockSignals(False)
+
+    def _preview_selected_candidate(self):
+        from app.thread.auto_shorts_thread import AutoShortsSinglePreviewThread
+
+        idx = self._selected_candidate_row
+        if not (0 <= idx < len(self.candidates)):
+            InfoBar.warning("Предпросмотр", "Сначала выберите кандидата в таблице/таймлайне", duration=2200, position=InfoBarPosition.TOP, parent=self)
+            return
+        if not self.video_path or not Path(self.video_path).exists():
+            return
+        c = dict(self.candidates[idx])
+        c["start_ms"] = int(c.get("manual_start_ms", c.get("start_ms", 0)) or 0)
+        c["end_ms"] = int(c.get("manual_end_ms", c.get("end_ms", 0)) or 0)
+        if c["end_ms"] <= c["start_ms"]:
+            InfoBar.warning("Предпросмотр", "Некорректные границы: финиш должен быть больше старта", duration=2400, position=InfoBarPosition.TOP, parent=self)
+            return
+        if not bool(c.get("trim_non_speech", True)):
+            c["speech_ranges"] = []
+
+        preview_dir = Path(tempfile.mkdtemp(prefix="shorts_preview_"))
+        if self._preview_in_progress or (self._preview_thread and self._preview_thread.isRunning()):
+            InfoBar.warning("Предпросмотр", "Предыдущий предпросмотр ещё рендерится", duration=1800, position=InfoBarPosition.TOP, parent=self)
+            return
+        self._preview_in_progress = True
+        InfoBar.info("Предпросмотр", "Готовлю предпросмотр с текущими настройками...", duration=1800, position=InfoBarPosition.TOP, parent=self)
+        self._preview_thread = AutoShortsSinglePreviewThread(
+            video_path=self.video_path,
+            candidate=c,
+            output_dir=str(preview_dir),
+            layout_template=self._build_layout_template(),
+            render_backend=self._get_render_backend(),
+            render_options=self._build_render_options(),
+        )
+        self._preview_thread.finished.connect(self._on_preview_ready)
+        self._preview_thread.error.connect(self._on_preview_error)
+        self._preview_thread.finished.connect(lambda _p: setattr(self, "_preview_in_progress", False))
+        self._preview_thread.error.connect(lambda _e: setattr(self, "_preview_in_progress", False))
+        self._preview_thread.start()
+
+    def _on_preview_ready(self, file_path: str):
+        try:
+            if file_path and Path(file_path).exists() and sys.platform == "win32":
+                os.startfile(str(file_path))
+        except Exception:
+            pass
+
+    def _on_preview_error(self, message: str):
+        InfoBar.error("Предпросмотр", f"Ошибка предпросмотра: {message}", duration=3200, position=InfoBarPosition.TOP, parent=self)
 
     def _start_render(self, autonomous: bool = None):
         from app.thread.auto_shorts_thread import AutoShortsRenderThread
@@ -2008,8 +2341,38 @@ class AutoShortsInterface(QWidget):
                 "filename_include_score": bool(self.filename_include_score_checkbox.isChecked()),
                 "filename_include_hook": bool(self.filename_include_hook_checkbox.isChecked()),
                 "filename_include_grade": bool(self.filename_include_grade_checkbox.isChecked()),
+                "candidate_table_sort": self._get_candidate_table_sort_state(),
             },
         }
+
+    def _get_candidate_table_sort_state(self) -> Dict[str, int]:
+        if not hasattr(self, "table"):
+            return {"column": 1, "order": int(Qt.AscendingOrder)}
+        header = self.table.horizontalHeader()
+        try:
+            col = int(header.sortIndicatorSection())
+            order = int(header.sortIndicatorOrder())
+        except Exception:
+            col = 1
+            order = int(Qt.AscendingOrder)
+        if col < 0:
+            col = 1
+        return {"column": col, "order": order}
+
+    def _apply_candidate_table_sort_state(self, sort_state: Dict):
+        if not hasattr(self, "table"):
+            return
+        if not isinstance(sort_state, dict):
+            return
+        try:
+            col = int(sort_state.get("column", 1))
+            order_raw = int(sort_state.get("order", int(Qt.AscendingOrder)))
+        except Exception:
+            return
+        if not (0 <= col < self.table.columnCount()):
+            col = 1
+        order = Qt.DescendingOrder if order_raw == int(Qt.DescendingOrder) else Qt.AscendingOrder
+        self.table.sortItems(col, order)
 
     def _reset_layout_template(self):
         self.source_preview.set_layers(
@@ -2335,6 +2698,7 @@ class AutoShortsInterface(QWidget):
                     self.selected_end_s = max(self.selected_start_s + 1, loaded_end)
                     self.range_slider.set_values(self.selected_start_s, self.selected_end_s, emit_signal=False)
                     self._update_range_labels()
+                    self._apply_candidate_table_sort_state(ui_settings.get("candidate_table_sort", {}))
                 except Exception:
                     pass
 
