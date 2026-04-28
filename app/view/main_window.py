@@ -27,7 +27,7 @@ from app.view.setting_interface import SettingInterface
 from app.view.subtitle_style_interface import SubtitleStyleInterface
 
 LOGO_PATH = APP_ICON_PATH
-APP_WINDOW_TITLE_RU = "MechaniksLab ContentCreatorAIStudio"
+APP_WINDOW_TITLE_RU = "Лаборатория Механика - ИИ Студия Создания Контента"
 
 
 def _contains_cjk_text(text: str) -> bool:
