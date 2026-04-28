@@ -2,17 +2,17 @@ import logging
 import os
 from pathlib import Path
 
-VERSION = "v1.5.0"
+VERSION = "v1.7.0"
 YEAR = 2026
-APP_NAME = "MechaniksLab Creator Studio"
+APP_NAME = "MechaniksLab ContentCreatorAIStudio"
 AUTHOR = "MechaniksLab"
 
-HELP_URL = "https://github.com/MechaniksLab/ShortsCreatorStudio"
-GITHUB_REPO_URL = "https://github.com/MechaniksLab/ShortsCreatorStudio"
-RELEASE_URL = "https://github.com/MechaniksLab/ShortsCreatorStudio/releases/latest"
-FEEDBACK_URL = "https://github.com/MechaniksLab/ShortsCreatorStudio/issues"
+HELP_URL = "https://github.com/MechaniksLab/ContentCreatorAIStudio"
+GITHUB_REPO_URL = "https://github.com/MechaniksLab/ContentCreatorAIStudio"
+RELEASE_URL = "https://github.com/MechaniksLab/ContentCreatorAIStudio/releases/latest"
+FEEDBACK_URL = "https://github.com/MechaniksLab/ContentCreatorAIStudio/issues"
 UPDATE_REPO_OWNER = "MechaniksLab"
-UPDATE_REPO_NAME = "ShortsCreatorStudio"
+UPDATE_REPO_NAME = "ContentCreatorAIStudio"
 UPDATE_REPO_BRANCH = "master"
 
 # 路径

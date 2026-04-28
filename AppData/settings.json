@@ -60,7 +60,7 @@
         "CheckUpdateAtStartUp": true,
         "LastKnownCommit": "c44ef5dee20f2cb60813ecd2b907301107254aa3",
         "RepoBranch": "main",
-        "RepoName": "ShortsCreatorStudio",
+        "RepoName": "ContentCreatorAIStudio",
         "RepoOwner": "MechaniksLab"
     },
     "Subtitle": {
@@ -110,7 +110,7 @@
         "MotionEasing": "ease_out",
         "MotionJitter": 6,
         "PreviewCustomText": "Мой текст для предпросмотра интерполяция синхрофазотрон",
-        "PreviewImage": "E:\\Neyro\\ShortsCreatorStudio\\resource\\assets\\default_bg_portrait.png",
+        "PreviewImage": "E:\\Neyro\\ContentCreatorAIStudio\\resource\\assets\\default_bg_portrait.png",
         "PreviewLiveDurationMs": 3000,
         "RainbowEndColor": "#4ca6ff",
         "SafeAreaEnabled": true,
@@ -143,11 +143,11 @@
         "EnableLipsync": false,
         "EnableSourceSeparation": true,
         "ExpectedSpeakerCount": 4,
-        "FishSpeechModelPath": "E:\\Neyro\\ShortsCreatorStudio\\AppData\\models\\fish_speech",
+        "FishSpeechModelPath": "E:\\Neyro\\ContentCreatorAIStudio\\AppData\\models\\fish_speech",
         "KeepBackgroundMusic": true,
         "LocalTTSEndpoint": "http://127.0.0.1:8020",
         "ManualVoiceMapJson": "{\"spk_0\": \"11\", \"spk_1\": \"16\", \"spk_2\": \"11\", \"spk_3\": \"11\", \"default\": \"11\", \"__single_voice__\": \"0\"}",
-        "OpenVoiceModelPath": "E:\\Neyro\\ShortsCreatorStudio\\AppData\\models\\openvoice_v2",
+        "OpenVoiceModelPath": "E:\\Neyro\\ContentCreatorAIStudio\\AppData\\models\\openvoice_v2",
         "OverlapAwareMix": true,
         "PreserveBackgroundLoudness": true,
         "ReferenceEnhancementEnabled": true,
@@ -165,7 +165,7 @@
         "RVCPassthroughChunkMaxGapMs": 320,
         "RVCPassthroughPostPadMs": 160,
         "RVCProtect": 0.33,
-        "RVCRuntimePython": "E:\\Neyro\\ShortsCreatorStudio\\runtime_rvc\\Scripts\\python.exe",
+        "RVCRuntimePython": "E:\\Neyro\\ContentCreatorAIStudio\\runtime_rvc\\Scripts\\python.exe",
         "ScheduleEffectiveDurationExtraMs": 420,
         "ScheduleMaxShiftMs": 520,
         "ScheduleMinGapMs": 6,
@@ -195,7 +195,7 @@
         "VoiceProvider": "rvc",
         "VoiceQuality": "studio",
         "VoiceReferenceMode": "auto",
-        "XTTSModelPath": "E:\\Neyro\\ShortsCreatorStudio\\AppData\\models\\xtts_v2"
+        "XTTSModelPath": "E:\\Neyro\\ContentCreatorAIStudio\\AppData\\models\\xtts_v2"
     },
     "WhisperAPI": {
         "WhisperApiBase": "",

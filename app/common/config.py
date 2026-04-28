@@ -659,7 +659,7 @@ class Config(QConfig):
     )
     update_last_known_commit = ConfigItem("Update", "LastKnownCommit", "")
     update_repo_owner = ConfigItem("Update", "RepoOwner", "MechaniksLab")
-    update_repo_name = ConfigItem("Update", "RepoName", "ShortsCreatorStudio")
+    update_repo_name = ConfigItem("Update", "RepoName", "ContentCreatorAIStudio")
     update_repo_branch = ConfigItem("Update", "RepoBranch", "master")
 
 cfg = Config()

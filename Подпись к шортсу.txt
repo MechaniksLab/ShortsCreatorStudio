@@ -1,5 +1,5 @@
-Создано в MechaniksLab - Shorts Creator Studio
+Создано в MechaniksLab - ContentCreatorAIStudio
 
-#MechaniksLab, #ShortsCreatorStudio
+#MechaniksLab, #ContentCreatorAIStudio
 
-MechaniksLab, ShortsCreatorStudio
+MechaniksLab, ContentCreatorAIStudio

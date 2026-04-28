@@ -201,7 +201,7 @@ class GitHubUpdateManager:
         owner, name, branch = self._repo()
         headers = {
             "Accept": "application/vnd.github+json",
-            "User-Agent": "ShortsCreatorStudio-Updater",
+            "User-Agent": "ContentCreatorAIStudio-Updater",
         }
 
         def _parse_commit(data: Dict, used_branch: str) -> Dict:
@@ -412,7 +412,7 @@ class GitHubUpdateManager:
 
         headers = {
             "Accept": "application/vnd.github+json",
-            "User-Agent": "ShortsCreatorStudio-Updater",
+            "User-Agent": "ContentCreatorAIStudio-Updater",
         }
         url = f"https://api.github.com/repos/{owner}/{name}/compare/{base_sha}...{head_sha}"
         r = requests.get(url, timeout=20, headers=headers)
@@ -431,7 +431,7 @@ class GitHubUpdateManager:
         try:
             headers = {
                 "Accept": "application/vnd.github.raw",
-                "User-Agent": "ShortsCreatorStudio-Updater",
+                "User-Agent": "ContentCreatorAIStudio-Updater",
             }
             total = len(files)
             if total <= 0:
@@ -498,7 +498,7 @@ class GitHubUpdateManager:
             return f'"{Path(sys.executable)}"'
 
         # Вне frozen: если рядом есть собранный GUI exe, предпочитаем его (без консоли)
-        for exe_name in ["ShortsCreatorStudio.exe", "Shorts creator studio.exe"]:
+        for exe_name in ["ContentCreatorAIStudio.exe"]:
             exe_path = self.app_root / exe_name
             if exe_path.exists():
                 return f'"{exe_path}"'

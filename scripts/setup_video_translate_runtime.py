@@ -4,8 +4,8 @@
 """Установщик зависимостей video-translate в локальный runtime Python.
 
 Примеры:
-  python scripts/setup_video_translate_runtime.py --runtime-python e:/Neyro/ShortsCreatorStudio/runtime/python.exe --profile cpu
-  python scripts/setup_video_translate_runtime.py --runtime-python e:/Neyro/ShortsCreatorStudio/runtime/python.exe --profile gpu-cu124
+  python scripts/setup_video_translate_runtime.py --runtime-python e:/Neyro/ContentCreatorAIStudio/runtime/python.exe --profile cpu
+  python scripts/setup_video_translate_runtime.py --runtime-python e:/Neyro/ContentCreatorAIStudio/runtime/python.exe --profile gpu-cu124
 """
 
 from __future__ import annotations

@@ -27,7 +27,7 @@ from app.view.setting_interface import SettingInterface
 from app.view.subtitle_style_interface import SubtitleStyleInterface
 
 LOGO_PATH = APP_ICON_PATH
-APP_WINDOW_TITLE_RU = "Лаборатория Механика - Студия создания шортсов"
+APP_WINDOW_TITLE_RU = "MechaniksLab ContentCreatorAIStudio"
 
 
 def _contains_cjk_text(text: str) -> bool:
@@ -132,9 +132,9 @@ class MainWindow(FluentWindow):
         """打开GitHub"""
         w = MessageBox(
             "Информация о GitHub",
-            "MechaniksLab Creator Studio разработан автором как независимый проект и размещён на GitHub."
+            "MechaniksLab ContentCreatorAIStudio разработан автором как независимый проект и размещён на GitHub."
             " Буду рад вашим Star и Fork. Если столкнётесь с проблемами или багами —"
-            " пожалуйста, создайте Issue.\n\n https://github.com/MechaniksLab/ShortsCreatorStudio",
+            " пожалуйста, создайте Issue.\n\n https://github.com/MechaniksLab/ContentCreatorAIStudio",
             self,
         )
         w.yesButton.setText("Открыть GitHub")
