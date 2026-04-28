@@ -44,6 +44,16 @@ class HomeInterface(QWidget):
             "Создание шортсов",
         )
         self.addSubInterface(
+            self.video_translate_interface,
+            "VideoTranslateInterface",
+            "Переозвучка/Перевод видео",
+        )
+        self.addSubInterface(
+            self.anti_mate_interface,
+            "AntiMateInterface",
+            "Система Антимат",
+        )
+        self.addSubInterface(
             self.task_creation_interface,
             "TaskCreationInterface",
             "Создание субтитров",
@@ -60,16 +70,6 @@ class HomeInterface(QWidget):
             self.video_synthesis_interface,
             "VideoSynthesisInterface",
             "Синтез видео с субтитрами",
-        )
-        self.addSubInterface(
-            self.anti_mate_interface,
-            "AntiMateInterface",
-            "Система Антимат",
-        )
-        self.addSubInterface(
-            self.video_translate_interface,
-            "VideoTranslateInterface",
-            "Переозвучка/Перевод видео",
         )
         self.vBoxLayout.addWidget(self.pivot)
         self.vBoxLayout.addWidget(self.stackedWidget)
